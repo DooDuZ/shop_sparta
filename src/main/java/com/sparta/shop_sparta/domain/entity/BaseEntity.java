@@ -5,12 +5,12 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import lombok.Getter;
-import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 // abstract class로 인스턴스화 방지
+// commit test
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
