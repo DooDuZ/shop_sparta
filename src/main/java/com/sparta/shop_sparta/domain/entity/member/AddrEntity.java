@@ -27,11 +27,19 @@ public class AddrEntity extends BaseEntity {
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "memberId")
-    MemberEntity memberEntity;
+    private MemberEntity memberEntity;
 
     public AddrEntity(String addr, String addr_detail, MemberEntity memberEntity) {
         this.addr = addr;
         this.addr_detail = addr_detail;
         this.memberEntity = memberEntity;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public void setAddr_detail(String addr_detail) {
+        this.addr_detail = addr_detail;
     }
 }

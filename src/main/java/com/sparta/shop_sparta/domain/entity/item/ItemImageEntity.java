@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.domain.entity.item;
 
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
+import com.sparta.shop_sparta.domain.entity.item.constant.ItemImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,16 +21,35 @@ public class ItemImageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemImageId;
+
     @Lob
     @Column(nullable = false)
-    private String image_path;
+    private String imagePath;
 
-    // Enum으로 쓸까?
     @Column(nullable = false)
-    private Integer image_type;
+    private ItemImageType itemImageType;
+
+    // 이미지 등록, 수정 등에서 순서를 계속 바꿀 수 있음
+    @Column(nullable = false)
+    private Byte imageOrdering;
 
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "itemId")
     private ItemEntity itemEntity;
+
+    public ItemImageEntity(String imagePath, ItemImageType itemImageType, Byte imageOrdering, ItemEntity itemEntity) {
+        this.imagePath = imagePath;
+        this.itemImageType = itemImageType;
+        this.imageOrdering = imageOrdering;
+        this.itemEntity = itemEntity;
+    }
+
+    public void setItemImageType(ItemImageType itemImageType) {
+        this.itemImageType = itemImageType;
+    }
+
+    public void setImageOrdering(Byte imageOrdering) {
+        this.imageOrdering = imageOrdering;
+    }
 }

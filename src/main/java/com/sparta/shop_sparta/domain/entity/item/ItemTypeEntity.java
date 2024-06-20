@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -19,4 +20,12 @@ public class ItemTypeEntity extends BaseEntity {
 
     @Column(nullable = false)
     private String itemName;
+
+    public ItemTypeEntity(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
 }

@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.domain.entity.order;
 
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.domain.entity.order.constant.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +29,17 @@ public class OrderEntity extends BaseEntity {
     @ToString.Exclude
     @JoinColumn(name = "memberId")
     private MemberEntity memberEntity;
-    // order_status enum('prepared', 'cancelled', 'in_delivery', 'delivered', 'return_requested', 'in_return', 'return_completed'), enum
 
+    @Column(nullable = false)
+    private OrderStatus orderStatus;
+
+    public OrderEntity(String order_addr, MemberEntity memberEntity, OrderStatus orderStatus) {
+        this.order_addr = order_addr;
+        this.memberEntity = memberEntity;
+        this.orderStatus = orderStatus;
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }

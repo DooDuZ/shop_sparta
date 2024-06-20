@@ -1,7 +1,8 @@
-package com.sparta.shop_sparta.domain.entity.cart;
+package com.sparta.shop_sparta.domain.entity.order.cart;
 
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.domain.entity.order.constant.CartStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,11 +20,22 @@ import lombok.ToString;
 public class CartEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long cartId;
+    private Long cartId;
+
+    @Column(nullable = false)
+    private CartStatus cartStatus;
 
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "memberId")
     private MemberEntity memberEntity;
-    // order_status enum('prepared', 'cancelled', 'in_delivery', 'delivered', 'return_requested', 'in_return', 'return_completed'), enum
+
+    public CartEntity(CartStatus cartStatus, MemberEntity memberEntity) {
+        this.cartStatus = cartStatus;
+        this.memberEntity = memberEntity;
+    }
+
+    public void setCartStatus(CartStatus cartStatus) {
+        this.cartStatus = cartStatus;
+    }
 }

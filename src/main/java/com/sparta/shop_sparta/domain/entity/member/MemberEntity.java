@@ -48,10 +48,12 @@ public class MemberEntity extends BaseEntity {
         this.email = email;
     }
 
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
     public void setPassword(String password) {
         this.password = password;
     }
-
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
