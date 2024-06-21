@@ -60,4 +60,4 @@ jobs:
 
       - name: Run tests in Docker container
         working-directory: ${{ github.workspace }}
-        run: docker-compose -f docker-compose.yml run --rm shop_sparta ./gradlew clean test
+        run: docker-compose -f Docker-Compose.yml run --rm shop_sparta ./gradlew clean test
