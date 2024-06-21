@@ -57,6 +57,9 @@ jobs:
           name: build-artifacts
           path: build/libs/
 
+      - name: Install xargs
+        run: sudo apt-get update && sudo apt-get install -y xargs
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
