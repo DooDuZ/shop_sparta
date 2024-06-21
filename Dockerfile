@@ -1,11 +1,7 @@
-#FROM amazoncorretto:21
-#COPY . .
-#RUN chmod +x ./gradlew
-#CMD ["./gradlew", "clean", "test"]
-
 FROM amazoncorretto:21
 WORKDIR /app
 COPY . .
+RUN yum update -y && yum install -y dos2unix
+RUN dos2unix /app/gradlew
 RUN chmod +x /app/gradlew
-COPY build/libs/shop_sparta-0.0.1-SNAPSHOT.jar app.jar
-CMD ["/app/start.sh"]
+CMD ["./gradlew", "clean", "test", "bootRun"]

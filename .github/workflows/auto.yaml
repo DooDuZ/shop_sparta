@@ -26,12 +26,7 @@ jobs:
       # unittest 실행
       - name: Run tests in Docker container
         working-directory: ${{ github.workspace }}
-        run: docker-compose run --rm spring-app ./gradlew clean test
-
-      # 애플리케이션 실행
-      - name: Run application and output logs
-        working-directory: ${{ github.workspace }}
-        run: docker-compose up -d spring-app
+        run: docker-compose run --rm spring-app
 
       # 애플리케이션 로그를 출력
       - name: Display application logs
