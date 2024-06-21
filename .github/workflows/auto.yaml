@@ -29,17 +29,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      # github에는 jar파일이 업로드되지 않으므로 새로 build 해준다
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      # build된 jar 경로를 build/libs/ 로 맞춰준다. local 개발환경과 동일하게 사용하기 위함
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: build/libs/
-
 
 
   # docker 실행
