@@ -1,40 +1,59 @@
-# Actions 이름 github 페이지에서 볼 수 있다.
 name: Run Test
 
-# Event Trigger 특정 액션 (Push, Pull_Request)등이 명시한 Branch에서 일어나면 동작을 수행한다.
+# develop branch가 push되거나 pull request 하면 테스트 실행
 on:
   push:
-    # 배열로 여러 브랜치를 넣을 수 있다.
-    branches: [develop]
-  # github pull request 생성시
+    branches: [ develop ]
   pull_request:
     branches:
-      - develop # -로 여러 브랜치를 명시하는 것도 가능
+      - develop
 
-  # 실제 어떤 작업을 실행할지에 대한 명시
 jobs:
   build:
-    # 스크립트 실행 환경 (OS)
-    # 배열로 선언시 개수 만큼 반복해서 실행한다. ( 예제 : 1번 실행)
-    runs-on: [ ubuntu-latest ]
+    # 운영체제 설정, ubuntu latest보단 서버와 버전을 맞추는 게 좋을듯?
+    runs-on: ubuntu-latest
 
-    # 실제 실행 스크립트
     steps:
-      # uses는 github actions에서 제공하는 플러그인을 실행.(git checkout 실행)
-      - name: checkout
+      # 해당 브랜치의 코드를 가져온다
+      # git에서 브랜치를 바꿀 때 쓰는 check out과 다른 의미인가...?
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # with은 plugin 파라미터 입니다. (java 21버전 셋업)
-      - name: java setup
-        uses: actions/setup-java@v2
+      # JDK를 설치한다
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
         with:
-          distribution: 'adopt' # See 'Supported distributions' for available options
+          distribution: 'adopt'
           java-version: '21'
 
-      - name: make executable gradlew
-        run: chmod +x ./gradlew
+      # github에는 jar파일이 업로드되지 않으므로 새로 build 해준다
+      - name: Build with Gradle
+        run: ./gradlew build
 
-      # run은 사용자 지정 스크립트 실행
-      - name: run unittest
-        run: |
-          ./gradlew clean test
+      # build된 jar 경로를 build/libs/ 로 맞춰준다. local 개발환경과 동일하게 사용하기 위함
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/libs/
+
+  # docker 실행
+  docker:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      # 위에 설정한 build된 jar을 해당 경로로 다운로드 받는다
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/libs
+
+      # 도커 설치?
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # 컨테이너 실행 후 test 진행
+      - name: Run tests in Docker container
+        run: docker-compose -f docker-compose.yml run --rm "shop_sparta" ./gradlew clean test
