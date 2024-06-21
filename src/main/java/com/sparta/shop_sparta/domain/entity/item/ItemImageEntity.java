@@ -1,7 +1,8 @@
 package com.sparta.shop_sparta.domain.entity.item;
 
+import com.sparta.shop_sparta.domain.dto.item.ItemImageDTO;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.domain.entity.item.constant.ItemImageType;
+import com.sparta.shop_sparta.domain.constant.ItemImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,6 +20,8 @@ import lombok.ToString;
 @Entity(name = "itemImage")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemImageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,18 +43,17 @@ public class ItemImageEntity extends BaseEntity {
     @JoinColumn(name = "itemId")
     private ItemEntity itemEntity;
 
-    public ItemImageEntity(String imagePath, ItemImageType itemImageType, Byte imageOrdering, ItemEntity itemEntity) {
-        this.imagePath = imagePath;
-        this.itemImageType = itemImageType;
-        this.imageOrdering = imageOrdering;
-        this.itemEntity = itemEntity;
-    }
-
     public void setItemImageType(ItemImageType itemImageType) {
         this.itemImageType = itemImageType;
     }
 
     public void setImageOrdering(Byte imageOrdering) {
         this.imageOrdering = imageOrdering;
+    }
+
+    public ItemImageDTO toDTO(){
+        return ItemImageDTO.builder().itemImageId(this.itemImageId).itemImageType(this.itemImageType)
+                .itemId(this.itemEntity.getItemId()).imageOrdering(this.imageOrdering)
+                .imagePath(this.imagePath).build();
     }
 }

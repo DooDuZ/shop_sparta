@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.member;
 
+import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -10,6 +11,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -17,6 +20,8 @@ import lombok.ToString;
 @Entity(name = "member")
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class MemberEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,13 +56,21 @@ public class MemberEntity extends BaseEntity {
     public void setMemberName(String memberName) {
         this.memberName = memberName;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
+
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public MemberDTO toDto() {
+        return MemberDTO.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
+                .loginId(this.loginId).password(this.password).phoneNumber(this.phoneNumber).role(this.role).build();
     }
 }
