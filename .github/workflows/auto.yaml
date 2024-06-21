@@ -40,10 +40,6 @@ jobs:
           name: build-artifacts
           path: build/libs/
 
-      # 빌드된 아티팩트를 워크스페이스에 저장합니다.
-      - name: Save build artifacts
-        run: mkdir -p ${{ github.workspace }}/build/libs && cp -r build/libs/* ${{ github.workspace }}/build/libs/
-
   # docker 실행
   docker:
     runs-on: ubuntu-latest
@@ -57,7 +53,3 @@ jobs:
       # 컨테이너 실행 후 test 진행
       - name: Run tests in Docker container
         run: docker-compose -f docker-compose.yml run --rm "shop_sparta" ./gradlew clean test
-
-      # 빌드 아티팩트를 워크스페이스로 복사합니다.
-      - name: Copy build artifacts to workspace
-        run: mkdir -p build/libs && cp -r ${{ github.workspace }}/build/libs/* build/libs/
