@@ -19,12 +19,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # JDK를 설치한다
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'adopt'
-          java-version: '21'
+      # gradlew 스크립트에 실행 권한을 부여한다
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
 
       # github에는 jar파일이 업로드되지 않으므로 새로 build 해준다
       - name: Build with Gradle
