@@ -11,4 +11,4 @@ COPY . .
 RUN chmod +x ./gradlew
 
 # 기본 명령어 설정
-CMD ["./gradlew", "clean", "test"]
+CMD ["./gradlew", "run"]
