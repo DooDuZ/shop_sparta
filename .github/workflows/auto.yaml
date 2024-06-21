@@ -9,27 +9,23 @@ on:
       - develop
 
 jobs:
-  build:
+  docker_test:
     # 운영체제 설정, ubuntu latest보단 서버와 버전을 맞추는 게 좋을듯?
     runs-on: ubuntu-latest
 
     steps:
+      # 해당 브랜치의 코드를 가져온다
+      # git에서 브랜치를 바꿀 때 쓰는 check out과 다른 의미인가...?
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # gradlew 스크립트에 실행 권한을 부여한다
+      #- name: Grant execute permission for gradlew
+        #run: chmod +x ./gradlew
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-          # gradlew 스크립트에 실행 권한을 부여한다
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      #- name: Run tests in Docker container
-        #working-directory: ${{ github.workspace }}
-        #run: docker-compose run --rm spring-app ./gradlew clean test
-
-      - name: make docker image
-        run: docker build -t spring-app .
-
-      - name: run container and test
-        run: docker run --rm -v ${{ github.workspace }}:/app -w /app spring-app ./gradlew clean test
+      - name: Run tests in Docker container
+        working-directory: ${{ github.workspace }}
+        run: docker-compose run --rm spring-app ./gradlew clean test
