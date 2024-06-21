@@ -28,6 +28,8 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: docker-compose run --rm spring-app ./gradlew clean test
 
+      # 하단은 log 출력  git Action으로 노출되는지 여부 테스트. 지워도 된다.
+
       # 애플리케이션 실행
       - name: Run application and output logs
         working-directory: ${{ github.workspace }}
