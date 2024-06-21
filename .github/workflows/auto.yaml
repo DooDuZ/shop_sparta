@@ -13,35 +13,6 @@ jobs:
     # 운영체제 설정, ubuntu latest보단 서버와 버전을 맞추는 게 좋을듯?
     runs-on: ubuntu-latest
 
-    steps:
-      # 해당 브랜치의 코드를 가져온다
-      # git에서 브랜치를 바꿀 때 쓰는 check out과 다른 의미인가...?
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: '21'
-
-      # gradlew 스크립트에 실행 권한을 부여한다
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-
-      # github에는 jar파일이 업로드되지 않으므로 새로 build 해준다
-      - name: Build with Gradle
-        run: ./gradlew build
-
-      # build된 jar 경로를 build/libs/ 로 맞춰준다. local 개발환경과 동일하게 사용하기 위함
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: build-artifacts
-          path: build/libs/
-
-
-
   # docker 실행
   docker:
     runs-on: ubuntu-latest
@@ -50,12 +21,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: build-artifacts
-          path: build/libs/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
