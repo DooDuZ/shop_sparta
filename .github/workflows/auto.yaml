@@ -60,6 +60,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      # 모든 서비스를 백그라운드에서 실행
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      # spring-app 컨테이너 내에서 테스트 실행
       - name: Run tests in Docker container
-        working-directory: ${{ github.workspace }}
-        run: docker-compose run --rm spring-app ./gradlew clean test
+        run: docker-compose exec spring-app ./gradlew clean test
+
+      # 모든 컨테이너 종료 및 제거
+      - name: Stop and remove Docker Compose services
+        run: docker-compose down
