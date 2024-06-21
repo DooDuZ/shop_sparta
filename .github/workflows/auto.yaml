@@ -46,10 +46,18 @@ jobs:
     needs: build
 
     steps:
-      # 도커 설치?
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+          path: build/libs/
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # 컨테이너 실행 후 test 진행
       - name: Run tests in Docker container
-        run: docker-compose -f Docker-Compose.yml run --rm "shop_sparta" ./gradlew clean test
+        working-directory: ${{ github.workspace }}
+        run: docker-compose -f docker-compose.yml run --rm shop_sparta ./gradlew clean test
