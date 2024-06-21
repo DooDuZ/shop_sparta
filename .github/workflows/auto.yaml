@@ -57,8 +57,9 @@ jobs:
           name: build-artifacts
           path: build/libs/
 
-      - name: List files in root directory
-        run: ls -la ${{ github.workspace }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+
+      - name: Run tests in Docker container
+        working-directory: ${{ github.workspace }}
+        run: docker-compose -f run --rm shop_sparta ./gradlew clean test
