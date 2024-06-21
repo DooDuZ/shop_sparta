@@ -18,6 +18,7 @@ public class OrderDTO {
     private String order_addr;
     private Long memberId;
     private OrderStatus orderStatus;
+    @Builder.Default
     private List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
 
     public OrderEntity toEntity(){
