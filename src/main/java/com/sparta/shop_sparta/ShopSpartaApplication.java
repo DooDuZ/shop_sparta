@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableJpaAuditing
 public class ShopSpartaApplication {
     public static void main(String[] args) {
+        System.out.println("Hello World!");
         SpringApplication.run(ShopSpartaApplication.class, args);
     }
 }
