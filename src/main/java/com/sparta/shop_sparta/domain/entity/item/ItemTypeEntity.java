@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.item;
 
+import com.sparta.shop_sparta.domain.dto.item.ItemTypeDTO;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,25 +8,32 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity(name = "itemType")
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ItemTypeEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemTypeId;
 
     @Column(nullable = false)
-    private String itemName;
+    private String itemTypeName;
 
-    public ItemTypeEntity(String itemName) {
-        this.itemName = itemName;
+    public ItemTypeEntity(String itemTypeName) {
+        this.itemTypeName = itemTypeName;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setItemTypeName(String itemName) {
+        this.itemTypeName = itemName;
+    }
+
+    public ItemTypeDTO toDTO(){
+        return ItemTypeDTO.builder().itemTypeId(this.itemTypeId).itemTypeName(this.itemTypeName).build();
     }
 }
