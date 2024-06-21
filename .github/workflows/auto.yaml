@@ -28,6 +28,16 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: docker-compose run --rm spring-app ./gradlew clean test
 
+      # 애플리케이션 실행
+      - name: Run application and output logs
+        working-directory: ${{ github.workspace }}
+        run: docker-compose up -d
+
       # 애플리케이션 로그를 출력
       - name: Display application logs
         run: docker-compose logs spring-app
+
+      # 애플리케이션 실행
+      - name: Run application and output logs
+        working-directory: ${{ github.workspace }}
+        run: docker-compose down
