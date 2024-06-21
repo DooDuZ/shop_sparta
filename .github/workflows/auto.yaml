@@ -52,4 +52,4 @@ jobs:
 
       # 컨테이너 실행 후 test 진행
       - name: Run tests in Docker container
-        run: docker-compose -f docker-compose.yml run --rm "shop_sparta" ./gradlew clean test
+        run: docker-compose -f Docker-Compose.yml run --rm "shop_sparta" ./gradlew clean test
