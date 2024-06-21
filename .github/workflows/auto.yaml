@@ -19,13 +19,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # gradlew 스크립트에 실행 권한을 부여한다
-      #- name: Grant execute permission for gradlew
-        #run: chmod +x ./gradlew
-
+      # 고급 빌드를 위한 buildx - 없어도 사용 가능
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      # unittest 실행
       - name: Run tests in Docker container
         working-directory: ${{ github.workspace }}
         run: docker-compose run --rm spring-app ./gradlew clean test
+
+      # 하단은 log 출력  git Action으로 노출되는지 여부 테스트. 지워도 된다.
+
+      # 애플리케이션 실행
+      - name: Run application and output logs
+        working-directory: ${{ github.workspace }}
+        run: docker-compose up -d
+
+      # 애플리케이션 로그를 출력
+      - name: Display application logs
+        run: docker-compose logs spring-app
+
+      # 애플리케이션 실행
+      - name: Run application and output logs
+        working-directory: ${{ github.workspace }}
+        run: docker-compose down
