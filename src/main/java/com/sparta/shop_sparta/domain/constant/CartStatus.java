@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.entity.constant;
+package com.sparta.shop_sparta.domain.constant;
 
 public enum CartStatus {
     UNORDERED,

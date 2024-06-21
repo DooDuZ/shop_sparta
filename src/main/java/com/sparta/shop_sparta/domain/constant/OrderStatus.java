@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.entity.constant;
+package com.sparta.shop_sparta.domain.constant;
 
 public enum OrderStatus {
     PREPARED,           // 상품 준비중, 배송 시작 전

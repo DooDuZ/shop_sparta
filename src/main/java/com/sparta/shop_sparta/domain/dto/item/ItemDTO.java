@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.dto.item;
 
 
 import com.sparta.shop_sparta.domain.entity.item.ItemEntity;
-import com.sparta.shop_sparta.domain.entity.constant.ItemStatus;
+import com.sparta.shop_sparta.domain.constant.ItemStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

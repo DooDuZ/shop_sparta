@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.entity.item;
 
 import com.sparta.shop_sparta.domain.dto.item.ItemImageDTO;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.domain.entity.constant.ItemImageType;
+import com.sparta.shop_sparta.domain.constant.ItemImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -3,7 +3,7 @@ package com.sparta.shop_sparta.domain.entity.cart;
 import com.sparta.shop_sparta.domain.dto.cart.CartDTO;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.constant.CartStatus;
+import com.sparta.shop_sparta.domain.constant.CartStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
