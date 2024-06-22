@@ -13,10 +13,14 @@ import lombok.NoArgsConstructor;
 public class AddrDto {
     private Long addrId;
     private String addr;
-    private String addr_detail;
+    private String addrDetail;
     private Long memberId;
 
     public AddrEntity toEntity() {
-        return AddrEntity.builder().addrId(this.addrId).addr(this.addr).addr_detail(this.addr_detail).build();
+        return AddrEntity.builder().addrId(this.addrId).addr(this.addr).addr_detail(this.addrDetail).build();
+    }
+
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
     }
 }

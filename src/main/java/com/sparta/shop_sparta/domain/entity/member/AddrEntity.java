@@ -43,7 +43,7 @@ public class AddrEntity extends BaseEntity {
     }
 
     public AddrDto toDto() {
-        return AddrDto.builder().addr(this.addr).addr_detail(this.addr_detail).addrId(this.addrId)
+        return AddrDto.builder().addr(this.addr).addrDetail(this.addr_detail).addrId(this.addrId)
                 .memberId(this.memberEntity.getMemberId()).build();
     }
 }
