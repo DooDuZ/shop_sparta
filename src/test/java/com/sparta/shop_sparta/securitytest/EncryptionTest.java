@@ -55,6 +55,9 @@ public class EncryptionTest {
     @Test
     @DisplayName("패스워드 일치 테스트")
     void passwordEncodeTest(){
+        String password = "tDest12123!@";
+        String DBPassword = bCryptPasswordEncoder.encode(password);
 
+        Assertions.assertThat(bCryptPasswordEncoder.matches(password, DBPassword)).isEqualTo(true);
     }
 }
