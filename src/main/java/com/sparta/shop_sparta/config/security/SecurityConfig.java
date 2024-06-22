@@ -12,7 +12,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private String secretKey = "mySecretKey";
 
     @Bean
