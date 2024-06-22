@@ -1,16 +1,16 @@
 package com.sparta.shop_sparta.service.member;
 
-import com.sparta.shop_sparta.domain.dto.member.LoginResponseDTO;
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
+import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 
 public class MemberServiceImpl implements MemberService{
     @Override
-    public MemberDTO createAccount(MemberDTO memberDTO) {
+    public MemberDto createAccount(MemberDto memberDTO) {
         return null;
     }
 
     @Override
-    public LoginResponseDTO login(MemberDTO memberDTO) {
+    public LoginResponseDto login(MemberDto memberDTO) {
         return null;
     }
 

@@ -13,13 +13,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDTO {
+public class OrderDto {
     private Long orderId;
     private String order_addr;
     private Long memberId;
     private OrderStatus orderStatus;
     @Builder.Default
-    private List<OrderDetailDTO> orderDetailDTOList = new ArrayList<>();
+    private List<OrderDetailDto> orderDetailDTOList = new ArrayList<>();
 
     public OrderEntity toEntity(){
         return OrderEntity.builder().orderId(this.orderId).order_addr(this.order_addr).orderStatus(this.orderStatus).build();

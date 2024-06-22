@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.item;
 
-import com.sparta.shop_sparta.domain.dto.item.ItemImageDTO;
+import com.sparta.shop_sparta.domain.dto.item.ItemImageDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.constant.ItemImageType;
 import jakarta.persistence.Column;
@@ -51,8 +51,8 @@ public class ItemImageEntity extends BaseEntity {
         this.imageOrdering = imageOrdering;
     }
 
-    public ItemImageDTO toDTO(){
-        return ItemImageDTO.builder().itemImageId(this.itemImageId).itemImageType(this.itemImageType)
+    public ItemImageDto toDto(){
+        return ItemImageDto.builder().itemImageId(this.itemImageId).itemImageType(this.itemImageType)
                 .itemId(this.itemEntity.getItemId()).imageOrdering(this.imageOrdering)
                 .imagePath(this.imagePath).build();
     }

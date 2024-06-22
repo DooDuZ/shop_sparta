@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemImageDTO {
+public class ItemImageDto {
     private Long itemImageId;
     private String imagePath;
     private Byte imageOrdering;

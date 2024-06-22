@@ -13,7 +13,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MemberDTO {
+public class MemberDto {
     private Long memberId;
     private String loginId;
     private String password;

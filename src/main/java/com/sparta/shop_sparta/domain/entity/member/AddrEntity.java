@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.member;
 
-import com.sparta.shop_sparta.domain.dto.member.AddrDTO;
+import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,8 +42,8 @@ public class AddrEntity extends BaseEntity {
         this.addr_detail = addr_detail;
     }
 
-    public AddrDTO toDTO() {
-        return AddrDTO.builder().addr(this.addr).addr_detail(this.addr_detail).addrId(this.addrId)
+    public AddrDto toDto() {
+        return AddrDto.builder().addr(this.addr).addr_detail(this.addr_detail).addrId(this.addrId)
                 .memberId(this.memberEntity.getMemberId()).build();
     }
 }

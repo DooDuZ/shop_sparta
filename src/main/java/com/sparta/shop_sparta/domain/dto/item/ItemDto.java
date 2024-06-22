@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemDTO {
+public class ItemDto {
     private Long itemId;
     private String itemName;
     private String itemDetails;

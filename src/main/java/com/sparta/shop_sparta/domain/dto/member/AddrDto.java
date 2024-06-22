@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddrDTO {
+public class AddrDto {
     private Long addrId;
     private String addr;
     private String addr_detail;
