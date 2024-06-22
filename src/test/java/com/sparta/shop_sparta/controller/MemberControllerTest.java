@@ -30,10 +30,6 @@ public class MemberControllerTest {
     @Test
     @DisplayName("회원가입 메서드 요청 확인 Test")
     void requestCheckingTest() throws Exception {
-        System.out.println("**************************");
-        System.out.println(objectMapper == null);
-        System.out.println("**************************");
-
         MemberEntity memberEntity = MemberEntity.builder().memberId(1L).memberName("지웅이").loginId("sin9158")
                 .password("1234").role("admin").email("sin9158@naver.com").phoneNumber("01027209158").build();
 
