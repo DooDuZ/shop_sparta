@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.domain.dto.member;
 
 
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.domain.entity.member.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,14 +14,16 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MemberDTO {
+public class MemberDto {
     private Long memberId;
     private String loginId;
     private String password;
     private String memberName;
     private String phoneNumber;
     private String email;
-    private String role;
+    private String addr;
+    private String addrDetail;
+    private MemberRole role;
 
 
     public MemberEntity toEntity() {

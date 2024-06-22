@@ -1,11 +1,11 @@
 package com.sparta.shop_sparta.controller.order;
 
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
-import com.sparta.shop_sparta.domain.dto.order.OrderDTO;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDto;
 import java.util.List;
 
 public interface OrderController {
-    OrderDTO addOrder(OrderDTO orderDTO);
-    List<OrderDTO> getOrders(MemberDTO memberDTO);
-    OrderDTO cancelOrder(OrderDTO orderDTO);
+    OrderDto addOrder(OrderDto orderDTO);
+    List<OrderDto> getOrders(MemberDto memberDTO);
+    OrderDto cancelOrder(OrderDto orderDTO);
 }

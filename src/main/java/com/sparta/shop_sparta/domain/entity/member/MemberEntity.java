@@ -1,21 +1,16 @@
 package com.sparta.shop_sparta.domain.entity.member;
 
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Entity(name = "member")
 @Getter
@@ -43,7 +38,7 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
-    private String role;
+    private MemberRole role;
 
     public MemberEntity(String loginId, String password, String memberName, String phoneNumber, String email) {
         this.loginId = loginId;
@@ -65,12 +60,16 @@ public class MemberEntity extends BaseEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setRole(String role) {
+    public void setRole(MemberRole role) {
         this.role = role;
     }
 
-    public MemberDTO toDto() {
-        return MemberDTO.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
+    }
+
+    public MemberDto toDto() {
+        return MemberDto.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
                 .loginId(this.loginId).password(this.password).phoneNumber(this.phoneNumber).role(this.role).build();
     }
 }

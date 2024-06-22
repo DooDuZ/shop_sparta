@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.controller.order;
 
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
-import com.sparta.shop_sparta.domain.dto.order.OrderDTO;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDto;
 import com.sparta.shop_sparta.service.order.OrderService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +22,17 @@ public class OrderControllerImpl implements OrderController{
 
     @Override
     @PostMapping("/")
-    public OrderDTO addOrder(@RequestBody OrderDTO orderDTO) {
+    public OrderDto addOrder(@RequestBody OrderDto orderDTO) {
         return orderService.addOrder(orderDTO);
     }
 
     @Override
-    public List<OrderDTO> getOrders(MemberDTO memberDTO) {
+    public List<OrderDto> getOrders(MemberDto memberDTO) {
         return null;
     }
 
     @Override
-    public OrderDTO cancelOrder(@RequestBody OrderDTO orderDTO) {
+    public OrderDto cancelOrder(@RequestBody OrderDto orderDTO) {
         return null;
     }
 }

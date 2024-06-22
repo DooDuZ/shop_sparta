@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.order;
 
+import com.sparta.shop_sparta.domain.dto.order.OrderDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.constant.OrderStatus;
@@ -37,16 +38,16 @@ public class OrderEntity extends BaseEntity {
     @Column(nullable = false)
     private OrderStatus orderStatus;
 
-    public OrderEntity(String order_addr, OrderStatus orderStatus) {
-        this.order_addr = order_addr;
-        this.orderStatus = orderStatus;
-    }
-
     public void setMemberEntity(MemberEntity memberEntity) {
         this.memberEntity = memberEntity;
     }
 
     public void setOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public OrderDto toDto(){
+        return OrderDto.builder().orderId(this.orderId).order_addr(this.order_addr).memberId(this.memberEntity.getMemberId())
+                .orderStatus(this.orderStatus).build();
     }
 }

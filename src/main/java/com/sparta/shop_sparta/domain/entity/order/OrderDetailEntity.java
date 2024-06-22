@@ -1,9 +1,8 @@
 package com.sparta.shop_sparta.domain.entity.order;
 
-import com.sparta.shop_sparta.domain.dto.order.OrderDetailDTO;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.item.ItemEntity;
-import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,8 +45,8 @@ public class OrderDetailEntity extends BaseEntity {
         this.orderEntity = orderEntity;
     }
 
-    public OrderDetailDTO toDTO(){
-        return OrderDetailDTO.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
+    public OrderDetailDto toDto(){
+        return OrderDetailDto.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
                 .itemId(this.itemEntity.getItemId()).amount(this.amount).build();
     }
 }

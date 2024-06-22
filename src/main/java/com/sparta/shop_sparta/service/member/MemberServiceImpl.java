@@ -1,16 +1,40 @@
 package com.sparta.shop_sparta.service.member;
 
-import com.sparta.shop_sparta.domain.dto.member.LoginResponseDTO;
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
+import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
-public class MemberServiceImpl implements MemberService{
-    @Override
-    public MemberDTO createAccount(MemberDTO memberDTO) {
-        return null;
+@Service
+public class MemberServiceImpl implements MemberService, UserDetailsService {
+    MemberRepository memberRepository;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Autowired
+    MemberServiceImpl(MemberRepository memberRepository, BCryptPasswordEncoder bCryptPasswordEncoder){
+        this.memberRepository = memberRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+
     }
 
     @Override
-    public LoginResponseDTO login(MemberDTO memberDTO) {
+    public MemberDto createAccount(MemberDto memberDto) {
+        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
+
+        MemberEntity memberEntity = memberRepository.save(memberDto.toEntity());
+        MemberDto responseDto = memberEntity.toDto();
+        responseDto.setPassword("");
+        return responseDto;
+    }
+
+    @Override
+    public LoginResponseDto login(MemberDto memberDTO) {
         return null;
     }
 
@@ -27,5 +51,10 @@ public class MemberServiceImpl implements MemberService{
     @Override
     public void updatePhoneNumber(String PhoneNumber) {
 
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
     }
 }

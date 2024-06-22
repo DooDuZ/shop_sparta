@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartDTO {
+public class CartDto {
     private Long cartId;
     private CartStatus cartStatus;
     private Long memberId;

@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDTO;
+import com.sparta.shop_sparta.domain.dto.cart.CartDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.constant.CartStatus;
@@ -44,8 +44,8 @@ public class CartEntity extends BaseEntity {
         this.cartStatus = cartStatus;
     }
 
-    public CartDTO toDTO() {
-        return CartDTO.builder().cartId(this.cartId).cartStatus(this.cartStatus)
+    public CartDto toDto() {
+        return CartDto.builder().cartId(this.cartId).cartStatus(this.cartStatus)
                 .memberId(this.memberEntity.getMemberId()).build();
     }
 }

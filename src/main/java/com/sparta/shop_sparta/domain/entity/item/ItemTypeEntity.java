@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.item;
 
-import com.sparta.shop_sparta.domain.dto.item.ItemTypeDTO;
+import com.sparta.shop_sparta.domain.dto.item.ItemTypeDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,7 +33,7 @@ public class ItemTypeEntity extends BaseEntity {
         this.itemTypeName = itemName;
     }
 
-    public ItemTypeDTO toDTO(){
-        return ItemTypeDTO.builder().itemTypeId(this.itemTypeId).itemTypeName(this.itemTypeName).build();
+    public ItemTypeDto toDto(){
+        return ItemTypeDto.builder().itemTypeId(this.itemTypeId).itemTypeName(this.itemTypeName).build();
     }
 }

@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.controller.member;
 
-import com.sparta.shop_sparta.domain.dto.member.LoginResponseDTO;
-import com.sparta.shop_sparta.domain.dto.member.MemberDTO;
+import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberControllerImpl implements MemberController{
     @Override
     @PostMapping("/")
-    public MemberDTO createAccount(@RequestBody MemberDTO memberDTO) {
+    public MemberDto createAccount(@RequestBody MemberDto memberDTO) {
         return memberDTO;
     }
 
     @Override
-    public LoginResponseDTO login(MemberDTO memberDTO) {
+    public LoginResponseDto login(MemberDto memberDTO) {
         return null;
     }
 
