@@ -38,7 +38,7 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     @Column(nullable = false)
-    private String role;
+    private MemberRole role;
 
     public MemberEntity(String loginId, String password, String memberName, String phoneNumber, String email) {
         this.loginId = loginId;
@@ -60,8 +60,12 @@ public class MemberEntity extends BaseEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setRole(String role) {
+    public void setRole(MemberRole role) {
         this.role = role;
+    }
+
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
     }
 
     public MemberDto toDto() {
