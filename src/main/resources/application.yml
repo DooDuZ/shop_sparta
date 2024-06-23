@@ -27,9 +27,9 @@ spring:
     name: shop_sparta
 
   datasource:
-    password: ${DATASOURCE_PASSWORD}
+    password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DATASOURCE_USERNAME}
+    username: root
     url: jdbc:mysql://localhost:3307/shop
 
   jpa:
