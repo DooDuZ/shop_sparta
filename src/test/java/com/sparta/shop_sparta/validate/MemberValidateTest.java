@@ -1,15 +1,47 @@
 package com.sparta.shop_sparta.validate;
 
-import com.sparta.shop_sparta.validator.member.pattern.PasswordValidator;
-import com.sparta.shop_sparta.validator.member.pattern.PasswordValidatorImpl;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.validator.member.EntityFieldValidator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.*;
+
+
 public class MemberValidateTest {
+
+    @Test
+    @DisplayName("필수 파라미터 포함 여부 성공 테스트")
+    void parameterCheckSuccessTest(){
+        MemberDto memberDto = MemberDto.builder()
+                .memberName("지웅이").phoneNumber("010-2720-9158").addr("경기도 안산시 단원구 고잔2길 9").email("sin9158@naver.com")
+                .loginId("sin9158").addrDetail("541호").password("testPassword1@")
+                .build();
+
+        EntityFieldValidator entityFieldValidator = new EntityFieldValidator();
+        Boolean result = entityFieldValidator.validateParams(memberDto.toEntity());
+
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("필수 파라미터 포함 여부 실패 테스트")
+    void parameterCheckFailTest(){
+        MemberDto memberDto = MemberDto.builder()
+                .memberName("지웅이").phoneNumber("010-2720-9158").addr("경기도 안산시 단원구 고잔2길 9")
+                .loginId("sin9158").addrDetail("541호").password("testPassword1@")
+                .build();
+
+        EntityFieldValidator entityFieldValidator = new EntityFieldValidator();
+        Boolean result = entityFieldValidator.validateParams(memberDto.toEntity());
+
+        assertThat(result).isEqualTo(false);
+    }
+
     @ParameterizedTest
     @DisplayName("패스워드 패턴 매칭[정규식] 성공 테스트")
     @ValueSource(strings = {"sSdsd!@1212!@", "zxcasdvDd23!@#", "tDest12123!@", "123adsDa@4", "AD!@#na123me",
@@ -20,7 +52,7 @@ public class MemberValidateTest {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
 
-        Assertions.assertThat(matcher.matches()).isEqualTo(true);
+        assertThat(matcher.matches()).isEqualTo(true);
     }
 
     @ParameterizedTest
@@ -32,7 +64,7 @@ public class MemberValidateTest {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(password);
 
-        Assertions.assertThat(matcher.matches()).isEqualTo(false);
+        assertThat(matcher.matches()).isEqualTo(false);
     }
 
     @ParameterizedTest
@@ -44,7 +76,7 @@ public class MemberValidateTest {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(loginId);
 
-        Assertions.assertThat(matcher.matches()).isEqualTo(true);
+        assertThat(matcher.matches()).isEqualTo(true);
     }
 
     @ParameterizedTest
@@ -56,6 +88,6 @@ public class MemberValidateTest {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(loginId);
 
-        Assertions.assertThat(matcher.matches()).isEqualTo(false);
+        assertThat(matcher.matches()).isEqualTo(false);
     }
 }
