@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.member.MemberRole;
+import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.service.member.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

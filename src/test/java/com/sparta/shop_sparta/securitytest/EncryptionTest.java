@@ -2,8 +2,6 @@ package com.sparta.shop_sparta.securitytest;
 
 import com.sparta.shop_sparta.config.security.encoder.SaltGenerator;
 import com.sparta.shop_sparta.config.security.encoder.UserInformationEncoder;
-import com.sparta.shop_sparta.validator.member.PasswordValidator;
-import com.sparta.shop_sparta.validator.member.PasswordValidatorImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
