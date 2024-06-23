@@ -1,7 +1,8 @@
 package com.sparta.shop_sparta.config.security;
 
-import com.sparta.shop_sparta.config.encoder.SaltGenerator;
-import com.sparta.shop_sparta.config.encoder.UserInformationEncoder;
+import com.sparta.shop_sparta.util.encoder.SaltGenerator;
+import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +13,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-    private String secretKey = "${SECRET_KEY}";
+
+    @Value("${SECRET_KEY}")
+    private String secretKey;
 
     @Bean
     public SaltGenerator saltGenerator() {
