@@ -60,9 +60,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private void encryptMemberDto(MemberDto memberDto) {
         String salt = saltGenerator.generateSalt();
         // 복호화를 위해 salt와 구분자 - 를 합쳐서 저장
-        memberDto.setEmail(salt + "-" + userInformationEncoder.encrypt(memberDto.getEmail(), salt));
-        memberDto.setPhoneNumber(salt + "-" + userInformationEncoder.encrypt(memberDto.getPhoneNumber(), salt));
-        memberDto.setMemberName(salt + "-" + userInformationEncoder.encrypt(memberDto.getMemberName(), salt));
+        memberDto.setEmail(userInformationEncoder.encrypt(memberDto.getEmail(), salt));
+        memberDto.setPhoneNumber(userInformationEncoder.encrypt(memberDto.getPhoneNumber(), salt));
+        memberDto.setMemberName(userInformationEncoder.encrypt(memberDto.getMemberName(), salt));
         memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
     }
 
@@ -125,13 +125,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             String message = getVerificationMessage(memberEntity);
 
-            String[] emailInfo = memberEntity.getEmail().split("-");
-            String salt = emailInfo[0];
-            String encodedEmail = emailInfo[1];
-
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(mailConfig.from, mailConfig.DOMAIN_NAME);
-            mimeMessageHelper.setTo(userInformationEncoder.decrypt(encodedEmail, salt));
+            mimeMessageHelper.setTo(userInformationEncoder.decrypt(memberEntity.getEmail()));
             mimeMessageHelper.setSubject(mailConfig.MAIL_TITLE);
             mimeMessageHelper.setText(message, true);
 

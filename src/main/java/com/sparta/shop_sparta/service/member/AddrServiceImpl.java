@@ -1,12 +1,13 @@
 package com.sparta.shop_sparta.service.member;
 
+import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AddrServiceImpl implements AddrService{
     @Override
     public void addAddr(Long memberId, String addr, String addrDetail) {
-
+        AddrEntity addrEntity = AddrEntity.builder().build();
     }
 
     @Override

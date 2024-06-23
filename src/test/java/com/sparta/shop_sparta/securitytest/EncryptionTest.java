@@ -30,7 +30,7 @@ public class EncryptionTest {
         String salt = saltGenerator.generateSalt();
 
         String encodedPassword = userInformationEncoder.encrypt(password, salt);
-        String decodedPassword = userInformationEncoder.decrypt(encodedPassword, salt);
+        String decodedPassword = userInformationEncoder.decrypt(encodedPassword);
 
         Assertions.assertThat(decodedPassword).isEqualTo(password);
     }
