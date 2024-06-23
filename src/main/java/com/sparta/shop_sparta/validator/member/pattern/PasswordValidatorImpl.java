@@ -3,14 +3,9 @@ package com.sparta.shop_sparta.validator.member.pattern;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PasswordValidatorImpl implements PasswordValidator{
-    private final String passwordRegex = PatternConfig.passwordRegex;
-    private final Pattern passwordPattern = Pattern.compile(passwordRegex);
-
-    @Override
-    public Boolean checkPattern(String password) {
-        Matcher matcher = passwordPattern.matcher(password);
-        return matcher.matches();
+public class PasswordValidatorImpl extends MemberInfoValidator implements PasswordValidator{
+    PasswordValidatorImpl(Pattern pattern) {
+        super(pattern);
     }
 
     @Override
