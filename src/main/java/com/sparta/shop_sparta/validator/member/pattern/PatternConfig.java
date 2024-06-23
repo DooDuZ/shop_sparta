@@ -7,7 +7,7 @@ public class PatternConfig {
     // 정규식
     private static final String passwordRegex = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=])(?=.*[0-9]).{10,16}$";
     private static final String loginIdRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,25}$";
-    private static final String emailRegex = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$";
+    private static final String emailRegex = "^[A-z0-9]{2,20}+@[A-z]{2,20}+\\.[a-z]{2,3}$";
     private static final String phoneNumberRegex = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$";
 
 
