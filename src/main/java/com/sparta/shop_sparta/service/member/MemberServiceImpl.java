@@ -19,9 +19,13 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 import java.lang.reflect.Field;
 import java.security.SecureRandom;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,6 +35,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService, UserDetailsService {
+
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JavaMailSender javaMailSender;
@@ -58,15 +63,6 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         addrService.addAddr(memberEntity, memberDto.getAddr(), memberDto.getAddrDetail());
 
         return memberEntity.toDto();
-    }
-
-    private void encryptMemberDto(MemberDto memberDto) {
-        String salt = saltGenerator.generateSalt();
-        // 복호화를 위해 salt와 구분자 - 를 합쳐서 저장
-        memberDto.setEmail(userInformationEncoder.encrypt(memberDto.getEmail(), salt));
-        memberDto.setPhoneNumber(userInformationEncoder.encrypt(memberDto.getPhoneNumber(), salt));
-        memberDto.setMemberName(userInformationEncoder.encrypt(memberDto.getMemberName(), salt));
-        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
     }
 
     @Override
@@ -197,7 +193,35 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
+        MemberEntity memberEntity = memberRepository.findByLoginId(loginId).orElseThrow(
+                () -> new UsernameNotFoundException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
+
+        Set<GrantedAuthority> authorities =new HashSet<>();
+        // 권한 추가
+        authorities.add(new SimpleGrantedAuthority(memberEntity.getRole().getGrade()));
+
+        MemberDto memberDto = memberEntity.toDto();
+
+        decryptMemberDto(memberDto);
+        memberDto.setAuthorities(authorities);
+
+        return memberDto;
+    }
+
+    private void encryptMemberDto(MemberDto memberDto) {
+        String salt = saltGenerator.generateSalt();
+        // 복호화를 위해 salt와 구분자 - 를 합쳐서 저장
+        memberDto.setEmail(userInformationEncoder.encrypt(memberDto.getEmail(), salt));
+        memberDto.setPhoneNumber(userInformationEncoder.encrypt(memberDto.getPhoneNumber(), salt));
+        memberDto.setMemberName(userInformationEncoder.encrypt(memberDto.getMemberName(), salt));
+        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
+    }
+
+    private void decryptMemberDto(MemberDto memberDto) {
+        memberDto.setEmail(userInformationEncoder.decrypt(memberDto.getEmail()));
+        memberDto.setPhoneNumber(userInformationEncoder.decrypt(memberDto.getPhoneNumber()));
+        memberDto.setMemberName(userInformationEncoder.decrypt(memberDto.getMemberName()));
     }
 }
