@@ -5,6 +5,8 @@ import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -12,12 +14,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity(name = "member")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class MemberEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,19 +43,9 @@ public class MemberEntity extends BaseEntity {
     private String email;
 
     // 레코드 생성 후 role 삽입
+    @Column(nullable = true)
+    @Enumerated(EnumType.STRING)
     private MemberRole role;
-
-    // 이메일 인증 여부 확인 컬럼
-    private Boolean emailVerified;
-
-    public MemberEntity(String loginId, String password, String memberName, String phoneNumber, String email) {
-        this.loginId = loginId;
-        this.password = password;
-        this.memberName = memberName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        this.emailVerified = false;
-    }
 
     public void setMemberName(String memberName) {
         this.memberName = memberName;
