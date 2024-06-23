@@ -10,13 +10,18 @@ spring:
   mail:
     host: smtp.naver.com
     username: ${MAIL_ID}
-    port: '587'
+    password: ${MAIL_PASSWORD}
+    port: 465
     properties:
       mail:
         smtp:
-          starttls: 'true'
-          auth: 'true'
-    password: ${MAIL_PASSWORD}
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            enable: true
+            trust: smtp.naver.com
+        debug: true
 
   application:
     name: shop_sparta
@@ -29,7 +34,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: 'true'
 
 logging:
