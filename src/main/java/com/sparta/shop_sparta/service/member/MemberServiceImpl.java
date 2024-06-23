@@ -54,6 +54,9 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
 
         sendVerification(memberEntity);
 
+        // 주소 서비스 통해서 주소 저장
+        addrService.addAddr(memberEntity, memberDto.getAddr(), memberDto.getAddrDetail());
+
         return memberEntity.toDto();
     }
 
