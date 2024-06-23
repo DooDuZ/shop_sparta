@@ -1,8 +1,7 @@
-package com.sparta.shop_sparta.config.security.encoder;
+package com.sparta.shop_sparta.config.encoder;
 
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
-import org.springframework.stereotype.Component;
 
 public class UserInformationEncoder implements EnableDecoding{
     public final String secretKey;
