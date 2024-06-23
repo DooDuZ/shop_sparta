@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.member;
 
+import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -37,7 +38,7 @@ public class MemberEntity extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    // 레코드 생성 후 role 삽입
     private MemberRole role;
 
     public MemberEntity(String loginId, String password, String memberName, String phoneNumber, String email) {
@@ -70,6 +71,6 @@ public class MemberEntity extends BaseEntity {
 
     public MemberDto toDto() {
         return MemberDto.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
-                .loginId(this.loginId).password(this.password).phoneNumber(this.phoneNumber).role(this.role).build();
+                .loginId(this.loginId).phoneNumber(this.phoneNumber).role(this.role).build();
     }
 }

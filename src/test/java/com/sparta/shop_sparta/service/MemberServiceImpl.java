@@ -1,10 +1,8 @@
 package com.sparta.shop_sparta.service;
 
-import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.member.MemberRole;
+import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.repository.AddrRepository;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
@@ -38,7 +36,7 @@ public class MemberServiceImpl {
     void createAccountTest(){
         MemberDto memberDto = MemberDto.builder().memberName("지웅이").email("sin9158@naver.com").loginId("sin9158")
                 .password("1234Password!").addr("경기도 안산시 단원구 고잔2길 9").addrDetail("541호")
-                .phoneNumber("01027209158").role(MemberRole.MEMBER).build();
+                .phoneNumber("01027209158").role(MemberRole.BASIC).build();
 
         String password = "1234Password!";
 

@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.validator.password;
+package com.sparta.shop_sparta.validator.member;
 
 public interface PasswordValidator {
     Boolean checkPattern(String password);

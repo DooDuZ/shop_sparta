@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.dto.constant;
+package com.sparta.shop_sparta.constant.order;
 
 public enum OrderResponseMessage {
     SUCCESS_ORDER("[주문 성공]"),

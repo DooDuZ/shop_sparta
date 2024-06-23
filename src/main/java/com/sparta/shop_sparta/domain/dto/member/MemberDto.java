@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.dto.member;
 
 
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.member.MemberRole;
+import com.sparta.shop_sparta.constant.member.MemberRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
