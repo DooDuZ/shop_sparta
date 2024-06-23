@@ -10,11 +10,14 @@ import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.CreateAccountException;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import com.sparta.shop_sparta.repository.RedisRepository;
+import com.sparta.shop_sparta.util.encoder.SaltGenerator;
+import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import com.sparta.shop_sparta.validator.member.EntityFieldValidator;
 import com.sparta.shop_sparta.validator.member.pattern.MemberInfoValidator;
 import com.sparta.shop_sparta.validator.member.pattern.PatternConfig;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
+import java.lang.reflect.Field;
 import java.security.SecureRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -33,6 +36,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private final JavaMailSender javaMailSender;
     private final RedisRepository redisRepository;
     private final MailConfig mailConfig;
+    private final UserInformationEncoder userInformationEncoder;
+    private final SaltGenerator saltGenerator;
 
     @Override
     @Transactional
@@ -40,7 +45,8 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         // 가입 정보 유효성 검사
         validateSignupRequest(memberDto);
 
-        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
+        // 유저 정보 암호화
+        encryptMemberDto(memberDto);
 
         MemberEntity memberEntity = memberRepository.save(memberDto.toEntity());
         memberEntity.setRole(MemberRole.UNVERIFIED);
@@ -48,6 +54,15 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
         sendVerification(memberEntity);
 
         return memberEntity.toDto();
+    }
+
+    private void encryptMemberDto(MemberDto memberDto) {
+        String salt = saltGenerator.generateSalt();
+        // 복호화를 위해 salt와 구분자 - 를 합쳐서 저장
+        memberDto.setEmail(salt + "-" + userInformationEncoder.encrypt(memberDto.getEmail(), salt));
+        memberDto.setPhoneNumber(salt + "-" + userInformationEncoder.encrypt(memberDto.getPhoneNumber(), salt));
+        memberDto.setMemberName(salt + "-" + userInformationEncoder.encrypt(memberDto.getMemberName(), salt));
+        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
     }
 
     @Override
@@ -109,9 +124,13 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             String message = getVerificationMessage(memberEntity);
 
+            String[] emailInfo = memberEntity.getEmail().split("-");
+            String salt = emailInfo[0];
+            String encodedEmail = emailInfo[1];
+
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             mimeMessageHelper.setFrom(mailConfig.from, mailConfig.DOMAIN_NAME);
-            mimeMessageHelper.setTo(memberEntity.getEmail());
+            mimeMessageHelper.setTo(userInformationEncoder.decrypt(encodedEmail, salt));
             mimeMessageHelper.setSubject(mailConfig.MAIL_TITLE);
             mimeMessageHelper.setText(message, true);
 
