@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.securitytest;
 
+import com.sparta.shop_sparta.config.security.SecurityConfig;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import org.assertj.core.api.Assertions;
@@ -11,17 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@SpringBootTest
 public class EncryptionTest {
 
-    @Autowired
-    SaltGenerator saltGenerator;
+    SaltGenerator saltGenerator = new SaltGenerator();
 
-    @Autowired
-    UserInformationEncoder userInformationEncoder;
+    UserInformationEncoder userInformationEncoder = new UserInformationEncoder(new SecurityConfig().secretKey);
 
-    @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
     @ParameterizedTest
     @DisplayName("데이터 암호화 후 복호화 값이 동일한지 확인합니다.")
