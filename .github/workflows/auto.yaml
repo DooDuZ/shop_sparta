@@ -23,11 +23,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      # 환경 변수 확인을 위한 출력
-      - name: Display Environment Variables
+      - name: Write Environment Variables to File
         run: |
-          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}"
-          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}"
+          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" > env_vars.txt
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> env_vars.txt
+
+      - name: Display Environment Variables from File
+        run: cat env_vars.txt
+
 
       # unittest 실행
       - name: Run tests in Docker container
