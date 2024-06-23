@@ -41,12 +41,16 @@ public class MemberEntity extends BaseEntity {
     // 레코드 생성 후 role 삽입
     private MemberRole role;
 
+    // 이메일 인증 여부 확인 컬럼
+    private Boolean emailVerified;
+
     public MemberEntity(String loginId, String password, String memberName, String phoneNumber, String email) {
         this.loginId = loginId;
         this.password = password;
         this.memberName = memberName;
         this.phoneNumber = phoneNumber;
         this.email = email;
+        this.emailVerified = false;
     }
 
     public void setMemberName(String memberName) {
