@@ -12,8 +12,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
-@PropertySource("classpath:/application.yml")
-@ConfigurationProperties(prefix = "spring.mail")
+//@PropertySource("classpath:/application.yml")
+//@ConfigurationProperties(prefix = "spring.mail")
 @Getter
 @Setter
 public class MailConfig {
@@ -24,10 +24,15 @@ public class MailConfig {
     public String from;
     public String DOMAIN_NAME = "두두지월드";
 
-    private String username;
-    private String password;
-    private int port;
-    private Properties properties;
+    //private String username;
+    //private String password;
+    //private int port;
+    //private Properties properties;
+
+    private String username = "test";
+    private String password = "test";
+    private int port = 1;
+    private Properties properties = null;
 
     @Bean
     JavaMailSender javaMailSender(){
