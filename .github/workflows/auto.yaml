@@ -26,8 +26,8 @@ jobs:
       # 환경 변수 확인을 위한 출력
       - name: Display Environment Variables
         run: |
-          echo "DATASOURCE_USERNAME=$DATASOURCE_USERNAME"
-          echo "MAIL_FROM=$MAIL_FROM"
+          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}"
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}"
 
       # unittest 실행
       - name: Run tests in Docker container
