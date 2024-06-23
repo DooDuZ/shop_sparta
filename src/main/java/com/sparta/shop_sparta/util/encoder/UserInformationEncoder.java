@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.config.encoder;
+package com.sparta.shop_sparta.util.encoder;
 
 import org.springframework.security.crypto.encrypt.Encryptors;
 import org.springframework.security.crypto.encrypt.TextEncryptor;

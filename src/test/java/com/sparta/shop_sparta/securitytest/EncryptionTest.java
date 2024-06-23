@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.securitytest;
 
-import com.sparta.shop_sparta.config.encoder.SaltGenerator;
-import com.sparta.shop_sparta.config.encoder.UserInformationEncoder;
+import com.sparta.shop_sparta.util.encoder.SaltGenerator;
+import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

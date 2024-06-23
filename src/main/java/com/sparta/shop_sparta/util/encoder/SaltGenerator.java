@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.config.encoder;
+package com.sparta.shop_sparta.util.encoder;
 
 import java.security.SecureRandom;
 
