@@ -7,7 +7,7 @@ public class MemberInfoValidator implements PatternValidator{
 
     private final Pattern pattern;
 
-    MemberInfoValidator(Pattern pattern){
+    public MemberInfoValidator(Pattern pattern){
         this.pattern = pattern;
     }
 

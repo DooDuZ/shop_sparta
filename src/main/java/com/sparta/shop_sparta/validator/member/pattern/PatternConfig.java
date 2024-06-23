@@ -5,13 +5,15 @@ import java.util.regex.Pattern;
 public class PatternConfig {
 
     // 정규식
-    static final String passwordRegex = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=])(?=.*[0-9]).{10,16}$";
-    static final String loginIdRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,25}$";
+    private static final String passwordRegex = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=])(?=.*[0-9]).{10,16}$";
+    private static final String loginIdRegex = "^(?=.*[a-zA-Z])[a-zA-Z0-9]{5,25}$";
+    private static final String emailRegex = "^[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_\\.]?[0-9a-zA-Z])*\\.[a-zA-Z]{2,3}$";
+    private static final String phoneNumberRegex = "^01(?:0|1|[6-9])-(?:\\d{3}|\\d{4})-\\d{4}$";
 
 
     // 컴파일 패턴
-    static final Pattern passwordPattern = Pattern.compile(passwordRegex);
-    static final Pattern loginIdPattern = Pattern.compile(loginIdRegex);
-    // static final String emailRegex = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=])(?=.*[0-9]).{10,16}$";
-    // static final String phoneNumberRegex = "^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=])(?=.*[0-9]).{10,16}$";
+    public static final Pattern passwordPattern = Pattern.compile(passwordRegex);
+    public static final Pattern loginIdPattern = Pattern.compile(loginIdRegex);
+    public static final Pattern emailPattern = Pattern.compile(emailRegex);
+    public static final Pattern phoneNumberPattern = Pattern.compile(phoneNumberRegex);
 }
