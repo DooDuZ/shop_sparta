@@ -38,6 +38,7 @@ public class MemberServiceImpl implements MemberService, UserDetailsService {
     private final MailConfig mailConfig;
     private final UserInformationEncoder userInformationEncoder;
     private final SaltGenerator saltGenerator;
+    private final AddrService addrService;
 
     @Override
     @Transactional
