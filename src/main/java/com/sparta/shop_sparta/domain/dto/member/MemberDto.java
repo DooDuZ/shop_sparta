@@ -35,7 +35,23 @@ public class MemberDto {
         this.password = password;
     }
 
+    public void setMemberName(String memberName) {
+        this.memberName = memberName;
+    }
+
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public void setAddrDetail(String addrDetail) {
+        this.addrDetail = addrDetail;
     }
 }
