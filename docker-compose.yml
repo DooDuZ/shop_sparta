@@ -7,7 +7,7 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${DATASOURCE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: shop
     volumes:
       - mysql-data:/var/lib/mysql
@@ -28,7 +28,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/shop
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
     depends_on:
