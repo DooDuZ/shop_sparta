@@ -14,8 +14,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    //@Value("${SECRET_KEY}")
-    public String secretKey = "mysecretkey";
+    @Value("${SECRET_KEY}")
+    public String secretKey;
 
     @Bean
     public SaltGenerator saltGenerator() {
