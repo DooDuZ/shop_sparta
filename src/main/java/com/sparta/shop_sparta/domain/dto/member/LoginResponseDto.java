@@ -1,7 +1,17 @@
 package com.sparta.shop_sparta.domain.dto.member;
 
-import com.sparta.shop_sparta.token.TokenWrapper;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoginResponseDto {
-    TokenWrapper tokenWrapper;
+    String token;
+    String message;
+    HttpStatus httpStatus;
 }
