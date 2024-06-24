@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -25,27 +24,22 @@ public class SecurityConfig {
 
     // 복호화 가능 암호화 인코더
     @Bean
-    public UserInformationEncoder userInformationEncoder() {
+    public UserInformationEncoder userInformationEncoder(){
         return new UserInformationEncoder(secretKey);
     }
 
     // 패스워드 인코더
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    public BCryptPasswordEncoder bCryptPasswordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
     // 개발 초기 단계 모든 접근 허용
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
-                .authorizeHttpRequests(authorize ->
+                .authorizeHttpRequests( authorize ->
                         authorize.anyRequest().permitAll()
-
-                )
-                .formLogin((form) ->
-                        form.loginPage("/login")
-                                .permitAll()
                 )
                 .csrf(csrf -> csrf.disable());
 
