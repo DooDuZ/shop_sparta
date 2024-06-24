@@ -75,6 +75,4 @@ public class MemberDto implements UserDetails {
     public String getUsername() {
         return loginId;
     }
-
-
 }
