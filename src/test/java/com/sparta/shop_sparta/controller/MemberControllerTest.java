@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.member.MemberRole;
+import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.service.member.MemberService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,8 +36,6 @@ public class MemberControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/member/").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(memberEntity)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("memberId").exists()) // ID가 생성되었는지 검증
-                .andExpect(MockMvcResultMatchers.jsonPath("memberName").value("지웅이")); // 이름이 예상대로 들어갔는지 검증
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

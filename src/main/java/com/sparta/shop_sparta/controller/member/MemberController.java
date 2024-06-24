@@ -9,4 +9,6 @@ public interface MemberController {
     void logout();
     void updatePassword(String currentPassword, String newPassword);
     void updatePhoneNumber(String PhoneNumber);
+
+    Boolean verifySignup(Long memberId, String verificationCode);
 }

@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.constant;
+package com.sparta.shop_sparta.constant.item;
 
 public enum ItemStatus {
     NOT_PUBLISHED,  // 공개 전

@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.dto.item;
 
 
 import com.sparta.shop_sparta.domain.entity.item.ItemImageEntity;
-import com.sparta.shop_sparta.domain.constant.ItemImageType;
+import com.sparta.shop_sparta.constant.item.ItemImageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

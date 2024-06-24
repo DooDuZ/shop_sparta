@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.entity.item;
 
 import com.sparta.shop_sparta.domain.dto.item.ItemDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.domain.constant.ItemStatus;
+import com.sparta.shop_sparta.constant.item.ItemStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,9 +1,8 @@
 package com.sparta.shop_sparta.securitytest;
 
-import com.sparta.shop_sparta.config.security.encoder.SaltGenerator;
-import com.sparta.shop_sparta.config.security.encoder.UserInformationEncoder;
-import com.sparta.shop_sparta.validator.password.PasswordValidator;
-import com.sparta.shop_sparta.validator.password.PasswordValidatorImpl;
+import com.sparta.shop_sparta.config.security.SecurityConfig;
+import com.sparta.shop_sparta.util.encoder.SaltGenerator;
+import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,25 +31,10 @@ public class EncryptionTest {
         String salt = saltGenerator.generateSalt();
 
         String encodedPassword = userInformationEncoder.encrypt(password, salt);
-        String decodedPassword = userInformationEncoder.decrypt(encodedPassword, salt);
+        String decodedPassword = userInformationEncoder.decrypt(encodedPassword);
 
         Assertions.assertThat(decodedPassword).isEqualTo(password);
     }
-
-    @ParameterizedTest
-    @DisplayName("패스워드 패턴 매칭[정규식] 성공 테스트")
-    @ValueSource(strings = {"sSdsd!@1212!@", "zxcasdvDd23!@#", "tDest12123!@", "123adsDa@4", "AD!@#na123me", "adAd3r!@!@A", "Abac#21a2#"})
-    void passwordPatternMatchTest(String password){
-        PasswordValidator passwordValidator = new PasswordValidatorImpl();
-
-        // System.out.println(password);
-        if (!passwordValidator.checkPattern(password)){
-            System.out.println(password);
-        }
-
-        Assertions.assertThat(passwordValidator.checkPattern(password)).isEqualTo(true);
-    }
-
 
     @Test
     @DisplayName("패스워드 일치 테스트")

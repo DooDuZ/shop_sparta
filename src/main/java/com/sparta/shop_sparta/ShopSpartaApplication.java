@@ -9,9 +9,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 @EnableJpaAuditing
 public class ShopSpartaApplication {
-    private static final Logger logger = LoggerFactory.getLogger(ShopSpartaApplication.class);
     public static void main(String[] args) {
         SpringApplication.run(ShopSpartaApplication.class, args);
-        logger.info("Hello, World!");
     }
 }
