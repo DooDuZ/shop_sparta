@@ -27,7 +27,6 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @GetMapping("/verification")
     public Boolean verifySignup(@RequestParam("memberId") Long memberId, @RequestParam("verificationCode") String verificationCode) {
-        System.out.println("test");
         return memberServiceImpl.verifySignup(memberId, verificationCode);
     }
 
