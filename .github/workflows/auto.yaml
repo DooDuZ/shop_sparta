@@ -15,7 +15,6 @@ jobs:
 
     steps:
       # 해당 브랜치의 코드를 가져온다
-      # git에서 브랜치를 바꿀 때 쓰는 check out과 다른 의미인가...?
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -26,36 +25,33 @@ jobs:
       # git secret을 환경변수 파일로 복사하기
       - name: Set up environment variables
         run: |
-          echo "REQUEST_URL=${{ secrets.REQUEST_URL }}" >> $.env
-          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $.env
-          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $.env
-          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> $.env
-          echo "MAIL_ID=${{ secrets.MAIL_ID }}" >> $.env
-          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $.env
-          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $.env
-          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> $.env
-          echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> $.env
-          echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> $.env
-          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $.env
-          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $.env
+          echo "REQUEST_URL=$REQUEST_URL" >> $.env
+          echo "SERVER_PORT=$SERVER_PORT" >> $.env
+          echo "SECRET_KEY=$SECRET_KEY" >> $.env
+          echo "MAIL_FROM=$MAIL_FROM" >> $.env
+          echo "MAIL_ID=$MAIL_ID" >> $.env
+          echo "MAIL_PASSWORD=$MAIL_PASSWORD" >> $.env
+          echo "MAIL_HOST=$MAIL_HOST" >> $.env
+          echo "DATASOURCE_USERNAME=$DATASOURCE_USERNAME" >> $.env
+          echo "DATASOURCE_PASSWORD=$DATASOURCE_PASSWORD" >> $.env
+          echo "DATASOURCE_URL=$DATASOURCE_URL" >> $.env
+          echo "REDIS_HOST=$REDIS_HOST" >> $.env
+          echo "REDIS_PORT=$REDIS_PORT" >> $.env
+        env:
+          REQUEST_URL: ${{ secrets.REQUEST_URL }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_ID: ${{ secrets.MAIL_ID }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
+          DATASOURCE_PASSWORD: ${{ secrets.DATASOURCE_PASSWORD }}
+          DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
 
       # unittest 실행
       - name: Run tests in Docker container
         working-directory: ${{ github.workspace }}
         run: docker-compose run --rm spring-app ./gradlew clean test
-
-      # 하단은 log 출력  git Action으로 노출되는지 여부 테스트. 지워도 된다.
-
-      # 애플리케이션 실행
-      - name: Run application and output logs
-        working-directory: ${{ github.workspace }}
-        run: docker-compose up -d
-
-      # 애플리케이션 로그를 출력
-      - name: Display application logs
-        run: docker-compose logs spring-app
-
-      # 애플리케이션 실행
-      - name: Run application and output logs
-        working-directory: ${{ github.workspace }}
-        run: docker-compose down
