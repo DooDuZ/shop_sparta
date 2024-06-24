@@ -39,9 +39,9 @@ spring:
     url: jdbc:mysql://localhost:3307/shop
 
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+    #properties:
+      #hibernate:
+        #dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
     show-sql: 'true'
