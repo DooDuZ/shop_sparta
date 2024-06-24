@@ -10,6 +10,8 @@ public enum MemberResponseMessage {
     UNMATCHED_PASSWORD("비밀번호 형식 오류"),
     NOT_FOUND("회원 정보를 찾지 못했습니다"),
     UNMATCHED_VERIFICATION_CODE("인증 코드 불일치"),
+    INVALID_PASSWORD("비밀번호가 일치하지 않습니다"),
+    SUCCESS_LOGIN("로그인 성공"),
     ;
     private final String message;
     MemberResponseMessage(String message){
