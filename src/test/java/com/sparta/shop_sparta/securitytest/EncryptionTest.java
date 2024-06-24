@@ -12,13 +12,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+@SpringBootTest
 public class EncryptionTest {
 
-    SaltGenerator saltGenerator = new SaltGenerator();
+    @Autowired
+    SaltGenerator saltGenerator;
 
-    UserInformationEncoder userInformationEncoder = new UserInformationEncoder(new SecurityConfig().secretKey);
+    @Autowired
+    UserInformationEncoder userInformationEncoder;
 
-    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @ParameterizedTest
     @DisplayName("데이터 암호화 후 복호화 값이 동일한지 확인합니다.")

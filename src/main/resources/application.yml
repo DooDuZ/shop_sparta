@@ -4,13 +4,13 @@ spring:
 
   data:
     redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
+      host: ${secrets.REDIS_HOST}
+      port: ${secrets.REDIS_PORT}
 
   mail:
     host: smtp.naver.com
-    username: ${MAIL_ID}
-    password: ${MAIL_PASSWORD}
+    username: ${secrets.MAIL_ID}
+    password: ${secrets.MAIL_PASSWORD}
     port: 465
     properties:
       mail:
@@ -27,9 +27,9 @@ spring:
     name: shop_sparta
 
   datasource:
-    password: ${DATASOURCE_PASSWORD}
+    password: ${secrets.DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DATASOURCE_USERNAME}
+    username: ${secrets.DATASOURCE_USERNAME}
     url: jdbc:mysql://localhost:3307/shop
 
   jpa:
@@ -48,5 +48,5 @@ logging:
 
 
 server:
-  port: ${SERVER_PORT}
+  port: ${secrets.SERVER_PORT}
 
