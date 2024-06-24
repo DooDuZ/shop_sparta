@@ -52,10 +52,6 @@ jobs:
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
 
-      - name: Display .env file contents
-        run: |
-          cat .env
-
       # unittest 실행
       - name: Run tests in Docker container
         working-directory: ${{ github.workspace }}

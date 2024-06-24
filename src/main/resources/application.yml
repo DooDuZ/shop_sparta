@@ -5,12 +5,16 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST}
+      #host: localhost
       port: ${REDIS_PORT}
+      #port: 6379
 
   mail:
     host: smtp.naver.com
     username: ${MAIL_ID}
     password: ${MAIL_PASSWORD}
+    #username: sin9158
+    #password: 1234
     port: 465
     properties:
       mail:
@@ -28,8 +32,10 @@ spring:
 
   datasource:
     password: ${DATASOURCE_PASSWORD}
+    #password: 1234
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ${DATASOURCE_USERNAME}
+    #username: root
     url: jdbc:mysql://localhost:3307/shop
 
   jpa:
@@ -37,7 +43,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: 'true'
 
 logging:
@@ -49,4 +55,5 @@ logging:
 
 server:
   port: ${SERVER_PORT}
+  #port: 8080
 
