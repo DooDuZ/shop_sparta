@@ -17,10 +17,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 @Getter
 @Setter
 public class MailConfig {
-    @Value("${secrets.REQUEST_URL}")
+    @Value("${REQUEST_URL}")
     public String requestUrl;
     public String MAIL_TITLE = "두두지월드 가입 인증 메일";
-    @Value("${secrets.MAIL_FROM}")
+    @Value("${MAIL_FROM}")
     public String from;
     public String DOMAIN_NAME = "두두지월드";
 

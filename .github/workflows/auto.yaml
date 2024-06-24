@@ -23,23 +23,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Set environment variables
-        env:
-          DATASOURCE_USERNAME: ${{ secrets.DATASOURCE_USERNAME }}
-          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+      # git secret을 환경변수 파일로 복사하기
+      - name: Set up environment variables
         run: |
-          if [ -z "$DATASOURCE_USERNAME" ]; then
-            echo "DATASOURCE_USERNAME is not set"
-            exit 1
-          else
-            echo "DATASOURCE_USERNAME is set"
-          fi
-          if [ -z "$MAIL_FROM" ]; then
-            echo "MAIL_FROM is not set"
-            exit 1
-          else
-            echo "MAIL_FROM is set"
-          fi
+          echo "REQUEST_URL=${{ secrets.REQUEST_URL }}" >> $GITHUB_ENV
+          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+          echo "MAIL_FROM=${{ secrets.MAIL_FROM }}" >> $GITHUB_ENV
+          echo "MAIL_ID=${{ secrets.MAIL_ID }}" >> $GITHUB_ENV
+          echo "MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}" >> $GITHUB_ENV
+          echo "MAIL_HOST=${{ secrets.MAIL_HOST }}" >> $GITHUB_ENV
+          echo "DATASOURCE_USERNAME=${{ secrets.DATASOURCE_USERNAME }}" >> $GITHUB_ENV
+          echo "DATASOURCE_PASSWORD=${{ secrets.DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+          echo "DATASOURCE_URL=${{ secrets.DATASOURCE_URL }}" >> $GITHUB_ENV
+          echo "REDIS_HOST=${{ secrets.REDIS_HOST }}" >> $GITHUB_ENV
+          echo "REDIS_PORT=${{ secrets.REDIS_PORT }}" >> $GITHUB_ENV
 
       # unittest 실행
       - name: Run tests in Docker container

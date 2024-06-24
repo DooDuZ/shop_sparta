@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class EmailSenderTest {
 
-    @Value("${secrets.REQUEST_URL}")
+    @Value("${REQUEST_URL}")
     String url;
     @Test
     void test(){
