@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.controller.member;
 import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.service.member.MemberService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,23 +17,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberControllerImpl implements MemberController{
 
-    private final MemberService memberServiceImpl;
+    private final MemberService memberService;
 
     @Override
     @PostMapping("/")
     public MemberDto createAccount(@RequestBody MemberDto memberDTO) {
-        return memberServiceImpl.createAccount(memberDTO);
+        return memberService.createAccount(memberDTO);
+    }
+
+    @Override
+    @PostMapping("/login")
+    public LoginResponseDto login(String username, String password, HttpServletResponse httpServletResponse) {
+        return memberService.login(username, password, httpServletResponse);
     }
 
     @Override
     @GetMapping("/verification")
     public Boolean verifySignup(@RequestParam("memberId") Long memberId, @RequestParam("verificationCode") String verificationCode) {
-        return memberServiceImpl.verifySignup(memberId, verificationCode);
-    }
-
-    @Override
-    public LoginResponseDto login(MemberDto memberDTO) {
-        return null;
+        return memberService.verifySignup(memberId, verificationCode);
     }
 
     @Override
