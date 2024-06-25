@@ -15,7 +15,7 @@ public class SignupVerifyCodeRedisRepository implements RedisRepository<String, 
     @Override
     public void saveWithDuration(String key, Object value, Integer minute) {
         Duration timeout = Duration.ofMinutes(minute);
-        redisTemplate.opsForValue().set(key, value,timeout);
+        redisTemplate.opsForValue().set(addPrefix(key), value,timeout);
     }
 
     @Override
