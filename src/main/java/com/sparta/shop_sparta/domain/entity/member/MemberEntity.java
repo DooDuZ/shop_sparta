@@ -69,6 +69,6 @@ public class MemberEntity extends BaseEntity {
 
     public MemberDto toDto() {
         return MemberDto.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
-                .loginId(this.loginId).phoneNumber(this.phoneNumber).role(this.role).build();
+                .loginId(this.loginId).phoneNumber(this.phoneNumber).role(this.role).password(this.password).build();
     }
 }

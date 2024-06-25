@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum MemberRole {
-    ADMIN("ADMIN"),
-    BASIC("BASIC"),
-    UNVERIFIED("UNVERIFIED"),
+    ADMIN("ROLE_ADMIN"),
+    BASIC("ROLE_BASIC"),
+    UNVERIFIED("ROLE_UNVERIFIED"),
     ;
 
     private final String grade;

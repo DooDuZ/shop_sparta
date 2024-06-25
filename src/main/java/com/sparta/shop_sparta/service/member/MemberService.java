@@ -1,14 +1,14 @@
 package com.sparta.shop_sparta.service.member;
 
-import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.dto.member.PasswordRequestDto;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
 
 public interface MemberService {
-    MemberDto createAccount(MemberDto memberDto);
-    LoginResponseDto login(MemberDto memberDTO);
-    void logout();
-    void updatePassword(String currentPassword, String newPassword);
-    void updatePhoneNumber(String PhoneNumber);
+    ResponseEntity<?> createAccount(MemberDto memberDto);
+    ResponseEntity<?> updatePassword(PasswordRequestDto passwordRequestDto);
+    ResponseEntity<?> updatePhoneNumber(String PhoneNumber);
 
-    Boolean verifySignup(Long memberId, String verificationCode);
+    ResponseEntity<?> verifySignup(Long memberId, String verificationCode);
 }

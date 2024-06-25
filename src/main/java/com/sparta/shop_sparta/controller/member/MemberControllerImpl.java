@@ -1,10 +1,12 @@
 package com.sparta.shop_sparta.controller.member;
 
-import com.sparta.shop_sparta.domain.dto.member.LoginResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.dto.member.PasswordRequestDto;
 import com.sparta.shop_sparta.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,38 +18,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MemberControllerImpl implements MemberController{
 
-    private final MemberService memberServiceImpl;
+    private final MemberService memberService;
 
     @Override
     @PostMapping("/")
-    public MemberDto createAccount(@RequestBody MemberDto memberDTO) {
-        return memberServiceImpl.createAccount(memberDTO);
+    public ResponseEntity<?> createAccount(@RequestBody MemberDto memberDTO) {
+        return memberService.createAccount(memberDTO);
     }
 
     @Override
     @GetMapping("/verification")
-    public Boolean verifySignup(@RequestParam("memberId") Long memberId, @RequestParam("verificationCode") String verificationCode) {
-        System.out.println("test");
-        return memberServiceImpl.verifySignup(memberId, verificationCode);
+    public ResponseEntity<?> verifySignup(@RequestParam("memberId") Long memberId, @RequestParam("verificationCode") String verificationCode) {
+        return memberService.verifySignup(memberId, verificationCode);
     }
 
     @Override
-    public LoginResponseDto login(MemberDto memberDTO) {
+    @PatchMapping("/password")
+    public ResponseEntity<?> updatePassword(@RequestBody PasswordRequestDto passwordRequestDto) {
+        return memberService.updatePassword(passwordRequestDto);
+    }
+
+    @Override
+    @PatchMapping("/phoneNumber")
+    public ResponseEntity<?> updatePhoneNumber(String PhoneNumber) {
         return null;
     }
 
-    @Override
-    public void logout() {
-
-    }
-
-    @Override
-    public void updatePassword(String currentPassword, String newPassword) {
-
-    }
-
-    @Override
-    public void updatePhoneNumber(String PhoneNumber) {
-
+    @GetMapping("/authorize")
+    public String test(){
+        return "Success!";
     }
 }
