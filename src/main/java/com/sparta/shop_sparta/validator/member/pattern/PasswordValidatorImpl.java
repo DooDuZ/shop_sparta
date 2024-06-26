@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PasswordValidatorImpl extends MemberInfoValidator implements PasswordValidator{
-    public PasswordValidatorImpl(Pattern pattern) {
-        super(pattern);
+    public PasswordValidatorImpl() {
+        super();
     }
 
     @Override
