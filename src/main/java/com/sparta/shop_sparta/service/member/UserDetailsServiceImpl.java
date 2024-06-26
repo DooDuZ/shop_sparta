@@ -27,7 +27,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
-
         MemberEntity memberEntity = memberRepository.findByLoginId(loginId).orElseThrow(
                 () -> new UsernameNotFoundException(MemberResponseMessage.NOT_FOUND.getMessage())
         );

@@ -16,6 +16,7 @@ public class AddrServiceImpl implements AddrService{
     private final SaltGenerator saltGenerator;
     private final UserInformationEncoder userInformationEncoder;
     private final AddrRepository addrRepository;
+
     @Override
     public void addAddr(MemberEntity memberEntity, String addr, String addrDetail) {
         String salt = saltGenerator.generateSalt();
