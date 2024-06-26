@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.config.security;
 
 import com.sparta.shop_sparta.config.security.jwt.JwtAuthenticationFilter;
-import com.sparta.shop_sparta.config.security.jwt.JwtTokenProvider;
 import com.sparta.shop_sparta.config.security.jwt.LoginSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +15,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final LoginSuccessHandler loginSuccessHandler;
 
