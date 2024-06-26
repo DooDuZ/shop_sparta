@@ -10,4 +10,6 @@ public interface MemberService {
     ResponseEntity<?> updatePhoneNumber(MemberUpdateRequestVo phoneNumberUpdateRequestDto);
 
     ResponseEntity<?> verifySignup(Long memberId, String verificationCode);
+
+    ResponseEntity<?> getMemberInfo(Long memberId);
 }

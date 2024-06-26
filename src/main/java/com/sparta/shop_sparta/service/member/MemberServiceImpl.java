@@ -3,9 +3,10 @@ package com.sparta.shop_sparta.service.member;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.exception.member.MemberAuthorizeException;
+import com.sparta.shop_sparta.exception.member.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import com.sparta.shop_sparta.service.member.verify.MailService;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
@@ -67,7 +68,7 @@ public class MemberServiceImpl implements MemberService {
         mailService.verifySignup(memberId, verificationCode);
 
         MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberAuthorizeException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
         memberEntity.setRole(MemberRole.BASIC);
@@ -75,41 +76,60 @@ public class MemberServiceImpl implements MemberService {
         return ResponseEntity.ok().build();
     }
 
+    @Override
+    public ResponseEntity<?> getMemberInfo(Long memberId) {
+        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
+
+        if (memberEntity.getMemberId() != memberId){
+            throw new MemberException(MemberResponseMessage.INVALID_PRINCIPLE.getMessage());
+        }
+
+        MemberDto memberDto = memberEntity.toDto();
+        decryptMemberDto(memberDto);
+
+        // 주소 추가 해줘야함
+        //addrService.getAddrList()
+
+        return ResponseEntity.ok(new MemberResponseDto(memberDto));
+    }
+
     private void validateSignupRequest(MemberDto memberDto) {
         MemberInfoValidator memberInfoValidator = new MemberInfoValidator();
 
         // 필수 파라미터 검사
         if (!new EntityFieldValidator().validateParams(memberDto.toEntity())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
 
         // 아이디 정규식 검사
         if (!memberInfoValidator.checkPattern(PatternConfig.loginIdPattern, memberDto.getLoginId())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_ID.getMessage());
+            throw new MemberException(MemberResponseMessage.UNMATCHED_ID.getMessage());
         }
 
         // 이메일 정규식 검사
-        if (memberInfoValidator.checkPattern(PatternConfig.emailPattern, memberDto.getEmail())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_EMAIL.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.emailPattern, memberDto.getEmail())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_EMAIL.getMessage());
         }
 
         // 패스워드 정규식 검사
-        if (memberInfoValidator.checkPattern(PatternConfig.passwordPattern, memberDto.getPassword())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.passwordPattern, memberDto.getPassword())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
         // 휴대폰 번호 정규식 검사
-        if (memberInfoValidator.checkPattern(PatternConfig.phoneNumberPattern, memberDto.getPhoneNumber())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.phoneNumberPattern, memberDto.getPhoneNumber())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
         }
 
         // 이메일 중복 검사
         if (memberRepository.findByEmail(memberDto.getEmail()).isPresent()) {
-            throw new MemberAuthorizeException(MemberResponseMessage.DUPLICATED_EMAIL.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_EMAIL.getMessage());
         }
 
         // 아이디 중복 검사
         if (memberRepository.findByLoginId(memberDto.getLoginId()).isPresent()) {
-            throw new MemberAuthorizeException(MemberResponseMessage.DUPLICATED_LOGIN_ID.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_LOGIN_ID.getMessage());
         }
     }
 
@@ -171,6 +191,7 @@ public class MemberServiceImpl implements MemberService {
         memberDto.setEmail(userInformationEncoder.decrypt(memberDto.getEmail()));
         memberDto.setPhoneNumber(userInformationEncoder.decrypt(memberDto.getPhoneNumber()));
         memberDto.setMemberName(userInformationEncoder.decrypt(memberDto.getMemberName()));
+        memberDto.setPassword("");
     }
 
 
@@ -192,7 +213,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return memberRepository.findByLoginId(username).orElseThrow(
-                () -> new MemberAuthorizeException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
     }
 }

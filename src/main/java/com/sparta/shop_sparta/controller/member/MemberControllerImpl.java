@@ -21,7 +21,7 @@ public class MemberControllerImpl implements MemberController{
     private final MemberService memberService;
 
     @Override
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> createAccount(@RequestBody MemberDto memberDTO) {
         return memberService.createAccount(memberDTO);
     }
@@ -33,6 +33,12 @@ public class MemberControllerImpl implements MemberController{
     }
 
     @Override
+    @GetMapping
+    public ResponseEntity<?> getMemberInfo(@RequestParam Long memberId) {
+        return memberService.getMemberInfo(memberId);
+    }
+
+    @Override
     @PatchMapping("/password")
     public ResponseEntity<?> updatePassword(@RequestBody MemberUpdateRequestVo passwordUpdateRequestDto) {
         return memberService.updatePassword(passwordUpdateRequestDto);
@@ -41,11 +47,7 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @PatchMapping("/phoneNumber")
     public ResponseEntity<?> updatePhoneNumber(@RequestBody MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+        System.out.println(phoneNumberUpdateRequestDto.getPhoneNumber());
         return memberService.updatePhoneNumber(phoneNumberUpdateRequestDto);
-    }
-
-    @GetMapping("/authorize")
-    public String test(){
-        return "Success!";
     }
 }
