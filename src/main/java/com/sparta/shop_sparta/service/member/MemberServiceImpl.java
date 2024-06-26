@@ -3,7 +3,7 @@ package com.sparta.shop_sparta.service.member;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.domain.dto.member.PasswordRequestDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.member.MemberAuthorizeException;
 import com.sparta.shop_sparta.repository.MemberRepository;
@@ -76,6 +76,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     private void validateSignupRequest(MemberDto memberDto) {
+        MemberInfoValidator memberInfoValidator = new MemberInfoValidator();
 
         // 필수 파라미터 검사
         if (!new EntityFieldValidator().validateParams(memberDto.toEntity())) {
@@ -83,21 +84,21 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // 아이디 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.loginIdPattern).checkPattern(memberDto.getLoginId())) {
+        if (!memberInfoValidator.checkPattern(PatternConfig.loginIdPattern, memberDto.getLoginId())) {
             throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_ID.getMessage());
         }
 
         // 이메일 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.emailPattern).checkPattern(memberDto.getEmail())) {
+        if (memberInfoValidator.checkPattern(PatternConfig.emailPattern, memberDto.getEmail())) {
             throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_EMAIL.getMessage());
         }
 
         // 패스워드 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.passwordPattern).checkPattern(memberDto.getPassword())) {
+        if (memberInfoValidator.checkPattern(PatternConfig.passwordPattern, memberDto.getPassword())) {
             throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
         // 휴대폰 번호 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.phoneNumberPattern).checkPattern(memberDto.getPhoneNumber())) {
+        if (memberInfoValidator.checkPattern(PatternConfig.phoneNumberPattern, memberDto.getPhoneNumber())) {
             throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
         }
 
@@ -114,7 +115,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePassword(PasswordRequestDto passwordRequestDto) {
+    public ResponseEntity<?> updatePassword(MemberUpdateRequestVo passwordRequestDto) {
         MemberEntity memberEntity = getMemberEntity();
 
         String password = passwordRequestDto.getPassword();
@@ -124,8 +125,8 @@ public class MemberServiceImpl implements MemberService {
             return ResponseEntity.ok(MemberResponseMessage.INVALID_PASSWORD);
         }
 
-        if (new MemberInfoValidator(PatternConfig.passwordPattern).checkPattern(confirmPassword)){
-            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PASSWORD);
+        if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)){
+            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
 
         passwordEncoder.matches(password, memberEntity.getPassword());
@@ -137,8 +138,24 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public ResponseEntity<?> updatePhoneNumber(String PhoneNumber) {
-        return null;
+    @Transactional
+    public ResponseEntity<?> updatePhoneNumber(MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+        if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String phoneNumber = phoneNumberUpdateRequestDto.getPhoneNumber();
+
+        if (!new MemberInfoValidator().checkPattern(PatternConfig.phoneNumberPattern, phoneNumber)) {
+            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
+        }
+
+        String salt = saltGenerator.generateSalt();
+        MemberEntity memberEntity = getMemberEntity();
+
+        memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumber, salt));
+
+        return ResponseEntity.ok().build();
     }
 
     private void encryptMemberDto(MemberDto memberDto) {
