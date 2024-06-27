@@ -1,12 +1,11 @@
-package com.sparta.shop_sparta.service.member.addr;
+package com.sparta.shop_sparta.controller.member;
 
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
-import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public interface AddrService {
+public interface AddrController {
     ResponseEntity<?> addAddr(UserDetails userDetails, AddrDto addrDto);
     ResponseEntity<?> removeAddr(UserDetails userDetails, Long addrId);
     ResponseEntity<?> updateAddr(UserDetails userDetails, AddrDto addrDto);
