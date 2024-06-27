@@ -2,12 +2,14 @@ package com.sparta.shop_sparta.service.member;
 
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
+import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.member.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
+import com.sparta.shop_sparta.service.member.addr.AddrService;
 import com.sparta.shop_sparta.service.member.verify.MailService;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
@@ -15,6 +17,7 @@ import com.sparta.shop_sparta.validator.member.EntityFieldValidator;
 import com.sparta.shop_sparta.validator.member.pattern.MemberInfoValidator;
 import com.sparta.shop_sparta.validator.member.pattern.PatternConfig;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -89,10 +92,10 @@ public class MemberServiceImpl implements MemberService {
         MemberDto memberDto = memberEntity.toDto();
         decryptMemberDto(memberDto);
 
-        // 주소 추가 해줘야함
-        //addrService.getAddrList()
+        // 주소 목록 추가
+        List<AddrDto> addrDtoList = addrService.getAddrList(memberId);
 
-        return ResponseEntity.ok(new MemberResponseDto(memberDto));
+        return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
     }
 
     private void validateSignupRequest(MemberDto memberDto) {
@@ -136,17 +139,21 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ResponseEntity<?> updatePassword(MemberUpdateRequestVo passwordRequestDto) {
+        if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null){
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+        }
+
         MemberEntity memberEntity = getMemberEntity();
 
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
 
         if (!passwordEncoder.matches(password, memberEntity.getPassword())){
-            return ResponseEntity.ok(MemberResponseMessage.INVALID_PASSWORD);
+            throw new MemberException(MemberResponseMessage.INVALID_PASSWORD.getMessage());
         }
 
         if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)){
-            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
 
         passwordEncoder.matches(password, memberEntity.getPassword());

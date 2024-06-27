@@ -23,4 +23,12 @@ public class AddrDto {
     public void setMemberId(Long memberId) {
         this.memberId = memberId;
     }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public void setAddrDetail(String addrDetail) {
+        this.addrDetail = addrDetail;
+    }
 }
