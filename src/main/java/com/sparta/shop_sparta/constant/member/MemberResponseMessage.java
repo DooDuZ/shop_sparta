@@ -14,6 +14,7 @@ public enum MemberResponseMessage {
     SUCCESS_LOGIN("로그인 성공"),
     INVALID_TOKEN("유효하지 않은 토큰입니다."),
     INVALID_PRINCIPLE("인증 정보 불일치"),
+    FAIL_CONVERT_TO_JSON("토큰 JSON 파싱 오류"),
     ;
     private final String message;
     MemberResponseMessage(String message){

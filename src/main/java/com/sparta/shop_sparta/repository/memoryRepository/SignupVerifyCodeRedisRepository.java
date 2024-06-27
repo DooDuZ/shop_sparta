@@ -29,7 +29,7 @@ public class SignupVerifyCodeRedisRepository implements RedisRepository<String, 
     }
 
     @Override
-    public void delete(String key) {
+    public void deleteKey(String key) {
         redisTemplate.delete(addPrefix(key));
     }
 

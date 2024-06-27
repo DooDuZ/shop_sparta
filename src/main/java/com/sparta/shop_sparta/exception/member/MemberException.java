@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.exception.member;
 
-public class MemberException extends IllegalArgumentException{
+public class MemberException extends RuntimeException{
 
     public MemberException(String message) {
         super(message);
