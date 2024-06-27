@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.controller.member;
 
 import com.sparta.shop_sparta.service.member.auth.JwtAuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +20,13 @@ public class JwtAuthControllerImpl implements JwtAuthController{
 
     @Override
     @PostMapping("/token")
-    public ResponseEntity<?> refreshAccessToken(@CookieValue(name="refresh_token") String token, HttpServletResponse response) {
-        return jwtAuthService.refreshAccessToken(token, response);
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        return jwtAuthService.refreshAccessToken(request, response);
     }
 
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue(name = "refresh_token") String refreshToken, HttpServletResponse response) {
-        return jwtAuthService.logout(refreshToken, response);
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        return jwtAuthService.logout(request, response);
     }
 }
