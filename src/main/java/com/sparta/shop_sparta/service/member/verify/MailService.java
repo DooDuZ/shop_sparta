@@ -30,7 +30,7 @@ public class MailService implements VerifySignUpService<MemberDto>{
         }
 
         // 사용한 인증 코드 삭제
-        signupVerifyCodeRedisRepository.delete(key);
+        signupVerifyCodeRedisRepository.deleteKey(key);
     }
 
     private String getVerificationCode() {

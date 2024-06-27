@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.member;
+package com.sparta.shop_sparta.service.member.addr;
 
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AddrServiceImpl implements AddrService{
+public class AddrServiceImpl implements AddrService {
     private final SaltGenerator saltGenerator;
     private final UserInformationEncoder userInformationEncoder;
     private final AddrRepository addrRepository;
@@ -47,6 +47,15 @@ public class AddrServiceImpl implements AddrService{
 
     @Override
     public List<AddrDto> getAddrList(Long memberId) {
-        return null;
+        return addrRepository.findAllByMemberEntity_MemberId(memberId).stream()
+                .map(AddrEntity::toDto).map(this::decryptAddrDto)
+                .toList();
+    }
+
+    private AddrDto decryptAddrDto(AddrDto addrDto) {
+        addrDto.setAddr(userInformationEncoder.decrypt(addrDto.getAddr()));
+        addrDto.setAddrDetail(userInformationEncoder.decrypt(addrDto.getAddrDetail()));
+
+        return addrDto;
     }
 }

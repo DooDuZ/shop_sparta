@@ -1,7 +1,6 @@
-package com.sparta.shop_sparta.service.member;
+package com.sparta.shop_sparta.service.member.addr;
 
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
-import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import java.util.List;
 
