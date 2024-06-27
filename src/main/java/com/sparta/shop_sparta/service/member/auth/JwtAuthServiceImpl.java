@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.service.member.auth;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.domain.dto.member.token.TokenWrapper;
 import com.sparta.shop_sparta.exception.member.MemberException;
@@ -48,7 +49,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
             response.setContentType("application/json");
             response.getWriter().write(objectMapper.writeValueAsString(tokenWrapper));
         }catch (Exception e){
-            throw new MemberException(MemberResponseMessage.FAIL_CONVERT_TO_JSON.getMessage(), e);
+            throw new MemberException(AuthMessage.FAIL_CONVERT_TO_JSON.getMessage(), e);
         }
     }
 
@@ -73,7 +74,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
 
         // 리프레시 토큰이 유효하지 않거나, 레디스에 존재하지 않으면
         if (jwtTokenProvider.validateRefreshToken(refreshToken) == null || !isManaged(refreshToken)) {
-            throw new MemberException(MemberResponseMessage.INVALID_TOKEN.getMessage());
+            throw new MemberException(AuthMessage.INVALID_TOKEN.getMessage());
             //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(MemberResponseMessage.INVALID_TOKEN);
         }
 

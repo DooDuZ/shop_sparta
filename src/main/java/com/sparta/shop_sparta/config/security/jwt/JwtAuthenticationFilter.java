@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.config.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.service.member.auth.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
@@ -25,10 +26,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = jwtTokenProvider.resolveToken(request);
-
         // 서명 확인
         Jws<Claims> claims = jwtTokenProvider.validateToken(token);
-
 
         if (token != null && claims != null) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
@@ -40,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("UTF-8");
 
             ObjectMapper objectMapper = new ObjectMapper();
-            String errorMessage = MemberResponseMessage.INVALID_TOKEN.getMessage();
+            String errorMessage = AuthMessage.INVALID_TOKEN.getMessage();
 
             response.getWriter().write(objectMapper.writeValueAsString(errorMessage));
         }
