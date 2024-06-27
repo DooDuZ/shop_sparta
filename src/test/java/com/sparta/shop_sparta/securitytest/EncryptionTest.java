@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootTest
 public class EncryptionTest {
@@ -22,7 +23,7 @@ public class EncryptionTest {
     UserInformationEncoder userInformationEncoder;
 
     @Autowired
-    BCryptPasswordEncoder bCryptPasswordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @ParameterizedTest
     @DisplayName("데이터 암호화 후 복호화 값이 동일한지 확인합니다.")
@@ -40,8 +41,8 @@ public class EncryptionTest {
     @DisplayName("패스워드 일치 테스트")
     void passwordEncodeTest(){
         String password = "tDest12123!@";
-        String DBPassword = bCryptPasswordEncoder.encode(password);
+        String DBPassword = passwordEncoder.encode(password);
 
-        Assertions.assertThat(bCryptPasswordEncoder.matches(password, DBPassword)).isEqualTo(true);
+        Assertions.assertThat(passwordEncoder.matches(password, DBPassword)).isEqualTo(true);
     }
 }

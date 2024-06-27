@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.service.member;
 
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
@@ -36,6 +37,7 @@ public class MemberServiceImpl implements MemberService {
     // 복호화 가능한 인코더
     private final SaltGenerator saltGenerator;
     private final UserInformationEncoder userInformationEncoder;
+
     // 복호화 불가능
     private final PasswordEncoder passwordEncoder;
 
@@ -58,7 +60,8 @@ public class MemberServiceImpl implements MemberService {
         mailService.sendVerification(memberDto);
 
         // 주소 서비스 통해서 주소 저장
-        addrService.addAddr(memberEntity, memberDto.getAddr(), memberDto.getAddrDetail());
+        addrService.addAddr(memberEntity,
+                AddrDto.builder().addr(memberDto.getAddr()).addrDetail(memberDto.getAddrDetail()).build());
 
         return ResponseEntity.ok().build();
     }
@@ -85,15 +88,15 @@ public class MemberServiceImpl implements MemberService {
                 () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
-        if (memberEntity.getMemberId() != memberId){
-            throw new MemberException(MemberResponseMessage.INVALID_PRINCIPLE.getMessage());
+        if (memberEntity.getMemberId() != memberId) {
+            throw new MemberException(AuthMessage.INVALID_PRINCIPLE.getMessage());
         }
 
         MemberDto memberDto = memberEntity.toDto();
         decryptMemberDto(memberDto);
 
         // 주소 목록 추가
-        List<AddrDto> addrDtoList = addrService.getAddrList(memberId);
+        List<AddrDto> addrDtoList = addrService.getAddrList(memberEntity.getMemberId());
 
         return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
     }
@@ -139,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ResponseEntity<?> updatePassword(MemberUpdateRequestVo passwordRequestDto) {
-        if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null){
+        if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
 
@@ -148,11 +151,11 @@ public class MemberServiceImpl implements MemberService {
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
 
-        if (!passwordEncoder.matches(password, memberEntity.getPassword())){
+        if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
             throw new MemberException(MemberResponseMessage.INVALID_PASSWORD.getMessage());
         }
 
-        if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)){
+        if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)) {
             throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
 
@@ -202,7 +205,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
 
-    private MemberEntity getMemberEntity(){
+    private MemberEntity getMemberEntity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
