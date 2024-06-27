@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.config.security;
 
+import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,5 +29,10 @@ public class EncoderConfig {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public TokenUsernameEncoder tokenUsernameEncoder(){
+        return new TokenUsernameEncoder();
     }
 }
