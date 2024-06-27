@@ -18,7 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MemberDto implements UserDetails {
+public class MemberDto {
     private Long memberId;
     private String loginId;
     private String password;
@@ -67,15 +67,5 @@ public class MemberDto implements UserDetails {
 
     public void setAuthorities(Set<GrantedAuthority> authorities){
         this.authorities = authorities;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
-
-    @Override
-    public String getUsername() {
-        return loginId;
     }
 }

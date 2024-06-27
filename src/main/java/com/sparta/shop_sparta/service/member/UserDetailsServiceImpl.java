@@ -20,9 +20,10 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final MemberRepository memberRepository;
+    private final UserInformationEncoder userInformationEncoder;
 
     // 복호화 가능한 인코더
-    private final UserInformationEncoder userInformationEncoder;
+    // private final UserInformationEncoder userInformationEncoder;
 
 
     @Override
@@ -31,21 +32,22 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 () -> new UsernameNotFoundException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
+
         Set<GrantedAuthority> authorities =new HashSet<>();
         // 권한 추가
         authorities.add(new SimpleGrantedAuthority(memberEntity.getRole().getGrade()));
 
-        MemberDto memberDto = memberEntity.toDto();
+        //MemberDto memberDto = memberEntity.toDto();
 
-        decryptMemberDto(memberDto);
-        memberDto.setAuthorities(authorities);
+        decryptMemberEntity(memberEntity);
+        memberEntity.setAuthorities(authorities);
 
-        return memberDto;
+        return memberEntity;
     }
 
-    private void decryptMemberDto(MemberDto memberDto) {
-        memberDto.setEmail(userInformationEncoder.decrypt(memberDto.getEmail()));
-        memberDto.setPhoneNumber(userInformationEncoder.decrypt(memberDto.getPhoneNumber()));
-        memberDto.setMemberName(userInformationEncoder.decrypt(memberDto.getMemberName()));
+    private void decryptMemberEntity(MemberEntity memberEntity) {
+        memberEntity.setEmail(userInformationEncoder.decrypt(memberEntity.getEmail()));
+        memberEntity.setPhoneNumber(userInformationEncoder.decrypt(memberEntity.getPhoneNumber()));
+        memberEntity.setMemberName(userInformationEncoder.decrypt(memberEntity.getMemberName()));
     }
 }
