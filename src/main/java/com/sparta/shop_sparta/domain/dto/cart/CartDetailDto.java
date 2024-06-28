@@ -14,7 +14,7 @@ public class CartDetailDto {
     private Long cartDetailId;
     private Integer amount;
 
-    private Long itemId;
+    private Long productId;
     private Long cartId;
 
     public CartDetailEntity toEntity(){

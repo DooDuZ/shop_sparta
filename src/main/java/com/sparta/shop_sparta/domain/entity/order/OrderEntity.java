@@ -28,7 +28,7 @@ public class OrderEntity extends BaseEntity {
     private Long orderId;
 
     @Column(nullable = false)
-    private String order_addr;
+    private String orderAddr;
 
     @ManyToOne
     @ToString.Exclude
@@ -47,7 +47,7 @@ public class OrderEntity extends BaseEntity {
     }
 
     public OrderDto toDto(){
-        return OrderDto.builder().orderId(this.orderId).order_addr(this.order_addr).memberId(this.memberEntity.getMemberId())
+        return OrderDto.builder().orderId(this.orderId).orderAddr(this.orderAddr).memberId(this.memberEntity.getMemberId())
                 .orderStatus(this.orderStatus).build();
     }
 }

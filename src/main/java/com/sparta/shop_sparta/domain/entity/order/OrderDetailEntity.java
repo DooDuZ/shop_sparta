@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.entity.order;
 
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.domain.entity.item.ItemEntity;
+import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +21,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDetailEntity extends BaseEntity {
+public class OrderDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderDetailId;
@@ -31,22 +31,22 @@ public class OrderDetailEntity extends BaseEntity {
 
     @ManyToOne
     @ToString.Exclude
-    @JoinColumn(name = "itemId")
-    private ItemEntity itemEntity;
+    @JoinColumn(name = "productId")
+    private ProductEntity productEntity;
 
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "orderId")
     private OrderEntity orderEntity;
 
-    public OrderDetailEntity(ItemEntity itemEntity, Integer amount, OrderEntity orderEntity) {
-        this.itemEntity = itemEntity;
+    public OrderDetailEntity(ProductEntity productEntity, Integer amount, OrderEntity orderEntity) {
+        this.productEntity = productEntity;
         this.amount = amount;
         this.orderEntity = orderEntity;
     }
 
     public OrderDetailDto toDto(){
         return OrderDetailDto.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
-                .itemId(this.itemEntity.getItemId()).amount(this.amount).build();
+                .productId(this.productEntity.getProductId()).amount(this.amount).build();
     }
 }

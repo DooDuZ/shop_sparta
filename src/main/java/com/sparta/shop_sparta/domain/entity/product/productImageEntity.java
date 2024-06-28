@@ -1,8 +1,8 @@
-package com.sparta.shop_sparta.domain.entity.item;
+package com.sparta.shop_sparta.domain.entity.product;
 
-import com.sparta.shop_sparta.domain.dto.item.ItemImageDto;
+import com.sparta.shop_sparta.domain.dto.item.productImageDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.constant.item.ItemImageType;
+import com.sparta.shop_sparta.constant.product.ProductImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,22 +17,22 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Entity(name = "itemImage")
+@Entity(name = "productImage")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemImageEntity extends BaseEntity {
+public class productImageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long itemImageId;
+    private Long productImageId;
 
     @Lob
     @Column(nullable = false)
     private String imagePath;
 
     @Column(nullable = false)
-    private ItemImageType itemImageType;
+    private ProductImageType productImageType;
 
     // 이미지 등록, 수정 등에서 순서를 계속 바꿀 수 있음
     @Column(nullable = false)
@@ -40,20 +40,20 @@ public class ItemImageEntity extends BaseEntity {
 
     @ManyToOne
     @ToString.Exclude
-    @JoinColumn(name = "itemId")
-    private ItemEntity itemEntity;
+    @JoinColumn(name = "productId")
+    private ProductEntity productEntity;
 
-    public void setItemImageType(ItemImageType itemImageType) {
-        this.itemImageType = itemImageType;
+    public void setProductImageType(ProductImageType productImageType) {
+        this.productImageType = productImageType;
     }
 
     public void setImageOrdering(Byte imageOrdering) {
         this.imageOrdering = imageOrdering;
     }
 
-    public ItemImageDto toDto(){
-        return ItemImageDto.builder().itemImageId(this.itemImageId).itemImageType(this.itemImageType)
-                .itemId(this.itemEntity.getItemId()).imageOrdering(this.imageOrdering)
+    public productImageDto toDto(){
+        return productImageDto.builder().productImageId(this.productImageId).productImageType(this.productImageType)
+                .itemId(this.productEntity.getProductId()).imageOrdering(this.imageOrdering)
                 .imagePath(this.imagePath).build();
     }
 }

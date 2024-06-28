@@ -1,6 +1,6 @@
-package com.sparta.shop_sparta.constant.item;
+package com.sparta.shop_sparta.constant.product;
 
-public enum ItemStatus {
+public enum ProductStatus {
     NOT_PUBLISHED,  // 공개 전
     WAITING,        // 공개, 판매 대기
     ON_SALE,        // 판매 중

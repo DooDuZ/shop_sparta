@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.domain.entity.cart;
 
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
-import com.sparta.shop_sparta.domain.entity.item.ItemEntity;
+import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,15 +21,15 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartDetailEntity extends BaseEntity {
+public class CartDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartDetailId;
 
     @ManyToOne
     @ToString.Exclude
-    @JoinColumn(name = "itemId")
-    private ItemEntity itemEntity;
+    @JoinColumn(name = "productId")
+    private ProductEntity productEntity;
 
     @ManyToOne
     @ToString.Exclude
@@ -39,8 +39,8 @@ public class CartDetailEntity extends BaseEntity {
     @Column(nullable = false)
     private Integer amount;
 
-    public CartDetailEntity(ItemEntity itemEntity, CartEntity cartEntity, Integer amount) {
-        this.itemEntity = itemEntity;
+    public CartDetailEntity(ProductEntity productEntity, CartEntity cartEntity, Integer amount) {
+        this.productEntity = productEntity;
         this.cartEntity = cartEntity;
         this.amount = amount;
     }
@@ -51,6 +51,6 @@ public class CartDetailEntity extends BaseEntity {
 
     public CartDetailDto toDto() {
         return CartDetailDto.builder().cartId(this.cartEntity.getCartId()).cartDetailId(this.cartDetailId)
-                .itemId(this.itemEntity.getItemId()).amount(this.amount).build();
+                .productId(this.productEntity.getProductId()).amount(this.amount).build();
     }
 }
