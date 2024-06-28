@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.controller.member;
+package com.sparta.shop_sparta.controller.member.auth;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
