@@ -1,0 +1,6 @@
+# curl -X POST --location "https://localhost:8080/login"
+#    -H "Content-Type: application/x-www-form-urlencoded"
+#    -d 'username+%3A+%22sin9158%22%0Apassword+%3A+%22testPassword1%40%22='
+POST https://localhost:8080/login
+Content-Type: application/x-www-form-urlencoded
+username=sin9158&password=testPassword1@

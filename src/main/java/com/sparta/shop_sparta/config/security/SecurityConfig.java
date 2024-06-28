@@ -31,9 +31,8 @@ public class SecurityConfig {
         http.
                 authorizeHttpRequests( authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/login", "/member/verification","/auth/token" ).permitAll()
+                                .requestMatchers("/index.html","/","/login", "/member/verification","/auth/token" ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member").permitAll()
-                                .requestMatchers("/member/**").authenticated()
                                 .anyRequest().hasAnyRole("BASIC", "ADMIN")
                 )
                 .sessionManagement( sessionManagement ->

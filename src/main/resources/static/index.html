@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required><br><br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required><br><br>
+    <button type="submit">Submit</button>
+</form>
+
+
+<button id="logoutButton">Logout</button>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // 폼의 기본 제출 동작을 막습니다.
+
+        const formData = new FormData();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        formData.append('username', username);
+        formData.append('password', password);
+
+        fetch('http://localhost:8080/login', { // 이 부분을 실제 API 엔드포인트로 변경하세요.
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // 여기서 성공적인 응답 처리를 합니다.
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 여기서 에러 처리를 합니다.
+            });
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', function() {
+        fetch('http://localhost:8080/auth/logout', { // 이 부분을 실제 API 엔드포인트로 변경하세요.
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Logged out successfully');
+                    // 여기서 성공적인 로그아웃 처리를 합니다.
+                } else {
+                    console.error('Logout failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // 여기서 에러 처리를 합니다.
+            });
+    });
+</script>
+</body>
+</html>
