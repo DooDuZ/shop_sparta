@@ -14,7 +14,8 @@ public class JwtRedisRepository implements RedisRepository<String, Object> {
     @Override
     public void saveWithDuration(String key, Object value, Integer minute) {
         Duration timeout = Duration.ofMinutes(minute);
-        redisTemplate.opsForValue().set(addPrefix(key), value,timeout);
+        redisTemplate.opsForValue().set(addPrefix(key), value, timeout);
+        redisTemplate.expire(addPrefix(key), timeout);
     }
 
     @Override
@@ -24,19 +25,7 @@ public class JwtRedisRepository implements RedisRepository<String, Object> {
 
     @Override
     public Object find(String key) {
-        return redisTemplate.opsForValue().get(addPrefix(key));
-    }
-
-    public Boolean findUserAgent(String key, String userAgent) {
-        return redisTemplate.opsForSet().isMember(addPrefix(key), userAgent);
-    }
-
-    public void deleteUserAgent(String key, String userAgent){
-        redisTemplate.opsForSet().remove(addPrefix(key), userAgent);
-
-        if (redisTemplate.opsForSet().members(addPrefix(key)).size() == 0){
-            deleteKey(addPrefix(key));
-        }
+        return redisTemplate.opsForHash().entries(addPrefix(key));
     }
 
     @Override
@@ -44,11 +33,40 @@ public class JwtRedisRepository implements RedisRepository<String, Object> {
         redisTemplate.delete(addPrefix(key));
     }
 
-    private String addPrefix(String key){
+    // set과 hashmap 사용 시 로직이 같음
+    public void deleteUserAgent(String key, String userAgent) {
+        redisTemplate.opsForHash().delete(addPrefix(key), userAgent);
+
+        if (redisTemplate.opsForHash().entries(addPrefix(key)).size() == 0) {
+            deleteKey(addPrefix(key));
+        }
+    }
+
+    // hash 사용을 위한 overloading
+    public void saveWithDuration(String key, String userAgent, String refreshToken, Integer minute) {
+        Duration timeout = Duration.ofMinutes(minute);
+        redisTemplate.opsForHash().put(addPrefix(key), userAgent, refreshToken);
+        redisTemplate.expire(addPrefix(key), timeout);
+    }
+
+    public void save(String key, String userAgent, String refreshToken){
+        redisTemplate.opsForHash().put(addPrefix(key), userAgent, refreshToken);
+    }
+
+    public String findUserAgent(String key, String userAgent){
+        return (String) redisTemplate.opsForHash().get(addPrefix(key), userAgent);
+    }
+
+    public Boolean isUserAgent(String key, String userAgent) {
+        return redisTemplate.opsForHash().hasKey(addPrefix(key), userAgent);
+    }
+    // hash 사용을 위한 overloading
+
+    private String addPrefix(String key) {
         return prefix + key;
     }
 
-    public int getSize(String key){
-        return redisTemplate.opsForSet().members(addPrefix(key)).size();
+    public int getSize(String key) {
+        return redisTemplate.opsForHash().size(addPrefix(key)).intValue();
     }
 }

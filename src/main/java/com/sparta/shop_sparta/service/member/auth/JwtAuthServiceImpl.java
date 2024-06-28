@@ -106,7 +106,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
 
         // 발급한 refreshToken을 redis에 등록
         // 유저 이름 암호화 되어있으므로 provider에서 뽑아서 써야한다
-        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), refreshToken);
+        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent, refreshToken);
 
         setCookie(response, accessTokenCookieName, accessToken, accessTokenExpirySecond);
 
@@ -118,7 +118,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
         String userAgent = jwtTokenProvider.getUserAgentByRefresh(token);
 
         // 레디스에 저장된 리프레시 토큰 가져오기
-        return jwtRedisRepository.findUserAgent(username, userAgent);
+        return jwtRedisRepository.isUserAgent(username, userAgent);
     }
 
     private void setCookie(HttpServletResponse response, String name, String token, int maxAge) {
