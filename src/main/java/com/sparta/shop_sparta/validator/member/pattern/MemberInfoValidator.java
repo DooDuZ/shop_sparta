@@ -5,14 +5,10 @@ import java.util.regex.Pattern;
 
 public class MemberInfoValidator implements PatternValidator{
 
-    private final Pattern pattern;
-
-    public MemberInfoValidator(Pattern pattern){
-        this.pattern = pattern;
-    }
+    public MemberInfoValidator(){}
 
     @Override
-    public Boolean checkPattern(String info) {
+    public Boolean checkPattern(Pattern pattern, String info) {
         Matcher matcher = pattern.matcher(info);
         return matcher.matches();
     }

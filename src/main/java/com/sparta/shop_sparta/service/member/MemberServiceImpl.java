@@ -1,51 +1,38 @@
 package com.sparta.shop_sparta.service.member;
 
-import com.sparta.shop_sparta.config.MailConfig;
-import com.sparta.shop_sparta.config.security.jwt.JwtTokenProvider;
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
+import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.domain.dto.member.PasswordRequestDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
+import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.exception.member.MemberAuthorizeException;
+import com.sparta.shop_sparta.exception.member.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
-import com.sparta.shop_sparta.repository.memoryRepository.SignupVerifyCodeRedisRepository;
+import com.sparta.shop_sparta.service.member.addr.AddrService;
+import com.sparta.shop_sparta.service.member.verify.MailService;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import com.sparta.shop_sparta.validator.member.EntityFieldValidator;
 import com.sparta.shop_sparta.validator.member.pattern.MemberInfoValidator;
-import com.sparta.shop_sparta.validator.member.pattern.PasswordValidator;
 import com.sparta.shop_sparta.validator.member.pattern.PatternConfig;
-import jakarta.mail.internet.MimeMessage;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import java.security.SecureRandom;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-
     private final MemberRepository memberRepository;
-    private final SignupVerifyCodeRedisRepository signupVerifyCodeRedisRepository;
-
-    // JwtProvider
-    private final JwtTokenProvider jwtTokenProvider;
-
-    // 메일 유틸 -> 다른 서비스로 분리
-    private final MailConfig mailConfig;
-    private final JavaMailSender javaMailSender;
+    private final MailService mailService;
+    private final AddrService addrService;
 
     // 복호화 가능한 인코더
     private final SaltGenerator saltGenerator;
@@ -53,8 +40,6 @@ public class MemberServiceImpl implements MemberService {
 
     // 복호화 불가능
     private final PasswordEncoder passwordEncoder;
-
-    private final AddrService addrService;
 
     @Override
     @Transactional
@@ -68,10 +53,15 @@ public class MemberServiceImpl implements MemberService {
         MemberEntity memberEntity = memberRepository.save(memberDto.toEntity());
         memberEntity.setRole(MemberRole.UNVERIFIED);
 
-        sendVerification(memberEntity);
+        memberDto.setMemberId(memberEntity.getMemberId());
+
+        // 다른 서비스 처리를 위해 복호화 후 회원번호 set
+        decryptMemberDto(memberDto);
+        mailService.sendVerification(memberDto);
 
         // 주소 서비스 통해서 주소 저장
-        addrService.addAddr(memberEntity, memberDto.getAddr(), memberDto.getAddrDetail());
+        addrService.addAddr(memberEntity,
+                AddrDto.builder().addr(memberDto.getAddr()).addrDetail(memberDto.getAddrDetail()).build());
 
         return ResponseEntity.ok().build();
     }
@@ -79,127 +69,94 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public ResponseEntity<?> verifySignup(Long memberId, String verificationCode) {
-        String key = String.valueOf(memberId);
-        String verificate = (String) signupVerifyCodeRedisRepository.find(key);
-
-        if (!verificate.equals(verificationCode)) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE.getMessage());
-        }
+        // 메일 서비스를 사용한 검증
+        // 코드 인즈 안되면 exception 발생
+        mailService.verifySignup(memberId, verificationCode);
 
         MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberAuthorizeException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
         memberEntity.setRole(MemberRole.BASIC);
 
-        // 사용한 인증 코드 삭제
-        signupVerifyCodeRedisRepository.delete(key);
-
         return ResponseEntity.ok().build();
     }
 
-    private String getVerificationCode() {
-        StringBuilder code = new StringBuilder();
-        SecureRandom secureRandom = new SecureRandom();
+    @Override
+    public ResponseEntity<?> getMemberInfo(Long memberId) {
+        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
 
-        for (int i = 0; i < 6; i++) {
-            int number = secureRandom.nextInt(10);
-            code.append(number);
+        if (memberEntity.getMemberId() != memberId) {
+            throw new MemberException(AuthMessage.INVALID_PRINCIPLE.getMessage());
         }
 
-        return code.toString();
-    }
+        MemberDto memberDto = memberEntity.toDto();
+        decryptMemberDto(memberDto);
 
-    private String getVerificationMessage(MemberEntity memberEntity) {
-        StringBuilder verificationMessage = new StringBuilder();
+        // 주소 목록 추가
+        List<AddrDto> addrDtoList = addrService.getAddrList(memberEntity.getMemberId());
 
-        String verificationCode = getVerificationCode();
-
-        // 레디스에 코드 저장
-        // 3분 후 만료
-        signupVerifyCodeRedisRepository.saveWithDuration(String.valueOf(memberEntity.getMemberId()),
-                verificationCode, 3);
-
-        System.out.println(signupVerifyCodeRedisRepository.find(String.valueOf(memberEntity.getMemberId())));
-
-        verificationMessage.append("<h3>")
-                .append("<a href=\"").append(mailConfig.requestUrl).append("/member/verification?memberId=")
-                .append(memberEntity.getMemberId()).append("&verificationCode=").append(verificationCode)
-                .append("\">Click!!</a>")
-                .append("</h3>");
-
-        return verificationMessage.toString();
-    }
-
-    // 가입 인증 메일 발송
-    private void sendVerification(MemberEntity memberEntity) {
-        try {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            String message = getVerificationMessage(memberEntity);
-
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            mimeMessageHelper.setFrom(mailConfig.from, mailConfig.DOMAIN_NAME);
-            mimeMessageHelper.setTo(userInformationEncoder.decrypt(memberEntity.getEmail()));
-            mimeMessageHelper.setSubject(mailConfig.MAIL_TITLE);
-            mimeMessageHelper.setText(message, true);
-
-            javaMailSender.send(mimeMessage);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
     }
 
     private void validateSignupRequest(MemberDto memberDto) {
+        MemberInfoValidator memberInfoValidator = new MemberInfoValidator();
 
         // 필수 파라미터 검사
         if (!new EntityFieldValidator().validateParams(memberDto.toEntity())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
 
         // 아이디 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.loginIdPattern).checkPattern(memberDto.getLoginId())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_ID.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.loginIdPattern, memberDto.getLoginId())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_ID.getMessage());
         }
 
         // 이메일 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.emailPattern).checkPattern(memberDto.getEmail())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_EMAIL.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.emailPattern, memberDto.getEmail())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_EMAIL.getMessage());
         }
 
         // 패스워드 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.passwordPattern).checkPattern(memberDto.getPassword())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.passwordPattern, memberDto.getPassword())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
         // 휴대폰 번호 정규식 검사
-        if (!new MemberInfoValidator(PatternConfig.phoneNumberPattern).checkPattern(memberDto.getPhoneNumber())) {
-            throw new MemberAuthorizeException(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
+        if (!memberInfoValidator.checkPattern(PatternConfig.phoneNumberPattern, memberDto.getPhoneNumber())) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
         }
 
         // 이메일 중복 검사
         if (memberRepository.findByEmail(memberDto.getEmail()).isPresent()) {
-            throw new MemberAuthorizeException(MemberResponseMessage.DUPLICATED_EMAIL.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_EMAIL.getMessage());
         }
 
         // 아이디 중복 검사
         if (memberRepository.findByLoginId(memberDto.getLoginId()).isPresent()) {
-            throw new MemberAuthorizeException(MemberResponseMessage.DUPLICATED_LOGIN_ID.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_LOGIN_ID.getMessage());
         }
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePassword(PasswordRequestDto passwordRequestDto) {
+    public ResponseEntity<?> updatePassword(MemberUpdateRequestVo passwordRequestDto) {
+        if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+        }
+
         MemberEntity memberEntity = getMemberEntity();
 
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
 
-        if (!passwordEncoder.matches(password, memberEntity.getPassword())){
-            return ResponseEntity.ok(MemberResponseMessage.INVALID_PASSWORD);
+        if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
+            throw new MemberException(MemberResponseMessage.INVALID_PASSWORD.getMessage());
         }
 
-        if (new MemberInfoValidator(PatternConfig.passwordPattern).checkPattern(confirmPassword)){
-            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PASSWORD);
+        if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)) {
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
 
         passwordEncoder.matches(password, memberEntity.getPassword());
@@ -211,8 +168,24 @@ public class MemberServiceImpl implements MemberService {
 
 
     @Override
-    public ResponseEntity<?> updatePhoneNumber(String PhoneNumber) {
-        return null;
+    @Transactional
+    public ResponseEntity<?> updatePhoneNumber(MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+        if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String phoneNumber = phoneNumberUpdateRequestDto.getPhoneNumber();
+
+        if (!new MemberInfoValidator().checkPattern(PatternConfig.phoneNumberPattern, phoneNumber)) {
+            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
+        }
+
+        String salt = saltGenerator.generateSalt();
+        MemberEntity memberEntity = getMemberEntity();
+
+        memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumber, salt));
+
+        return ResponseEntity.ok().build();
     }
 
     private void encryptMemberDto(MemberDto memberDto) {
@@ -224,8 +197,15 @@ public class MemberServiceImpl implements MemberService {
         memberDto.setPassword(passwordEncoder.encode(memberDto.getPassword()));
     }
 
+    private void decryptMemberDto(MemberDto memberDto) {
+        memberDto.setEmail(userInformationEncoder.decrypt(memberDto.getEmail()));
+        memberDto.setPhoneNumber(userInformationEncoder.decrypt(memberDto.getPhoneNumber()));
+        memberDto.setMemberName(userInformationEncoder.decrypt(memberDto.getMemberName()));
+        memberDto.setPassword("");
+    }
 
-    private MemberEntity getMemberEntity(){
+
+    private MemberEntity getMemberEntity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null) {
@@ -243,7 +223,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         return memberRepository.findByLoginId(username).orElseThrow(
-                () -> new MemberAuthorizeException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
     }
 }

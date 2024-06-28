@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest
@@ -29,7 +29,7 @@ public class MemberServiceImplTest {
     private AddrRepository addrRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Test
     @DisplayName("test")
@@ -40,7 +40,7 @@ public class MemberServiceImplTest {
 
         String password = "1234Password!";
 
-        memberDto.setPassword(bCryptPasswordEncoder.encode(memberDto.getPassword()));
+        memberDto.setPassword(passwordEncoder.encode(memberDto.getPassword()));
 
         System.out.println(memberDto.getAddr());
 
@@ -54,7 +54,7 @@ public class MemberServiceImplTest {
         System.out.println(memberEntity);
 
         Assertions.assertThat(memberEntity.getMemberId()).isNotNull();
-        Assertions.assertThat(bCryptPasswordEncoder.matches(password, memberEntity.getPassword())).isEqualTo(true);
+        Assertions.assertThat(passwordEncoder.matches(password, memberEntity.getPassword())).isEqualTo(true);
 
         // AddrDto addrDto = AddrDto.builder().addr(memberDto.getAddr()).addrDetail(memberDto.getAddrDetail()).build();
         // AddrEntity addrEntity = addrRepository.save(addrDto.toEntity());

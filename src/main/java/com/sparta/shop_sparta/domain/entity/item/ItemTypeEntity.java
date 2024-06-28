@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ItemTypeEntity extends BaseEntity {
+public class ItemTypeEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long itemTypeId;

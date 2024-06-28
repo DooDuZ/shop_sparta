@@ -17,10 +17,18 @@ public class AddrDto {
     private Long memberId;
 
     public AddrEntity toEntity() {
-        return AddrEntity.builder().addrId(this.addrId).addr(this.addr).addr_detail(this.addrDetail).build();
+        return AddrEntity.builder().addrId(this.addrId).addr(this.addr).addrDetail(this.addrDetail).build();
     }
 
     public void setMemberId(Long memberId) {
         this.memberId = memberId;
+    }
+
+    public void setAddr(String addr) {
+        this.addr = addr;
+    }
+
+    public void setAddrDetail(String addrDetail) {
+        this.addrDetail = addrDetail;
     }
 }

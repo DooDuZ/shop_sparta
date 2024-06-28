@@ -27,7 +27,7 @@ public class AddrEntity extends BaseEntity {
     @Column(nullable = false)
     private String addr;
     @Column(nullable = false)
-    private String addr_detail;
+    private String addrDetail;
 
     @ManyToOne
     @ToString.Exclude
@@ -38,12 +38,12 @@ public class AddrEntity extends BaseEntity {
         this.addr = addr;
     }
 
-    public void setAddr_detail(String addr_detail) {
-        this.addr_detail = addr_detail;
+    public void setAddrDetail(String addr_detail) {
+        this.addrDetail = addr_detail;
     }
 
     public AddrDto toDto() {
-        return AddrDto.builder().addr(this.addr).addrDetail(this.addr_detail).addrId(this.addrId)
+        return AddrDto.builder().addr(this.addr).addrDetail(this.addrDetail).addrId(this.addrId)
                 .memberId(this.memberEntity.getMemberId()).build();
     }
 }

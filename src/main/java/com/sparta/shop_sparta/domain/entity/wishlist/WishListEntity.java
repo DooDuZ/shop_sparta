@@ -21,7 +21,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WishListEntity extends BaseEntity {
+public class WishListEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long wishListId;

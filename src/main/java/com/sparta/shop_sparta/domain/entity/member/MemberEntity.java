@@ -10,11 +10,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "member")
 @Getter
@@ -22,7 +27,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class MemberEntity extends BaseEntity {
+public class MemberEntity extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
@@ -47,6 +52,8 @@ public class MemberEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
+    private Set<GrantedAuthority> authorities;
+
     public void setMemberName(String memberName) {
         this.memberName = memberName;
     }
@@ -67,8 +74,26 @@ public class MemberEntity extends BaseEntity {
         this.memberId = memberId;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setAuthorities(Set<GrantedAuthority> authorities) {
+        this.authorities = authorities;
+    }
+
     public MemberDto toDto() {
         return MemberDto.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)
                 .loginId(this.loginId).phoneNumber(this.phoneNumber).role(this.role).password(this.password).build();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getUsername() {
+        return loginId;
     }
 }

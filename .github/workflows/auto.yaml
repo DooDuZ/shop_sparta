@@ -37,7 +37,9 @@ jobs:
           echo "DATASOURCE_URL=$DATASOURCE_URL" >> .env
           echo "REDIS_HOST=$REDIS_HOST" >> .env
           echo "REDIS_PORT=$REDIS_PORT" >> .env
-          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          echo "JWT_ACCESS_SECRET=JWT_ACCESS_SECRET" >> .env
+          echo "JWT_REFRESH_SECRET=JWT_REFRESH_SECRET" >> .env
+          echo "TOKEN_USERNAME_SECRET=TOKEN_USERNAME_SECRET" >> .env
 
         env:
           REQUEST_URL: ${{ secrets.REQUEST_URL }}
@@ -52,7 +54,9 @@ jobs:
           DATASOURCE_URL: ${{ secrets.DATASOURCE_URL }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
+          JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
+          TOKEN_USERNAME_SECRET: ${{ secrets.TOKEN_USERNAME_SECRET }}
 
       # unittest 실행
       - name: Run tests in Docker container
