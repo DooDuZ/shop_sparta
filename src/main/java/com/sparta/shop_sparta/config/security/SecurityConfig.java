@@ -33,7 +33,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers("/index.html","/","/login", "/member/verification","/auth/token" ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member").permitAll()
-                                .anyRequest().hasAnyRole("BASIC", "ADMIN")
+                                .anyRequest().hasAnyRole("BASIC", "SELLER","ADMIN")
                 )
                 .sessionManagement( sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
