@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +32,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     private final int accessTokenExpirySecond = 60 * 15;
     private final int refreshTokenExpirySecond = 60 * 60 * 24 * 7;
     private final TokenUsernameEncoder tokenUsernameEncoder;
+    private final String USER_AGENT_KEY = "User-Agent";
     //
 
     // controller가 아닌 usernamePasswordAuthenticationFilter -> loginSuccessHandler 에서 접근
@@ -54,16 +56,20 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     }
 
     @Override
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
+    public ResponseEntity<?> logout(UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
+        String accessToken = jwtTokenProvider.resolveToken(request);
 
-        System.out.println(refreshToken);
+        try {
+            // 엑세스 토큰에서 유저 이름 추출 -> redis key로 저장된 형식으로 인코딩
+            String key = tokenUsernameEncoder.encrypt(jwtTokenProvider.getUsername(accessToken));
+            String userAgent = request.getHeader(USER_AGENT_KEY);
+            jwtRedisRepository.deleteUserAgent(key, userAgent);
 
-        String key = jwtTokenProvider.getUsernameByRefresh(refreshToken);
-        String userAgent = jwtTokenProvider.getUserAgentByRefresh(refreshToken);
-        jwtRedisRepository.deleteUserAgent(key, userAgent);
+            setCookie(response, accessTokenCookieName, null, 0);
+        }catch (Exception e){
+            throw new MemberException(AuthMessage.INVALID_TOKEN.getMessage(), e);
+        }
 
-        setCookie(response, accessTokenCookieName, null, 0);
         return ResponseEntity.ok().build();
     }
 
@@ -94,13 +100,13 @@ public class JwtAuthServiceImpl implements JwtAuthService {
 
     private TokenWrapper generateTokens(String username, String role, HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.createAccessToken(username, role);
-        String userAgent = request.getHeader("User-Agent");
+        String userAgent = request.getHeader(USER_AGENT_KEY);
 
         String refreshToken = jwtTokenProvider.createRefreshToken(username, role, userAgent);
 
         // 발급한 refreshToken을 redis에 등록
         // 유저 이름 암호화 되어있으므로 provider에서 뽑아서 써야한다
-        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent);
+        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), refreshToken);
 
         setCookie(response, accessTokenCookieName, accessToken, accessTokenExpirySecond);
 
