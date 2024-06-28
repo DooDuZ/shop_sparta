@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum MemberRole {
     ADMIN("ROLE_ADMIN"),
     BASIC("ROLE_BASIC"),
+    SELLER("ROLE_SELLER"),
     UNVERIFIED("ROLE_UNVERIFIED"),
     ;
 

@@ -22,7 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CartEntity extends BaseEntity {
+public class CartEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartId;
