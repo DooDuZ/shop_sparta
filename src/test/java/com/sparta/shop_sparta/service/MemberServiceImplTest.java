@@ -8,41 +8,35 @@ import com.sparta.shop_sparta.repository.MemberRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+
+@ExtendWith(MockitoExtension.class)
 public class MemberServiceImplTest {
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private MemberRepository memberRepository;
 
-    @MockBean
+    @Mock
     private AddrRepository addrRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Test
     @DisplayName("test")
     void createAccountTest(){
-        MemberDto memberDto = MemberDto.builder().memberName("지웅이").email("sin9158@naver.com").loginId("sin9158")
-                .password("1234Password!").addr("경기도 안산시 단원구 고잔2길 9").addrDetail("541호")
-                .phoneNumber("01027209158").role(MemberRole.BASIC).build();
-
         String password = "1234Password!";
+        MemberDto memberDto = MemberDto.builder().memberName("지웅이").email("sin9158@naver.com").loginId("sin9158")
+                .password(password).addr("경기도 안산시 단원구 고잔2길 9").addrDetail("541호")
+                .phoneNumber("01027209158").role(MemberRole.BASIC).build();
 
         memberDto.setPassword(passwordEncoder.encode(memberDto.getPassword()));
 
-        System.out.println(memberDto.getAddr());
+        System.out.println("passwordEncoder = " + passwordEncoder);
 
         // Mock the behavior of memberRepository.save
         MemberEntity mockMemberEntity = memberDto.toEntity();
@@ -50,7 +44,6 @@ public class MemberServiceImplTest {
         Mockito.when(memberRepository.save(Mockito.any(MemberEntity.class))).thenReturn(mockMemberEntity);
 
         MemberEntity memberEntity = memberRepository.save(memberDto.toEntity());
-
         System.out.println(memberEntity);
 
         Assertions.assertThat(memberEntity.getMemberId()).isNotNull();
