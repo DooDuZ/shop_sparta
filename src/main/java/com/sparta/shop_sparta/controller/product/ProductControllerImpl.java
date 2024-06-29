@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.controller.product;
 
 import com.sparta.shop_sparta.domain.dto.item.ProductDto;
 import com.sparta.shop_sparta.domain.dto.item.CategoryDto;
+import com.sparta.shop_sparta.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,11 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ProductControllerImpl implements ProductController {
 
+    private final ProductService productService;
 
     @Override
     public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
-
-        return null;
+        return productService.addProduct(userDetails, productDto);
     }
 
     @Override
