@@ -118,7 +118,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
         String userAgent = jwtTokenProvider.getUserAgentByRefresh(token);
 
         // 레디스에 저장된 리프레시 토큰 가져오기
-        return jwtRedisRepository.isUserAgent(username, userAgent);
+        return jwtRedisRepository.findUserAgent(username, userAgent).equals(token);
     }
 
     private void setCookie(HttpServletResponse response, String name, String token, int maxAge) {
