@@ -55,8 +55,8 @@ public class MemberServiceImpl implements MemberService {
 
         memberDto.setMemberId(memberEntity.getMemberId());
 
-        // 다른 서비스 처리를 위해 복호화 후 회원번호 set
-        decryptMemberDto(memberDto);
+        // 다른 서비스 처리를 위해 복호화 후 회원번호 set -> userDetails 사용하므로 복호화 된 정보 사용함
+        // decryptMemberDto(memberDto);
         mailService.sendVerification(memberDto);
 
         // 주소 서비스 통해서 주소 저장
@@ -83,17 +83,16 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public ResponseEntity<?> getMemberInfo(Long memberId) {
-        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
-        );
+    public ResponseEntity<?> getMemberInfo(UserDetails userDetails, Long memberId) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if (memberEntity.getMemberId() != memberId) {
             throw new MemberException(AuthMessage.INVALID_PRINCIPLE.getMessage());
         }
 
         MemberDto memberDto = memberEntity.toDto();
-        decryptMemberDto(memberDto);
+        //decryptMemberDto(memberDto);
+        memberDto.setPassword("");
 
         // 주소 목록 추가
         List<AddrDto> addrDtoList = addrService.getAddrList(memberEntity.getMemberId());
@@ -141,12 +140,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePassword(MemberUpdateRequestVo passwordRequestDto) {
+    public ResponseEntity<?> updatePassword(UserDetails userDetails, MemberUpdateRequestVo passwordRequestDto) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
 
-        MemberEntity memberEntity = getMemberEntity();
+        MemberEntity memberEntity = (MemberEntity) userDetails;
 
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
@@ -169,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePhoneNumber(MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+    public ResponseEntity<?> updatePhoneNumber(UserDetails userDetails, MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -181,7 +180,7 @@ public class MemberServiceImpl implements MemberService {
         }
 
         String salt = saltGenerator.generateSalt();
-        MemberEntity memberEntity = getMemberEntity();
+        MemberEntity memberEntity = (MemberEntity) userDetails;
 
         memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumber, salt));
 
@@ -197,33 +196,12 @@ public class MemberServiceImpl implements MemberService {
         memberDto.setPassword(passwordEncoder.encode(memberDto.getPassword()));
     }
 
+    // userDetails 사용으로 바뀌면서 사용하는 경우 없음
+    // 바로 삭제하지 않고 일단 keep
     private void decryptMemberDto(MemberDto memberDto) {
         memberDto.setEmail(userInformationEncoder.decrypt(memberDto.getEmail()));
         memberDto.setPhoneNumber(userInformationEncoder.decrypt(memberDto.getPhoneNumber()));
         memberDto.setMemberName(userInformationEncoder.decrypt(memberDto.getMemberName()));
         memberDto.setPassword("");
-    }
-
-
-    private MemberEntity getMemberEntity() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null) {
-            throw new RuntimeException("[서버 내부 오류] 인증 정보 없음");
-        }
-
-        Object principal = authentication.getPrincipal();
-
-        String username;
-
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else {
-            username = principal.toString();
-        }
-
-        return memberRepository.findByLoginId(username).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
-        );
     }
 }

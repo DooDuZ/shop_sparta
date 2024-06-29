@@ -1,5 +1,4 @@
-package com.sparta.shop_sparta.domain.dto.item;
-
+package com.sparta.shop_sparta.domain.dto.product;
 
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
@@ -9,24 +8,28 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductDto {
+public class ProductResponseDto {
     private Long productId;
     private String productName;
-    private String productDetails;
+    private String productDetail;
     private Long categoryId;
     private ProductStatus productStatus;
+    private Long sellerId;
 
+    @Setter
     @Builder.Default
-    private List<productImageDto> productImages = new ArrayList<>();
+    private List<ProductImageDto> productImages = new ArrayList<>();
 
     public ProductEntity toEntity(){
-        return ProductEntity.builder().productId(this.productId).productDetails(this.productDetails)
+        return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
                 .productStatus(this.productStatus).productName(this.productName).build();
     }
+
 }
