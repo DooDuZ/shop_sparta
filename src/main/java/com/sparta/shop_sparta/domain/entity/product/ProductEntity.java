@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
-import com.sparta.shop_sparta.domain.dto.item.ProductDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -23,6 +23,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class ProductEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,12 +34,12 @@ public class ProductEntity extends BaseEntity {
 
     @Lob
     @Column(nullable = false)
-    private String productDetails;
+    private String productDetail;
 
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "productCategoryId")
-    private categoryEntity categoryEntity;
+    private CategoryEntity categoryEntity;
 
     @ManyToOne
     @ToString.Exclude
@@ -49,16 +50,15 @@ public class ProductEntity extends BaseEntity {
     private ProductStatus productStatus;
 
 
-
     public void setProductName(String productName) {
         this.productName = productName;
     }
 
-    public void setProductDetails(String productDetails) {
-        this.productDetails = productDetails;
+    public void setProductDetail(String productDetail) {
+        this.productDetail = productDetail;
     }
 
-    public void setCategoryEntity(categoryEntity categoryEntity) {
+    public void setCategoryEntity(CategoryEntity categoryEntity) {
         this.categoryEntity = categoryEntity;
     }
 
@@ -66,8 +66,12 @@ public class ProductEntity extends BaseEntity {
         this.productStatus = productStatus;
     }
 
+    public void setSellerEntity(MemberEntity sellerEntity) {
+        this.sellerEntity = sellerEntity;
+    }
+
     public ProductDto toDto(){
-        return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetails(this.productDetails)
+        return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetail(this.productDetail)
                 .productStatus(this.productStatus).productName(this.productName).build();
     }
 }
