@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.controller.product;
 
-import com.sparta.shop_sparta.domain.dto.item.ProductDto;
-import com.sparta.shop_sparta.domain.dto.item.CategoryDto;
+import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,22 +20,22 @@ public class ProductControllerImpl implements ProductController {
 
     @Override
     @Secured("ROLE_SELLER")
-    public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
-        return productService.addProduct(userDetails, productDto);
+    public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails,  ProductRequestDto productRequestDto) {
+        return productService.addProduct(userDetails, productRequestDto);
     }
 
     @Override
-    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
+    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails,  ProductRequestDto productRequestDto) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
+    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails,  ProductRequestDto productRequestDto) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> getProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
+    public ResponseEntity<?> getProduct(@AuthenticationPrincipal UserDetails userDetails,  ProductRequestDto productRequestDto) {
         return null;
     }
 
