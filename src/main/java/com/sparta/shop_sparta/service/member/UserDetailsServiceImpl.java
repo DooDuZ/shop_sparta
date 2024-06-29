@@ -32,12 +32,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 () -> new UsernameNotFoundException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
-
         Set<GrantedAuthority> authorities =new HashSet<>();
+
         // 권한 추가
         authorities.add(new SimpleGrantedAuthority(memberEntity.getRole().getGrade()));
-
-        //MemberDto memberDto = memberEntity.toDto();
 
         decryptMemberEntity(memberEntity);
         memberEntity.setAuthorities(authorities);
