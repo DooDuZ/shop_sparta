@@ -22,8 +22,8 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody MemberDto memberDTO) {
-        return memberService.createAccount(memberDTO);
+    public ResponseEntity<?> createAccount(@RequestBody MemberDto memberDto) {
+        return memberService.createAccount(memberDto);
     }
 
     @Override
