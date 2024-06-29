@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.domain.entity.product;
 import com.sparta.shop_sparta.domain.dto.item.ProductDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,8 +40,15 @@ public class ProductEntity extends BaseEntity {
     @JoinColumn(name = "productCategoryId")
     private categoryEntity categoryEntity;
 
+    @ManyToOne
+    @ToString.Exclude
+    @JoinColumn(name = "memberId")
+    private MemberEntity sellerEntity;
+
     @Column(nullable = false)
     private ProductStatus productStatus;
+
+
 
     public void setProductName(String productName) {
         this.productName = productName;

@@ -5,6 +5,7 @@ import com.sparta.shop_sparta.domain.dto.item.CategoryDto;
 import com.sparta.shop_sparta.service.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ public class ProductControllerImpl implements ProductController {
     private final ProductService productService;
 
     @Override
+    @Secured("ROLE_SELLER")
     public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails, ProductDto productDto) {
         return productService.addProduct(userDetails, productDto);
     }

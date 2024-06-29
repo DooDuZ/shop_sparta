@@ -21,6 +21,7 @@ public class ProductDto {
     private String productDetails;
     private Long categoryId;
     private ProductStatus productStatus;
+    private Long sellerId;
 
     @Builder.Default
     private List<productImageDto> productImages = new ArrayList<>();
