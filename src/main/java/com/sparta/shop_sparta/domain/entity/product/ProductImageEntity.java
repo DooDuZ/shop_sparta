@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
-import com.sparta.shop_sparta.domain.dto.item.productImageDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductImageType;
 import jakarta.persistence.Column;
@@ -22,7 +22,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class productImageEntity extends BaseEntity {
+public class ProductImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productImageId;
@@ -51,8 +51,8 @@ public class productImageEntity extends BaseEntity {
         this.imageOrdering = imageOrdering;
     }
 
-    public productImageDto toDto(){
-        return productImageDto.builder().productImageId(this.productImageId).productImageType(this.productImageType)
+    public ProductImageDto toDto(){
+        return ProductImageDto.builder().productImageId(this.productImageId).productImageType(this.productImageType)
                 .itemId(this.productEntity.getProductId()).imageOrdering(this.imageOrdering)
                 .imagePath(this.imagePath).build();
     }

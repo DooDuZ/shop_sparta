@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.dto.item;
+package com.sparta.shop_sparta.domain.dto.product;
 
 import com.sparta.shop_sparta.domain.entity.product.categoryEntity;
 import lombok.AllArgsConstructor;

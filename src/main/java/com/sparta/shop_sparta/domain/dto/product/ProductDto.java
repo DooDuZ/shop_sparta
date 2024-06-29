@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.domain.dto.item;
+package com.sparta.shop_sparta.domain.dto.product;
 
 
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
@@ -24,7 +24,7 @@ public class ProductDto {
     private Long sellerId;
 
     @Builder.Default
-    private List<productImageDto> productImages = new ArrayList<>();
+    private List<ProductImageDto> productImages = new ArrayList<>();
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetails(this.productDetails)
