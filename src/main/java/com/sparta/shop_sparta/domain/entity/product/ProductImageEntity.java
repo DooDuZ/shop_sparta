@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
-import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,7 +52,7 @@ public class ProductImageEntity {
 
     public ProductImageDto toDto(){
         return ProductImageDto.builder().productImageId(this.productImageId).productImageType(this.productImageType)
-                .itemId(this.productEntity.getProductId()).imageOrdering(this.imageOrdering)
+                .productId(this.productEntity.getProductId()).imageOrdering(this.imageOrdering)
                 .imagePath(this.imagePath).build();
     }
 }

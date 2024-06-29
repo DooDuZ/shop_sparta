@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
-import com.sparta.shop_sparta.domain.dto.product.ProductDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -70,8 +70,8 @@ public class ProductEntity extends BaseEntity {
         this.sellerEntity = sellerEntity;
     }
 
-    public ProductDto toDto(){
-        return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetail(this.productDetail)
-                .productStatus(this.productStatus).productName(this.productName).build();
+    public ProductResponseDto toDto(){
+        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetail(this.productDetail)
+                .productStatus(this.productStatus).productName(this.productName).sellerId(sellerEntity.getMemberId()).build();
     }
 }

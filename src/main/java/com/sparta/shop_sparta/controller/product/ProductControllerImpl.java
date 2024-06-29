@@ -8,8 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,32 +33,37 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails,  ProductRequestDto productRequestDto) {
+    @PutMapping("/{productId}")
+    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProductRequestDto productRequestDto) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails,  Long productId) {
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long productId) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> getProduct(@AuthenticationPrincipal UserDetails userDetails,  Long productId) {
+    @GetMapping("/{productId}")
+    public ResponseEntity<?> getProduct(@PathVariable Long productId) {
+        return productService.getProduct(productId);
+    }
+
+    // 후에 페이징 적용
+    @Override
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    @Override
+    public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
         return null;
     }
 
     @Override
-    public ResponseEntity<?> getAllProducts(UserDetails userDetails) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<?> getAllByCategory(UserDetails userDetails, CategoryDto categoryDto) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<?> getAllProductsBySeller(UserDetails userDetails, Long sellerId) {
+    public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
         return null;
     }
 }

@@ -7,17 +7,20 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class ProductImageDto {
     private Long productImageId;
     private String imagePath;
     private Byte imageOrdering;
-    private Long itemId;
+    private Long productId;
     private ProductImageType productImageType;
+    private String EncodedImageByBase64;
 
     public ProductImageEntity toEntity(){
         return ProductImageEntity.builder().productImageId(this.productImageId).imagePath(this.imagePath).imageOrdering(this.imageOrdering)

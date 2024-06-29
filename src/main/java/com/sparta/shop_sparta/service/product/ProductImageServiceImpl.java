@@ -7,6 +7,7 @@ import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
 import com.sparta.shop_sparta.exception.product.ProductException;
 import com.sparta.shop_sparta.repository.ProductImageRepository;
+import com.sparta.shop_sparta.util.Image.ImageUtil;
 import jakarta.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -35,31 +35,20 @@ public class ProductImageServiceImpl implements ProductImageService {
     public void addProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails, List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
 
-        System.out.println("ProductImageServiceImpl.addProductImages");
-        System.out.println("filesize : " + productThumbnails.size());
-        System.out.println("filesize2 : " + productDetailImages.size());
-
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
 
         productImageEntityList.addAll(getImageEntities(productEntity, productThumbnails, ProductImageType.HEADER));
         productImageEntityList.addAll(getImageEntities(productEntity, productDetailImages, ProductImageType.BODY));
 
         try {
-            // 만약 여러장 이미지 저장이 실패하면 Exception 발생시켜서 호출 메서드에서 알 수 있게 해야함
-            // FK사용을 위해 저장된 ProductEntity를 delete 해야줘야하기 떄문!!
-            // ProductEntity엔 softDelete 적용돼있는데... 괜찮겠지 이정도는? -> 너무 많은 garbage값이 생긴다면 EntityListener를 풀고 물리적 삭제 기능을 살려 두는 것도 방법
             productImageRepository.saveAll(productImageEntityList);
         }catch (Exception e){
-            // DB 커넥션 풀 부족 등의 문제로 실패할 가능성이 있음
-            // 그러나 시스템 외적인 문제도 고려해야함
             e.printStackTrace();
         }
     }
 
     private List<ProductImageEntity> getImageEntities(ProductEntity productEntity, List<MultipartFile> images, ProductImageType productImageType) {
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
-
-        System.out.println("images.size() = " + images.size());
 
         try {
             for (byte i = 1; i <= images.size(); i++){
@@ -79,9 +68,7 @@ public class ProductImageServiceImpl implements ProductImageService {
             }
         }catch (IOException e){
             e.printStackTrace();
-            // 파일만 저장되고 Entity로 저장이 안되는 경우에도 참조값 비교를 통해 주기적으로 지워지도록 구현 예정
-            // 저장한 파일 신경쓰지 말고 exception 발생!
-            throw new ProductException(ProductMessage.FAIL_STORE_IMAGE.getMessage(), e);
+            throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage(), e);
         }catch (RuntimeException e){
             throw new ProductException(ProductMessage.FILE_SIZE_EXCEEDED.getMessage(), e);
         }
@@ -99,12 +86,37 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     public List<ProductImageDto> getProductImages(ProductEntity productEntity) {
-        return List.of();
+        return productImageRepository.findAllByProductEntity(productEntity)
+                .stream().map(ProductImageEntity::toDto)
+                .peek(
+                        dto -> {
+                            try{
+                                dto.setEncodedImageByBase64(ImageUtil.readAndEncodeImage(filepath + dto.getImagePath()));
+                            }catch (IOException e){
+                                e.printStackTrace();
+                                throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage());
+                            }
+                        }
+                ).toList();
+    }
+
+    @Override
+    @Transactional
+    public void updateProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
+                                    List<MultipartFile> productDetailImages) {
+        validateImageSize(productThumbnails, productDetailImages);
+        deleteProductImages(productEntity);
+        addProductImages(productEntity, productThumbnails, productDetailImages);
     }
 
     @Override
     @Transactional
     public void deleteProductImages(ProductEntity productEntity) {
+        productImageRepository.deleteAllByProductEntity(productEntity);
+    }
 
+    @Override
+    public List<ProductImageDto> getAllProductImages() {
+        return productImageRepository.findAll().stream().map(ProductImageEntity::toDto).toList();
     }
 }

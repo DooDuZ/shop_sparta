@@ -17,16 +17,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity(name = "member")
 @Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class MemberEntity extends BaseEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,36 +53,8 @@ public class MemberEntity extends BaseEntity implements UserDetails {
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private MemberRole role;
-
     private Set<GrantedAuthority> authorities;
 
-    public void setMemberName(String memberName) {
-        this.memberName = memberName;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void setRole(MemberRole role) {
-        this.role = role;
-    }
-
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAuthorities(Set<GrantedAuthority> authorities) {
-        this.authorities = authorities;
-    }
 
     public MemberDto toDto() {
         return MemberDto.builder().memberId(this.memberId).email(this.email).memberName(this.memberName)

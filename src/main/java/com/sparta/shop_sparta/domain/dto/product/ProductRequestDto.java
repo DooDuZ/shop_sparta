@@ -23,13 +23,13 @@ public class ProductRequestDto {
     private String productName;
     private String productDetail;
     private Long categoryId;
-    private ProductStatus productStatus;
     private Long sellerId;
+    private Long productStatus;
     private List<MultipartFile> productThumbnails;
     private List<MultipartFile> productDetailImages;
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
-                .productStatus(this.productStatus).productName(this.productName).build();
+                .productName(this.productName).build();
     }
 }
