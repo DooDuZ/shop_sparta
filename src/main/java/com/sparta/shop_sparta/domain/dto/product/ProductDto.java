@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 public class ProductDto {
     private Long productId;
     private String productName;
-    private String productDetails;
+    private String productDetail;
     private Long categoryId;
     private ProductStatus productStatus;
     private Long sellerId;
@@ -27,7 +27,7 @@ public class ProductDto {
     private List<ProductImageDto> productImages = new ArrayList<>();
 
     public ProductEntity toEntity(){
-        return ProductEntity.builder().productId(this.productId).productDetails(this.productDetails)
+        return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
                 .productStatus(this.productStatus).productName(this.productName).build();
     }
 }

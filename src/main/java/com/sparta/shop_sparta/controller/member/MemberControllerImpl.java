@@ -5,6 +5,8 @@ import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
 import com.sparta.shop_sparta.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,20 +36,20 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @GetMapping
-    public ResponseEntity<?> getMemberInfo(@RequestParam Long memberId) {
-        return memberService.getMemberInfo(memberId);
+    public ResponseEntity<?> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long memberId) {
+        return memberService.getMemberInfo(userDetails, memberId);
     }
 
     @Override
     @PatchMapping("/password")
-    public ResponseEntity<?> updatePassword(@RequestBody MemberUpdateRequestVo passwordUpdateRequestDto) {
-        return memberService.updatePassword(passwordUpdateRequestDto);
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberUpdateRequestVo passwordUpdateRequestDto) {
+        return memberService.updatePassword(userDetails, passwordUpdateRequestDto);
     }
 
     @Override
     @PatchMapping("/phoneNumber")
-    public ResponseEntity<?> updatePhoneNumber(@RequestBody MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+    public ResponseEntity<?> updatePhoneNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
         System.out.println(phoneNumberUpdateRequestDto.getPhoneNumber());
-        return memberService.updatePhoneNumber(phoneNumberUpdateRequestDto);
+        return memberService.updatePhoneNumber(userDetails, phoneNumberUpdateRequestDto);
     }
 }
