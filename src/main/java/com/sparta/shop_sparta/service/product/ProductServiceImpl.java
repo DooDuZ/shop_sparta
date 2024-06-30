@@ -75,8 +75,7 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setProductName(productRequestDto.getProductName());
         productEntity.setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
 
-        // [Todo]
-        // 이미지 update
+        // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
 
         return ResponseEntity.ok().build();
@@ -103,15 +102,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getProduct(Long productId) {
-        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
-        );
+        ProductEntity productEntity = getProductEntity(productId);
 
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
         ProductResponseDto productResponseDto = productEntity.toDto();
         productResponseDto.setProductImages(productImages);
 
         return ResponseEntity.ok(productResponseDto);
+    }
+
+    // 주문에서 사용할 수 있도록 분리
+    @Override
+    public ProductEntity getProductEntity(Long productId){
+        return productRepository.findById(productId).orElseThrow(
+                ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
+        );
     }
 
     // 후에 페이징 처리 할 것

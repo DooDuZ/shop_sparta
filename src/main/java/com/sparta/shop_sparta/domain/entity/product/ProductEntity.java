@@ -36,6 +36,12 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     private String productDetail;
 
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long stock;
+
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long price;
+
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "productCategoryId")
@@ -68,6 +74,14 @@ public class ProductEntity extends BaseEntity {
 
     public void setSellerEntity(MemberEntity sellerEntity) {
         this.sellerEntity = sellerEntity;
+    }
+
+    public void setStock(Long stock) {
+        this.stock = stock;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
     }
 
     public ProductResponseDto toDto(){
