@@ -35,16 +35,8 @@ public class WishListEntity{
     @JoinColumn(name = "productId")
     private ProductEntity productEntity;
 
-    @Column(nullable = false)
-    private Boolean isChecked;
-
-    public WishListEntity(MemberEntity memberEntity, ProductEntity productEntity, Boolean isChecked) {
+    public WishListEntity(MemberEntity memberEntity, ProductEntity productEntity) {
         this.memberEntity = memberEntity;
         this.productEntity = productEntity;
-        this.isChecked = isChecked;
-    }
-
-    public void setChecked(Boolean checked) {
-        isChecked = checked;
     }
 }
