@@ -6,7 +6,7 @@ import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
-import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
+import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
@@ -53,8 +53,8 @@ public class MemberServiceImpl implements MemberService {
 
         memberDto.setMemberId(memberEntity.getMemberId());
 
-        // 다른 서비스 처리를 위해 복호화 후 회원번호 set -> userDetails 사용하므로 복호화 된 정보 사용함
-        // decryptMemberDto(memberDto);
+        // 다른 서비스 처리를 위해 복호화 후 회원번호 set
+        decryptMemberDto(memberDto);
         mailService.sendVerification(memberDto);
 
         // 주소 서비스 통해서 주소 저장
@@ -138,7 +138,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePassword(UserDetails userDetails, MemberUpdateRequestVo passwordRequestDto) {
+    public ResponseEntity<?> updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
@@ -166,7 +166,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePhoneNumber(UserDetails userDetails, MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+    public ResponseEntity<?> updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
             return ResponseEntity.badRequest().build();
         }
