@@ -60,9 +60,9 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
+    @Transactional
     public void cancelOrder(OrderEntity orderEntity) {
         List<OrderDetailEntity> orderDetailEntities = orderDetailRepository.findByOrderEntity(orderEntity);
-
         // 재고 반환 처리
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
             ProductEntity productEntity = orderDetailEntity.getProductEntity();

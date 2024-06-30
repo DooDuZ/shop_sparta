@@ -8,5 +8,5 @@ public interface OrderController {
     ResponseEntity<?> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto);
     ResponseEntity<?> getOrder(UserDetails userDetails, Long orderId);
     ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId);
-    // ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId); // 반품을 분리할까 cancel로 같이 쓸까...
+    ResponseEntity<?> requestReturn(UserDetails userDetails, Long orderId);
 }

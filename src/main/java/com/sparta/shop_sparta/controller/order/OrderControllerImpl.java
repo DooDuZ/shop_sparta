@@ -38,4 +38,10 @@ public class OrderControllerImpl implements OrderController{
     public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
         return orderService.cancelOrder(userDetails, orderId);
     }
+
+    @Override
+    @PutMapping("/return/{orderId}")
+    public ResponseEntity<?> requestReturn(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+        return orderService.requestReturn(userDetails, orderId);
+    }
 }

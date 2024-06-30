@@ -11,8 +11,9 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderRepository;
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -30,7 +31,6 @@ public class OrderServiceImpl implements OrderService{
     @Override
     @Transactional
     public ResponseEntity<OrderResponseDto> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
-        System.out.println("userDetails = " + userDetails);
         // 결제가 성공했다면
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = orderRequestDto.toEntity();
@@ -78,7 +78,7 @@ public class OrderServiceImpl implements OrderService{
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        if (!Objects.equals(memberEntity.getMemberId(), orderEntity.getMemberEntity().getMemberId())) {
+        if (memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
@@ -96,6 +96,29 @@ public class OrderServiceImpl implements OrderService{
         return ResponseEntity.ok().body(orderEntity.toDto());
     }
 
+    @Override
+    @Transactional
+    public ResponseEntity<?> requestReturn(UserDetails userDetails, Long orderId) {
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
+        );
+
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        if(memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0){
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+        }
+
+        if (orderEntity.getOrderStatus() != OrderStatus.DELIVERED || ChronoUnit.DAYS.between(orderEntity.getLastModifyDate(),
+                LocalDateTime.now()) > 1 ) {
+            throw new OrderException(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
+        }
+
+        orderEntity.setOrderStatus(OrderStatus.RETURN_REQUESTED);
+
+        return ResponseEntity.ok().build();
+    }
+
     //@Scheduled(fixedDelay = 60000)
     // 테스트 - 5분마다 상태 변경
     @Transactional
@@ -111,6 +134,13 @@ public class OrderServiceImpl implements OrderService{
         List<OrderEntity> orderEntities = orderRepository.findByOrderStatus(prevStatus);
         for (OrderEntity orderEntity : orderEntities) {
             orderEntity.setOrderStatus(nextStatus);
+
+            if (nextStatus == OrderStatus.RETURN_COMPLETED){
+                orderDetailService.cancelOrder(orderEntity);
+
+                // Todo 환불 로직 추가
+                // 환불은 이 트랜잭션 끝나고 몰아서 처리해야할듯
+            }
         }
     }
 }

@@ -8,4 +8,5 @@ public interface OrderService {
     ResponseEntity<?> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto);
     ResponseEntity<?> getOrders(UserDetails userDetails, Long orderId);
     ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId);
+    ResponseEntity<?> requestReturn(UserDetails userDetails, Long orderId);
 }
