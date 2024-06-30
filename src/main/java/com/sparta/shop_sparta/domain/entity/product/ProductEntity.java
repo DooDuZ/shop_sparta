@@ -37,7 +37,7 @@ public class ProductEntity extends BaseEntity {
     private String productDetail;
 
     @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
-    private Long stock;
+    private Long amount;
 
     @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long price;
@@ -76,16 +76,17 @@ public class ProductEntity extends BaseEntity {
         this.sellerEntity = sellerEntity;
     }
 
-    public void setStock(Long stock) {
-        this.stock = stock;
+    public void setAmount(Long stock) {
+        this.amount = stock;
     }
 
     public void setPrice(Long price) {
         this.price = price;
     }
 
-    public ProductResponseDto toDto(){
-        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetail(this.productDetail)
-                .productStatus(this.productStatus).productName(this.productName).sellerId(sellerEntity.getMemberId()).build();
+    public ProductResponseDto toDto() {
+        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
+                .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
+                .sellerId(sellerEntity.getMemberId()).amount(this.amount).price(this.price).build();
     }
 }
