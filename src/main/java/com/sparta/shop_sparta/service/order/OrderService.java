@@ -1,10 +1,11 @@
 package com.sparta.shop_sparta.service.order;
 
-import com.sparta.shop_sparta.domain.dto.order.OrderDto;
-import java.util.List;
+import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OrderService {
-    OrderDto addOrder(OrderDto orderDTO);
-    List<OrderDto> getOrders(Long memberId);
-    OrderDto cancelOrder(OrderDto orderDTO);
+    ResponseEntity<?> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto);
+    ResponseEntity<?> getOrders(UserDetails userDetails, Long orderId);
+    ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId);
 }

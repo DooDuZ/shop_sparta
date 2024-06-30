@@ -12,17 +12,17 @@ public enum OrderStatus {
     RETURN_COMPLETED(6),    // 반품 완료
     ;
 
-    private final int status;
+    private final long status;
 
-    OrderStatus(int status) {
+    OrderStatus(long status) {
         this.status = status;
     }
 
-    public int getStatus() {
+    public long getStatus() {
         return this.status;
     }
 
-    public static OrderStatus of(int status){
+    public static OrderStatus of(long status){
         for (OrderStatus orderStatus : OrderStatus.values()) {
             if (orderStatus.getStatus() == status) {
                 return orderStatus;
