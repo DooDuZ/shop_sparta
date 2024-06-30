@@ -5,7 +5,7 @@ import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
-import com.sparta.shop_sparta.exception.product.ProductException;
+import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ProductImageRepository;
 import com.sparta.shop_sparta.util.Image.ImageUtil;
 import jakarta.transaction.Transactional;

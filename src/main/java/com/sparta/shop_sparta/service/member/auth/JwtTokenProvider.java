@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.service.member.auth;
 
-import com.sparta.shop_sparta.exception.member.MemberException;
-import com.sparta.shop_sparta.util.encoder.SaltGenerator;
+import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -16,7 +15,6 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

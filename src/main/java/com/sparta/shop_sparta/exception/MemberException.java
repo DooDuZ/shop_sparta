@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.exception.member;
+package com.sparta.shop_sparta.exception;
 
 public class MemberException extends RuntimeException{
 
