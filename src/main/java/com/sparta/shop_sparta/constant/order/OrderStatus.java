@@ -1,11 +1,34 @@
 package com.sparta.shop_sparta.constant.order;
 
+import com.sparta.shop_sparta.exception.OrderException;
+
 public enum OrderStatus {
-    PREPARED,           // 상품 준비중, 배송 시작 전
-    CANCELLED,          // 주문 취소
-    IN_DELIVERY,        // 배송중
-    DELIVERED,          // 배송 완료
-    RETURN_REQUESTED,   // 반품 요청 접수
-    IN_RETURN,          // 반품 진행중
-    RETURN_COMPLETED    // 반품 완료
+    PREPARED(0),           // 상품 준비중, 배송 시작 전
+    CANCELLED(1),          // 주문 취소
+    IN_DELIVERY(2),        // 배송중
+    DELIVERED(3),          // 배송 완료
+    RETURN_REQUESTED(4),   // 반품 요청 접수
+    IN_RETURN(5),          // 반품 진행중
+    RETURN_COMPLETED(6),    // 반품 완료
+    ;
+
+    private final int status;
+
+    OrderStatus(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return this.status;
+    }
+
+    public static OrderStatus of(int status){
+        for (OrderStatus orderStatus : OrderStatus.values()) {
+            if (orderStatus.getStatus() == status) {
+                return orderStatus;
+            }
+        }
+
+        throw new OrderException(OrderResponseMessage.INVALID_ORDER_STATUS.getMessage());
+    }
 }
