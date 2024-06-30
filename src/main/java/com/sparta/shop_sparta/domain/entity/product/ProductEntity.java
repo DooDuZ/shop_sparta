@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
+import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
@@ -88,5 +89,19 @@ public class ProductEntity extends BaseEntity {
         return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
                 .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
                 .sellerId(sellerEntity.getMemberId()).amount(this.amount).price(this.price).build();
+    }
+
+    public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
+        setProductStatus(ProductStatus.WAITING);
+        setCategoryEntity(categoryEntity);
+        setSellerEntity(sellerEntity);
+    }
+
+    public void update(ProductRequestDto productRequestDto) {
+        setProductDetail(productRequestDto.getProductDetail());
+        setProductName(productRequestDto.getProductName());
+        setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
+        setPrice(productRequestDto.getPrice());
+        setAmount(productRequestDto.getAmount());
     }
 }

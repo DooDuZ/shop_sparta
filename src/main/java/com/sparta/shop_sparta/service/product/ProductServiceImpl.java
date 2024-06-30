@@ -42,9 +42,7 @@ public class ProductServiceImpl implements ProductService {
                 () -> new ProductException(ProductMessage.INVALID_CATEGORY.getMessage())
         );
 
-        productEntity.setProductStatus(ProductStatus.WAITING);
-        productEntity.setCategoryEntity(categoryEntity);
-        productEntity.setSellerEntity( (MemberEntity) userDetails );
+        productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
         productRepository.save(productEntity);
 
@@ -71,9 +69,7 @@ public class ProductServiceImpl implements ProductService {
                 () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
 
-        productEntity.setProductDetail(productRequestDto.getProductDetail());
-        productEntity.setProductName(productRequestDto.getProductName());
-        productEntity.setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
+        productEntity.update(productRequestDto);
 
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
