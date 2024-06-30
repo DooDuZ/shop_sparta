@@ -8,5 +8,5 @@ import java.util.List;
 public interface OrderDetailService {
     Long addOrder(OrderEntity orderEntity, List<OrderDetailDto> orderDetailDtoList);
     List<OrderDetailDto> getOrderedProduct(OrderEntity orderEntity);
-    void cancelOrder(Long orderId);
+    void cancelOrder(OrderEntity orderEntity);
 }

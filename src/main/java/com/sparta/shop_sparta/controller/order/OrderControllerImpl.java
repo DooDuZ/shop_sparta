@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,8 @@ public class OrderControllerImpl implements OrderController{
     }
 
     @Override
-    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetails userDetails, Long orderId) {
-        return null;
+    @PutMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+        return orderService.cancelOrder(userDetails, orderId);
     }
 }

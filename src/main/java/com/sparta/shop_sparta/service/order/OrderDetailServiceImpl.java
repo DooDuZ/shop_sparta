@@ -32,12 +32,14 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         for (OrderDetailDto orderDetailDto : orderDetailDtoList) {
             ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductId());
 
-            // 재고 없다면
+            // 주문 수량 0이하거나 재고 없다면
             if (orderDetailDto.getAmount() <= 0 || productEntity.getAmount() < orderDetailDto.getAmount()) {
+                // 후에 메시지 케이스 별로 분리
                 throw new ProductException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
             }
 
             totalPrice += productEntity.getPrice() * orderDetailDto.getAmount();
+             productEntity.setAmount(productEntity.getAmount() - orderDetailDto.getAmount());
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
@@ -58,7 +60,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
-    public void cancelOrder(Long orderId) {
+    public void cancelOrder(OrderEntity orderEntity) {
+        List<OrderDetailEntity> orderDetailEntities = orderDetailRepository.findByOrderEntity(orderEntity);
 
+        // 재고 반환 처리
+        for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
+            ProductEntity productEntity = orderDetailEntity.getProductEntity();
+            productEntity.setAmount(productEntity.getAmount() + orderDetailEntity.getAmount());
+        }
     }
 }

@@ -7,6 +7,8 @@ public enum OrderResponseMessage {
     OUT_OF_STOCK("[재고 부족] 남은 수량이 적습니다."),
     INVALID_ORDER_STATUS("주문 정보 상태 변경 오류"),
     INVALID_ORDER("[주문 조회 실패] 유효하지 않은 주문 번호입니다."),
+    FAIL_CANCEL("[배송중] 주문 취소 불가. 배송 완료 후 반품 신청 해주세요."),
+    FAIL_REQUEST_RETURN("[반품 기한 만료] 반품 신청 불가")
     ;
 
     private final String message;
