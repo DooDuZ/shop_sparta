@@ -28,19 +28,22 @@ public class ProductControllerImpl implements ProductController {
     // @Secured("ROLE_SELLER")
     @Override
     @PostMapping
-    public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute ProductRequestDto productRequestDto) {
+    public ResponseEntity<?> addProduct(@AuthenticationPrincipal UserDetails userDetails,
+                                        @ModelAttribute ProductRequestDto productRequestDto) {
         return productService.addProduct(userDetails, productRequestDto);
     }
 
     @Override
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ProductRequestDto productRequestDto) {
-        return null;
+    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails,
+                                           @ModelAttribute ProductRequestDto productRequestDto) {
+        return productService.updateProduct(userDetails, productRequestDto);
     }
 
     @Override
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long productId) {
+    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails,
+                                           @PathVariable Long productId) {
         return null;
     }
 

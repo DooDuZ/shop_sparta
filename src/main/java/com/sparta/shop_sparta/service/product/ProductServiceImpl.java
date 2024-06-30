@@ -75,6 +75,10 @@ public class ProductServiceImpl implements ProductService {
         productEntity.setProductName(productRequestDto.getProductName());
         productEntity.setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
 
+        // [Todo]
+        // 이미지 update
+        // version 관리 방법 고민 후 적용
+
         return ResponseEntity.ok().build();
     }
 

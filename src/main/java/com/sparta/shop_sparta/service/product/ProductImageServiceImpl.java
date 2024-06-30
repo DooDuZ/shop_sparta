@@ -24,15 +24,17 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     private final ProductImageRepository productImageRepository;
     private final String fileSeparator = System.getProperty("file.separator");
-    private final String filepath = System.getProperty("user.dir") + fileSeparator + "src" + fileSeparator + "main" + fileSeparator
-            + "resources" + fileSeparator + "images" + fileSeparator;
+    private final String filepath =
+            System.getProperty("user.dir") + fileSeparator + "src" + fileSeparator + "main" + fileSeparator
+                    + "resources" + fileSeparator + "images" + fileSeparator;
     private final int maxThumbnails = 5;
     private final int maxDetail = 5;
     private static final long MAX_FILE_SIZE = 20 * 1024 * 1024;
 
     @Override
     @Transactional
-    public void addProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails, List<MultipartFile> productDetailImages) {
+    public void addProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
+                                 List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
 
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
@@ -40,21 +42,18 @@ public class ProductImageServiceImpl implements ProductImageService {
         productImageEntityList.addAll(getImageEntities(productEntity, productThumbnails, ProductImageType.HEADER));
         productImageEntityList.addAll(getImageEntities(productEntity, productDetailImages, ProductImageType.BODY));
 
-        try {
-            productImageRepository.saveAll(productImageEntityList);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        productImageRepository.saveAll(productImageEntityList);
     }
 
-    private List<ProductImageEntity> getImageEntities(ProductEntity productEntity, List<MultipartFile> images, ProductImageType productImageType) {
+    private List<ProductImageEntity> getImageEntities(ProductEntity productEntity, List<MultipartFile> images,
+                                                      ProductImageType productImageType) {
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
 
         try {
-            for (byte i = 1; i <= images.size(); i++){
+            for (byte i = 1; i <= images.size(); i++) {
                 MultipartFile productThumbnail = images.get(i - 1);
 
-                if (productThumbnail.getSize() > MAX_FILE_SIZE){
+                if (productThumbnail.getSize() > MAX_FILE_SIZE) {
                     throw new RuntimeException();
                 }
 
@@ -66,20 +65,19 @@ public class ProductImageServiceImpl implements ProductImageService {
                 productImageEntityList.add(ProductImageEntity.builder().productEntity(productEntity)
                         .productImageType(productImageType).imageOrdering(i).imagePath(uniqueFilename).build());
             }
-        }catch (IOException e){
-            e.printStackTrace();
+        } catch (IOException e) {
             throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage(), e);
-        }catch (RuntimeException e){
+        } catch (RuntimeException e) {
             throw new ProductException(ProductMessage.FILE_SIZE_EXCEEDED.getMessage(), e);
         }
 
         return productImageEntityList;
     }
 
-    private void validateImageSize(List<MultipartFile> thumbnails, List<MultipartFile> detailImages){
+    private void validateImageSize(List<MultipartFile> thumbnails, List<MultipartFile> detailImages) {
         if (thumbnails.size() == 0) {
             throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL.getMessage());
-        }else if(thumbnails.size() > maxThumbnails || detailImages.size() > maxDetail){
+        } else if (thumbnails.size() > maxThumbnails || detailImages.size() > maxDetail) {
             throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL.getMessage());
         }
     }
@@ -89,15 +87,16 @@ public class ProductImageServiceImpl implements ProductImageService {
         return productImageRepository.findAllByProductEntity(productEntity)
                 .stream().map(ProductImageEntity::toDto)
                 .peek(
-                        dto -> {
-                            try{
-                                dto.setEncodedImageByBase64(ImageUtil.readAndEncodeImage(filepath + dto.getImagePath()));
-                            }catch (IOException e){
-                                e.printStackTrace();
-                                throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage());
-                            }
-                        }
+                        dto -> dto.setEncodedImageByBase64(encodeBase64(dto))
                 ).toList();
+    }
+
+    private String encodeBase64(ProductImageDto productImageDto) {
+        try {
+            return ImageUtil.readAndEncodeImage(filepath + productImageDto.getImagePath());
+        } catch (IOException e) {
+            throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage());
+        }
     }
 
     @Override
@@ -117,6 +116,9 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     public List<ProductImageDto> getAllProductImages() {
-        return productImageRepository.findAll().stream().map(ProductImageEntity::toDto).toList();
+        return productImageRepository.findAll().stream().map(ProductImageEntity::toDto)
+                .peek(
+                        dto -> dto.setEncodedImageByBase64(encodeBase64(dto))
+                ).toList();
     }
 }
