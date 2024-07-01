@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
-import com.sparta.shop_sparta.domain.entity.BaseEntity;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -49,7 +48,7 @@ public class CartDetailEntity {
         this.amount = amount;
     }
 
-    public CartDetailDto toDto() {
-        return CartDetailDto.builder().productId(this.productEntity.getProductId()).amount(this.amount).build();
+    public CartDetailRequestDto toDto() {
+        return CartDetailRequestDto.builder().productId(this.productEntity.getProductId()).amount(this.amount).build();
     }
 }

@@ -114,6 +114,17 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    @Override
+    public ProductResponseDto getProductResponseDto(Long productId){
+        ProductEntity productEntity = getProductEntity(productId);
+
+        List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
+        ProductResponseDto productResponseDto = productEntity.toDto();
+        productResponseDto.setProductImages(productImages);
+
+        return productResponseDto;
+    }
+
     // 후에 페이징 처리 할 것
     // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override

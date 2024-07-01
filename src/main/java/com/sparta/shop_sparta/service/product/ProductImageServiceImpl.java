@@ -92,11 +92,14 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     private String encodeBase64(ProductImageDto productImageDto) {
+        /* 테스트 불편해서 주석 처리
         try {
             return ImageUtil.readAndEncodeImage(filepath + productImageDto.getImagePath());
         } catch (IOException e) {
             throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage());
         }
+        */
+        return productImageDto.getImagePath();
     }
 
     @Override

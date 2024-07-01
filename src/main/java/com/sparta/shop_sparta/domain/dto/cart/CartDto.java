@@ -2,7 +2,6 @@ package com.sparta.shop_sparta.domain.dto.cart;
 
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
 import com.sparta.shop_sparta.constant.cart.CartStatus;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +18,7 @@ public class CartDto {
     private CartStatus cartStatus;
     private Long memberId;
 
-    private List<CartDetailDto> cartDetails;
+    private List<CartDetailResponseDto> cartDetails;
 
     public CartEntity toEntity(){
         return CartEntity.builder().cartId(this.cartId).cartStatus(this.cartStatus).build();
@@ -29,7 +28,7 @@ public class CartDto {
         this.cartStatus = cartStatus;
     }
 
-    public void setCartDetails(List<CartDetailDto> cartDetails) {
+    public void setCartDetails(List<CartDetailResponseDto> cartDetails) {
         this.cartDetails = cartDetails;
     }
 }

@@ -1,16 +1,48 @@
 package com.sparta.shop_sparta.service.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
+
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
+import com.sparta.shop_sparta.repository.CartDetailRepository;
+import com.sparta.shop_sparta.service.product.ProductService;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CartDetailServiceImpl implements CartDetailService{
+public class CartDetailServiceImpl implements CartDetailService {
+
+    private final CartDetailRepository cartDetailRepository;
+    private final ProductService productService;
+
     @Override
-    public List<CartDetailDto> getCartDetailsByCartEntity(CartEntity cartEntity) {
+    public List<CartDetailResponseDto> getCartDetailsByCartEntity(CartEntity cartEntity) {
         return List.of();
+    }
+
+    public List<CartDetailResponseDto> mapToCartDetailDtoList(Map<Long, Long> cartDetailMap) {
+        List<CartDetailResponseDto> cartDetailRequestDtoList = new ArrayList<>();
+
+        System.out.println("CartDetailServiceImpl.mapToCartDetailDtoList");
+
+        for (Long key : cartDetailMap.keySet()) {
+            System.out.println("key = " + key);
+
+            // 빈 카트 저장을 위한 더미 값 == 0
+            if(key == 0){
+                continue;
+            }
+
+            cartDetailRequestDtoList.add(
+                    CartDetailResponseDto.builder()
+                            .productResponseDto(productService.getProductResponseDto(key))
+                            .amount(cartDetailMap.get(key))
+                            .build());
+        }
+
+        return cartDetailRequestDtoList;
     }
 }

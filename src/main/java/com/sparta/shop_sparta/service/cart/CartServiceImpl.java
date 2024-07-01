@@ -3,15 +3,16 @@ package com.sparta.shop_sparta.service.cart;
 import com.sparta.shop_sparta.constant.cart.CartResponseMessage;
 import com.sparta.shop_sparta.constant.cart.CartStatus;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDto;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.CartException;
+import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.repository.CartRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartRedisRepository cartRedisRepository;
     private final CartDetailService cartDetailService;
+    private final CartDetailRepository cartDetailRepository;
 
     @Override
     public CartDto createCart(MemberEntity memberEntity) {
@@ -34,14 +36,32 @@ public class CartServiceImpl implements CartService {
                 CartEntity.builder().memberEntity(memberEntity).cartStatus(CartStatus.UNORDERED).build()
         );
 
-        cartRedisRepository.addKey(cartEntity.getCartId());
+        // cartRedisRepository.addKey(cartEntity.getMemberEntity().getMemberId());
+        cartRedisRepository.save(cartEntity.getMemberEntity().getMemberId(), 0L, 0L);
 
         return cartEntity.toDto();
     }
 
     @Override
-    public ResponseEntity<?> createCartDetail(UserDetails userDetails, Long cartId, CartDetailDto cartDetailDto) {
-        return null;
+    public ResponseEntity<?> createCartDetail(UserDetails userDetails, CartDetailRequestDto cartDetailRequestDto) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        if(cartRedisRepository.findCart(memberEntity.getMemberId()).isEmpty()){
+            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
+                    CartStatus.UNORDERED).orElseThrow(
+                    () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
+            );
+
+            addToRedis(cartEntity);
+        }
+
+        cartRedisRepository.save(
+                memberEntity.getMemberId(),
+                cartDetailRequestDto.getProductId(),
+                cartDetailRequestDto.getAmount()
+        );
+
+        return ResponseEntity.ok().build();
     }
 
     // client 입장에선 create 여부는 중요하지 않다
@@ -53,7 +73,7 @@ public class CartServiceImpl implements CartService {
         Optional<CartEntity> optional = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
                 CartStatus.UNORDERED);
 
-        // 주문 완료된 카트 정보가 존재하면
+        // 주문 전인 카트 정보가 존재하면
         if (optional.isPresent()) {
             return getCart(memberEntity, optional.get());
         }
@@ -68,38 +88,41 @@ public class CartServiceImpl implements CartService {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
-        Map<Long, Long> cartInfo = cartRedisRepository.findCart(cartEntity.getCartId());
+        Map<Long, Long> cartInfo = cartRedisRepository.findCart(cartEntity.getMemberEntity().getMemberId());
 
         //레디스에 cart가 존재하면 파싱해서 return
         if (!cartInfo.isEmpty()) {
             CartDto cartDto = cartEntity.toDto();
-            cartDto.setCartDetails(mapToCartDetailDtoList(cartInfo));
+            cartDto.setCartDetails(cartDetailService.mapToCartDetailDtoList(cartInfo));
             // return ResponseEntity.ok(optional.get().toDto());
             return ResponseEntity.ok(cartDto);
         }
 
-        CartDto cartDto = cartEntity.toDto();
-        List<CartDetailDto> cartDetailDtoList = cartDetailService.getCartDetailsByCartEntity(cartEntity);
-        cartDto.setCartDetails(cartDetailDtoList);
-
-        Long cartId = cartEntity.getCartId();
-
-        // cart가 로드될 때 redis에 등록
-        for(CartDetailDto cartDetailDto : cartDetailDtoList) {
-            cartRedisRepository.save(cartId, cartDetailDto.getProductId(), cartDetailDto.getAmount());
-        }
+        CartDto cartDto = addToRedis(cartEntity);
 
         return ResponseEntity.ok(cartDto);
     }
 
-    private List<CartDetailDto> mapToCartDetailDtoList(Map<Long, Long> cartDetailMap) {
-        List<CartDetailDto> cartDetailDtoList = new ArrayList<>();
 
-        for (Long key : cartDetailMap.keySet()) {
-            cartDetailDtoList.add( CartDetailDto.builder().productId(key).amount(cartDetailMap.get(key)).build() );
+    private CartDto addToRedis(CartEntity cartEntity){
+        CartDto cartDto = cartEntity.toDto();
+        List<CartDetailResponseDto> cartDetailResponseDtoList = cartDetailService.getCartDetailsByCartEntity(cartEntity);
+        cartDto.setCartDetails(cartDetailResponseDtoList);
+
+        Long memberId = cartEntity.getMemberEntity().getMemberId();
+
+        // cart가 로드될 때 redis에 등록
+        // cartRedisRepository.addKey(memberId);
+        cartRedisRepository.save(memberId, 0L, 0L);
+
+        for(CartDetailResponseDto cartDetailRequestDto : cartDetailResponseDtoList) {
+            cartRedisRepository.save(
+                    memberId,
+                    cartDetailRequestDto.getProductResponseDto().getProductId(),
+                    cartDetailRequestDto.getAmount());
         }
 
-        return cartDetailDtoList;
+        return cartDto;
     }
 
     @Override
@@ -108,7 +131,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> updateCartDetail(UserDetails userDetails, Long cartDetailId, CartDetailDto cartDetailDto) {
+    public ResponseEntity<?> updateCartDetail(UserDetails userDetails, Long cartDetailId, CartDetailRequestDto cartDetailRequestDto) {
+
         return null;
     }
 }

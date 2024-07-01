@@ -1,11 +1,12 @@
 package com.sparta.shop_sparta.controller.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
 import com.sparta.shop_sparta.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,13 +21,15 @@ public class CartControllerImpl implements CartController{
     private final CartService cartService;
 
     @Override
-    public ResponseEntity<?> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartId, @RequestBody CartDetailDto cartDetailDto) {
-        return null;
+    @PostMapping
+    public ResponseEntity<?> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
+        return cartService.createCartDetail(userDetails, cartDetailRequestDto);
     }
 
     @Override
-    public ResponseEntity<?> getCart(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartId) {
-        return null;
+    @GetMapping
+    public ResponseEntity<?> getCart(@AuthenticationPrincipal UserDetails userDetails) {
+        return cartService.getCart(userDetails);
     }
 
     @Override
@@ -35,7 +38,7 @@ public class CartControllerImpl implements CartController{
     }
 
     @Override
-    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartDetailId, @RequestBody CartDetailDto cartDetailDto) {
+    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartDetailId, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
         return null;
     }
 }
