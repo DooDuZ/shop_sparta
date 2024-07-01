@@ -2,7 +2,6 @@ package com.sparta.shop_sparta.domain.dto.order;
 
 import com.sparta.shop_sparta.constant.order.OrderStatus;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;

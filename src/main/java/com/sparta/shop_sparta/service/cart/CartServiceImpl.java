@@ -6,6 +6,7 @@ import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
@@ -13,6 +14,7 @@ import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.repository.CartRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
+import jakarta.transaction.Transactional;
 import java.lang.reflect.Member;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +35,7 @@ public class CartServiceImpl implements CartService {
     private final CartDetailRepository cartDetailRepository;
 
     @Override
+    @Transactional
     public CartDto createCart(MemberEntity memberEntity) {
         CartEntity cartEntity = cartRepository.save(
                 CartEntity.builder().memberEntity(memberEntity).cartStatus(CartStatus.UNORDERED).build()
@@ -87,7 +90,7 @@ public class CartServiceImpl implements CartService {
         return ResponseEntity.ok(createCart(memberEntity));
     }
 
-    // 내부 사용 메서드 overloading
+    // 메서드 overloading
     private ResponseEntity<CartDto> getCart(MemberEntity memberEntity, CartEntity cartEntity) {
         if (memberEntity.getMemberId() - cartEntity.getMemberEntity().getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
@@ -106,6 +109,30 @@ public class CartServiceImpl implements CartService {
         CartDto cartDto = addToRedis(cartEntity);
 
         return ResponseEntity.ok(cartDto);
+    }
+
+    public Map<Long, Long> getCartInRedis(MemberEntity memberEntity){
+        return cartRedisRepository.findCart(memberEntity.getMemberId());
+    }
+
+    @Override
+    @Transactional
+    public void removeOrderedProduct(MemberEntity memberEntity, List<OrderDetailDto> orderDetails) {
+        Map<Long, Long> cartInfo = getCartInRedis(memberEntity);
+        Long memberId = memberEntity.getMemberId();
+
+        for (OrderDetailDto orderedProduct : orderDetails) {
+            cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductId());
+        }
+
+        // 장바구니의 모든 상품이 주문 됐다면 현재 카트는 주문 완료 처리
+        if(cartRedisRepository.findCart(memberId).size() == 1){
+            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
+                    CartStatus.UNORDERED).orElseThrow(
+                    () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
+            );
+            cartEntity.setCartStatus(CartStatus.ORDERED);
+        }
     }
 
 

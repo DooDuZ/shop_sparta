@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class OrderDetailDto {
     private Long orderDetailId;
     private Long productId;
-    private Integer amount;
+    private Long amount;
     private Long orderId;
 
     OrderDetailEntity toEntity(){
