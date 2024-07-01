@@ -1,8 +1,14 @@
 package com.sparta.shop_sparta.service.cart;
 
 
+import com.sparta.shop_sparta.constant.cart.CartResponseMessage;
+import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
+import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.exception.CartException;
+import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import java.util.ArrayList;
@@ -44,6 +50,10 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     public void validateProduct(Long productId){
         // 조회 실패시 exception
-        productService.getProductEntity(productId);
+        ProductEntity productEntity = productService.getProductEntity(productId);
+
+        if(productEntity.getProductStatus() != ProductStatus.ON_SALE){
+            throw new CartException(CartResponseMessage.NOT_ON_SALE.getMessage());
+        }
     }
 }
