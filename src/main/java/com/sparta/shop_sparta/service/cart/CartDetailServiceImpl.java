@@ -26,11 +26,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     public List<CartDetailResponseDto> mapToCartDetailDtoList(Map<Long, Long> cartDetailMap) {
         List<CartDetailResponseDto> cartDetailRequestDtoList = new ArrayList<>();
 
-        System.out.println("CartDetailServiceImpl.mapToCartDetailDtoList");
-
         for (Long key : cartDetailMap.keySet()) {
-            System.out.println("key = " + key);
-
             // 빈 카트 저장을 위한 더미 값 == 0
             if(key == 0){
                 continue;
@@ -44,5 +40,10 @@ public class CartDetailServiceImpl implements CartDetailService {
         }
 
         return cartDetailRequestDtoList;
+    }
+
+    public void validateProduct(Long productId){
+        // 조회 실패시 exception
+        productService.getProductEntity(productId);
     }
 }

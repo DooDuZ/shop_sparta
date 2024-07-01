@@ -13,6 +13,8 @@ import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.repository.CartRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
+import java.lang.reflect.Member;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -54,6 +56,9 @@ public class CartServiceImpl implements CartService {
 
             addToRedis(cartEntity);
         }
+
+        // 상품 유효성 검증
+        cartDetailService.validateProduct(cartDetailRequestDto.getProductId());
 
         cartRedisRepository.save(
                 memberEntity.getMemberId(),
@@ -112,7 +117,7 @@ public class CartServiceImpl implements CartService {
         Long memberId = cartEntity.getMemberEntity().getMemberId();
 
         // cart가 로드될 때 redis에 등록
-        // cartRedisRepository.addKey(memberId);
+        // cartRedisRepository.addKey(memberId); -> 깡통 map이 안들어감
         cartRedisRepository.save(memberId, 0L, 0L);
 
         for(CartDetailResponseDto cartDetailRequestDto : cartDetailResponseDtoList) {
@@ -126,13 +131,23 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long cartDetailId) {
-        return null;
+    public ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long productId) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        cartRedisRepository.removeCartDetail(memberEntity.getMemberId(), productId);
+
+        return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<?> updateCartDetail(UserDetails userDetails, Long cartDetailId, CartDetailRequestDto cartDetailRequestDto) {
+    public ResponseEntity<?> updateCartDetail(UserDetails userDetails, CartDetailRequestDto cartDetailRequestDto) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        Long memberId = memberEntity.getMemberId();
+        Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberId);
 
-        return null;
+        if (cartInfo.containsKey(cartDetailRequestDto.getProductId())) {
+            cartRedisRepository.save(memberId, cartDetailRequestDto.getProductId(), cartDetailRequestDto.getAmount());
+        }
+
+        return ResponseEntity.ok().build();
     }
 }

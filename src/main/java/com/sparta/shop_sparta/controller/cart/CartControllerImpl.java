@@ -6,9 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,12 +35,14 @@ public class CartControllerImpl implements CartController{
     }
 
     @Override
-    public ResponseEntity<?> removeCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartDetailId) {
-        return null;
+    @DeleteMapping("/{productId}")
+    public ResponseEntity<?> removeCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long productId) {
+        return cartService.removeCartDetail(userDetails, productId);
     }
 
     @Override
-    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long cartDetailId, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
-        return null;
+    @PutMapping
+    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
+        return cartService.updateCartDetail(userDetails, cartDetailRequestDto);
     }
 }

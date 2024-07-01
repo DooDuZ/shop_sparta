@@ -10,6 +10,6 @@ public interface CartService {
     CartDto createCart(MemberEntity memberEntity);
     ResponseEntity<?> createCartDetail(UserDetails userDetails, CartDetailRequestDto cartDetailRequestDto);
     ResponseEntity<?> getCart(UserDetails userDetails);
-    ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long cartDetailId);
-    ResponseEntity<?> updateCartDetail(UserDetails userDetails, Long cartDetailId, CartDetailRequestDto cartDetailRequestDto);
+    ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long productId);
+    ResponseEntity<?> updateCartDetail(UserDetails userDetails, CartDetailRequestDto cartDetailRequestDto);
 }

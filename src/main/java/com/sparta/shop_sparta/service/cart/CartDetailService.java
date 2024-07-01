@@ -8,4 +8,5 @@ import java.util.Map;
 public interface CartDetailService {
     List<CartDetailResponseDto> getCartDetailsByCartEntity(CartEntity cartEntity);
     List<CartDetailResponseDto> mapToCartDetailDtoList(Map<Long, Long> cartDetailMap);
+    void validateProduct(Long productId);
 }
