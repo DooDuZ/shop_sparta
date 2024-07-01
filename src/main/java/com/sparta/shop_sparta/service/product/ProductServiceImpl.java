@@ -64,7 +64,9 @@ public class ProductServiceImpl implements ProductService {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
-        ProductEntity productEntity = productRepository.findById(productRequestDto.getProductId()).orElseThrow(
+        Long productId = productRequestDto.getProductId();
+
+        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
                 () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
 
@@ -109,6 +111,7 @@ public class ProductServiceImpl implements ProductService {
     // 주문에서 사용할 수 있도록 분리
     @Override
     public ProductEntity getProductEntity(Long productId){
+        System.out.println(productId);
         return productRepository.findById(productId).orElseThrow(
                 ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );

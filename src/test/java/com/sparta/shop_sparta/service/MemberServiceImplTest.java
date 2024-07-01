@@ -29,23 +29,21 @@ public class MemberServiceImplTest {
     @Test
     @DisplayName("test")
     void createAccountTest(){
+        // given
         String password = "1234Password!";
         MemberDto memberDto = MemberDto.builder().memberName("지웅이").email("sin9158@naver.com").loginId("sin9158")
                 .password(password).addr("경기도 안산시 단원구 고잔2길 9").addrDetail("541호")
                 .phoneNumber("01027209158").role(MemberRole.BASIC).build();
-
         memberDto.setPassword(passwordEncoder.encode(memberDto.getPassword()));
 
-        System.out.println("passwordEncoder = " + passwordEncoder);
-
-        // Mock the behavior of memberRepository.save
         MemberEntity mockMemberEntity = memberDto.toEntity();
         mockMemberEntity.setMemberId(1L); // 임의의 ID 설정
+
+        // when
         Mockito.when(memberRepository.save(Mockito.any(MemberEntity.class))).thenReturn(mockMemberEntity);
-
         MemberEntity memberEntity = memberRepository.save(memberDto.toEntity());
-        System.out.println(memberEntity);
 
+        // then
         Assertions.assertThat(memberEntity.getMemberId()).isNotNull();
         Assertions.assertThat(passwordEncoder.matches(password, memberEntity.getPassword())).isEqualTo(true);
 

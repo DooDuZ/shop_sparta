@@ -2,13 +2,12 @@ package com.sparta.shop_sparta.service.cart;
 
 
 import com.sparta.shop_sparta.constant.cart.CartResponseMessage;
-import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
+import com.sparta.shop_sparta.domain.entity.cart.CartDetailEntity;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.exception.CartException;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import java.util.ArrayList;
@@ -26,7 +25,9 @@ public class CartDetailServiceImpl implements CartDetailService {
 
     @Override
     public List<CartDetailResponseDto> getCartDetailsByCartEntity(CartEntity cartEntity) {
-        return List.of();
+        List<CartDetailEntity> cartDetailEntities = cartDetailRepository.findAllByCartEntity(cartEntity);
+
+        return cartDetailEntities.stream().map(CartDetailEntity::toResponseDto).toList();
     }
 
     public List<CartDetailResponseDto> mapToCartDetailDtoList(Map<Long, Long> cartDetailMap) {
@@ -55,5 +56,27 @@ public class CartDetailServiceImpl implements CartDetailService {
         if(productEntity.getProductStatus() != ProductStatus.ON_SALE){
             throw new CartException(CartResponseMessage.NOT_ON_SALE.getMessage());
         }
+    }
+
+    @Override
+    public void addCartDetail(CartEntity cartEntity, Map<Long,Long> cartInfo) {
+        for (Long productId : cartInfo.keySet()) {
+            if(productId == 0){
+                continue;
+            }
+            ProductEntity productEntity = productService.getProductEntity(productId);
+            cartDetailRepository.save(
+                    CartDetailEntity.builder()
+                            .cartEntity(cartEntity)
+                            .productEntity(productEntity)
+                            .amount(cartInfo.get(productId))
+                            .build()
+            );
+        }
+    }
+
+    @Override
+    public void removeOrderedProduct(CartEntity cartEntity, Long productId) {
+        cartDetailRepository.deleteByCartEntityAndProductEntity_ProductId(cartEntity, productId);
     }
 }

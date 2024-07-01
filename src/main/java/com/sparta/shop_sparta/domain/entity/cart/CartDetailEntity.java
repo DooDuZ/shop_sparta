@@ -1,6 +1,8 @@
 package com.sparta.shop_sparta.domain.entity.cart;
 
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -38,17 +40,16 @@ public class CartDetailEntity {
     @Column(nullable = false)
     private Long amount;
 
-    public CartDetailEntity(ProductEntity productEntity, CartEntity cartEntity, Long amount) {
-        this.productEntity = productEntity;
-        this.cartEntity = cartEntity;
-        this.amount = amount;
-    }
 
     public void setAmount(Long amount) {
         this.amount = amount;
     }
 
-    public CartDetailRequestDto toDto() {
+    public CartDetailRequestDto toRequestDto() {
         return CartDetailRequestDto.builder().productId(this.productEntity.getProductId()).amount(this.amount).build();
+    }
+
+    public CartDetailResponseDto toResponseDto() {
+        return CartDetailResponseDto.builder().productResponseDto(new ProductResponseDto(this.productEntity)).amount(this.amount).build();
     }
 }

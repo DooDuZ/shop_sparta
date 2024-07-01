@@ -27,6 +27,19 @@ public class ProductResponseDto {
     private ProductStatus productStatus;
     private Long sellerId;
 
+    public ProductResponseDto(ProductEntity productEntity) {
+        this.productId = productEntity.getProductId();
+        this.productName = productEntity.getProductName();
+        this.productDetail = productEntity.getProductDetail();
+        this.categoryId = productEntity.getCategoryEntity().getCategoryId();
+
+        this.price = productEntity.getPrice();
+        this.amount = productEntity.getAmount();
+
+        this.productStatus = productEntity.getProductStatus();
+        this.sellerId = productEntity.getSellerEntity().getMemberId();
+    }
+
     @Setter
     @Builder.Default
     private List<ProductImageDto> productImages = new ArrayList<>();

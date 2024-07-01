@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.repository.memoryRepository;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -47,7 +48,42 @@ public class CartRedisRepository {
         redisTemplate.opsForHash().delete(addPrefix(key), productId);
     }
 
+    public void removeKey(Long key){
+        System.out.println("CartRedisRepository.removeKey");
+        System.out.println(key);
+        System.out.println(redisTemplate.hasKey(addPrefix(key)));
+        redisTemplate.delete(addPrefix(key));
+        System.out.println(redisTemplate.hasKey(addPrefix(key)));
+    }
+
     private String addPrefix(Long key) {
         return prefix + key;
+    }
+
+    public Set<Long> getAllCartKeys() {
+        String pattern = prefix + "*";
+        Set<String> keys = redisTemplate.keys(pattern);
+
+        if(keys.isEmpty()){
+            return Set.of();
+        }
+
+        return keys.stream()
+                .map(key -> key.replace(prefix, ""))
+                .map(Long::valueOf)
+                .collect(Collectors.toSet());
+    }
+
+    public void deleteAllCartKeys() {
+        String pattern = prefix + "*";
+        Set<String> keys = redisTemplate.keys(pattern);
+
+        if(keys.isEmpty()){
+            return;
+        }
+
+        for(String key : keys){
+            redisTemplate.delete(key);
+        }
     }
 }

@@ -151,7 +151,7 @@ public class OrderServiceImpl implements OrderService{
     //@Scheduled(fixedDelay = 60000)
     // 테스트 - 5분마다 상태 변경
     @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 27 3 * * ?")
     protected void updateOrderStatus() {
         updateOrderStatus(OrderStatus.IN_DELIVERY, OrderStatus.DELIVERED);
         updateOrderStatus(OrderStatus.PREPARED, OrderStatus.IN_DELIVERY);

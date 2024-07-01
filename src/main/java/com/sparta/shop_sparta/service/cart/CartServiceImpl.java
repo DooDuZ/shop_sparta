@@ -20,8 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -112,6 +114,17 @@ public class CartServiceImpl implements CartService {
     }
 
     public Map<Long, Long> getCartInRedis(MemberEntity memberEntity){
+        Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberEntity.getMemberId());
+
+        if (cartInfo.isEmpty()) {
+            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
+                    CartStatus.UNORDERED).orElseThrow(
+                    ()->new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
+            );
+
+            addToRedis(cartEntity);
+        }
+
         return cartRedisRepository.findCart(memberEntity.getMemberId());
     }
 
@@ -121,17 +134,22 @@ public class CartServiceImpl implements CartService {
         Map<Long, Long> cartInfo = getCartInRedis(memberEntity);
         Long memberId = memberEntity.getMemberId();
 
+        CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
+                CartStatus.UNORDERED).orElseThrow(
+                () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
+        );
+
         for (OrderDetailDto orderedProduct : orderDetails) {
             cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductId());
+            cartDetailService.removeOrderedProduct(cartEntity, orderedProduct.getProductId());
         }
 
         // 장바구니의 모든 상품이 주문 됐다면 현재 카트는 주문 완료 처리
         if(cartRedisRepository.findCart(memberId).size() == 1){
-            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
-                    CartStatus.UNORDERED).orElseThrow(
-                    () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
-            );
             cartEntity.setCartStatus(CartStatus.ORDERED);
+            cartRedisRepository.removeKey(memberId);
+            System.out.println();
+            createCart(memberEntity);
         }
     }
 
@@ -176,5 +194,22 @@ public class CartServiceImpl implements CartService {
         }
 
         return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 44 3 * * ?")
+    public void flushRedisRepository(){
+        Set<Long> cartKeys = cartRedisRepository.getAllCartKeys();
+
+        for (Long memberId : cartKeys) {
+            CartEntity cartEntity = cartRepository.findByMemberEntity_MemberIdAndCartStatus(memberId, CartStatus.UNORDERED).orElseThrow(
+                    () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
+            );
+
+            Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberId);
+            cartDetailService.addCartDetail(cartEntity, cartInfo);
+        }
+
+        cartRedisRepository.deleteAllCartKeys();
     }
 }
