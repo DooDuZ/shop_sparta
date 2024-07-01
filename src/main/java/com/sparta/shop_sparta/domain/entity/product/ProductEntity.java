@@ -1,11 +1,14 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
+import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,6 +39,12 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     private String productDetail;
 
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long amount;
+
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long price;
+
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "productCategoryId")
@@ -47,6 +56,7 @@ public class ProductEntity extends BaseEntity {
     private MemberEntity sellerEntity;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
 
@@ -70,8 +80,31 @@ public class ProductEntity extends BaseEntity {
         this.sellerEntity = sellerEntity;
     }
 
-    public ProductResponseDto toDto(){
-        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId()).productDetail(this.productDetail)
-                .productStatus(this.productStatus).productName(this.productName).sellerId(sellerEntity.getMemberId()).build();
+    public void setAmount(Long stock) {
+        this.amount = stock;
+    }
+
+    public void setPrice(Long price) {
+        this.price = price;
+    }
+
+    public ProductResponseDto toDto() {
+        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
+                .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
+                .sellerId(sellerEntity.getMemberId()).amount(this.amount).price(this.price).build();
+    }
+
+    public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
+        setProductStatus(ProductStatus.WAITING);
+        setCategoryEntity(categoryEntity);
+        setSellerEntity(sellerEntity);
+    }
+
+    public void update(ProductRequestDto productRequestDto) {
+        setProductDetail(productRequestDto.getProductDetail());
+        setProductName(productRequestDto.getProductName());
+        setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
+        setPrice(productRequestDto.getPrice());
+        setAmount(productRequestDto.getAmount());
     }
 }

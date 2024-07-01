@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.controller.member;
 
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.domain.dto.member.MemberUpdateRequestVo;
+import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,13 +42,13 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PatchMapping("/password")
-    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberUpdateRequestVo passwordUpdateRequestDto) {
+    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo passwordUpdateRequestDto) {
         return memberService.updatePassword(userDetails, passwordUpdateRequestDto);
     }
 
     @Override
     @PatchMapping("/phoneNumber")
-    public ResponseEntity<?> updatePhoneNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberUpdateRequestVo phoneNumberUpdateRequestDto) {
+    public ResponseEntity<?> updatePhoneNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo phoneNumberUpdateRequestDto) {
         System.out.println(phoneNumberUpdateRequestDto.getPhoneNumber());
         return memberService.updatePhoneNumber(userDetails, phoneNumberUpdateRequestDto);
     }

@@ -13,15 +13,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrderDto {
+public class OrderResponseDto {
     private Long orderId;
     private String orderAddr;
+    private String orderAddrDetail;
     private Long memberId;
     private OrderStatus orderStatus;
-    @Builder.Default
-    private List<OrderDetailDto> orderDetailDTOList = new ArrayList<>();
+    private Long totalPrice;
 
-    public OrderEntity toEntity(){
-        return OrderEntity.builder().orderId(this.orderId).orderAddr(this.orderAddr).orderStatus(this.orderStatus).build();
+    @Builder.Default
+    private List<OrderDetailDto> orderDetails = new ArrayList<>();
+
+    public void setOrderDetails(List<OrderDetailDto> orderDetails) {
+        this.orderDetails = orderDetails;
     }
 }

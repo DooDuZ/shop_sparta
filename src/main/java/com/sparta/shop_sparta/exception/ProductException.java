@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.exception.product;
+package com.sparta.shop_sparta.exception;
 
 public class ProductException extends RuntimeException{
     public ProductException(String message){}

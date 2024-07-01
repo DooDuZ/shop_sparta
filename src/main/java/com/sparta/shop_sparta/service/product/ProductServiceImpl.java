@@ -10,8 +10,8 @@ import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.exception.member.AuthorizationException;
-import com.sparta.shop_sparta.exception.product.ProductException;
+import com.sparta.shop_sparta.exception.AuthorizationException;
+import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
 import jakarta.transaction.Transactional;
@@ -42,9 +42,7 @@ public class ProductServiceImpl implements ProductService {
                 () -> new ProductException(ProductMessage.INVALID_CATEGORY.getMessage())
         );
 
-        productEntity.setProductStatus(ProductStatus.WAITING);
-        productEntity.setCategoryEntity(categoryEntity);
-        productEntity.setSellerEntity( (MemberEntity) userDetails );
+        productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
         productRepository.save(productEntity);
 
@@ -71,9 +69,10 @@ public class ProductServiceImpl implements ProductService {
                 () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
 
-        productEntity.setProductDetail(productRequestDto.getProductDetail());
-        productEntity.setProductName(productRequestDto.getProductName());
-        productEntity.setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
+        productEntity.update(productRequestDto);
+
+        // [Todo] 이미지 update 적용
+        // version 관리 방법 고민 후 적용
 
         return ResponseEntity.ok().build();
     }
@@ -99,15 +98,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getProduct(Long productId) {
-        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
-                ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
-        );
+        ProductEntity productEntity = getProductEntity(productId);
 
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
         ProductResponseDto productResponseDto = productEntity.toDto();
         productResponseDto.setProductImages(productImages);
 
         return ResponseEntity.ok(productResponseDto);
+    }
+
+    // 주문에서 사용할 수 있도록 분리
+    @Override
+    public ProductEntity getProductEntity(Long productId){
+        return productRepository.findById(productId).orElseThrow(
+                ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
+        );
     }
 
     // 후에 페이징 처리 할 것

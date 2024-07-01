@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +54,8 @@ public class MemberEntity extends BaseEntity implements UserDetails {
     @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private MemberRole role;
+
+    @Transient
     private Set<GrantedAuthority> authorities;
 
 

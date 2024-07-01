@@ -24,12 +24,16 @@ public class ProductRequestDto {
     private String productDetail;
     private Long categoryId;
     private Long sellerId;
+
+    private Long price;
+    private Long amount;
+
     private Long productStatus;
     private List<MultipartFile> productThumbnails;
     private List<MultipartFile> productDetailImages;
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
-                .productName(this.productName).build();
+                .productName(this.productName).price(this.price).amount(this.amount).build();
     }
 }

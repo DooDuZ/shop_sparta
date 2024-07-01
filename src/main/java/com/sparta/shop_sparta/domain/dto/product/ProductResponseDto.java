@@ -20,16 +20,14 @@ public class ProductResponseDto {
     private String productName;
     private String productDetail;
     private Long categoryId;
+
+    private Long price;
+    private Long amount;
+
     private ProductStatus productStatus;
     private Long sellerId;
 
     @Setter
     @Builder.Default
     private List<ProductImageDto> productImages = new ArrayList<>();
-
-    public ProductEntity toEntity(){
-        return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
-                .productStatus(this.productStatus).productName(this.productName).build();
-    }
-
 }

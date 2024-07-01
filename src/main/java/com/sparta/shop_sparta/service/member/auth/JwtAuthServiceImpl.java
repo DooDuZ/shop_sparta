@@ -1,18 +1,15 @@
 package com.sparta.shop_sparta.service.member.auth;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.domain.dto.member.token.TokenWrapper;
-import com.sparta.shop_sparta.exception.member.MemberException;
+import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.memoryRepository.JwtRedisRepository;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
