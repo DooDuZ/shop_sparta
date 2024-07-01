@@ -11,13 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CartDetailDto {
-    private Long cartDetailId;
-    private Integer amount;
-
+    private Long amount;
     private Long productId;
-    private Long cartId;
 
     public CartDetailEntity toEntity(){
-        return CartDetailEntity.builder().cartDetailId(this.cartDetailId).amount(this.amount).build();
+        return CartDetailEntity.builder().amount(this.amount).build();
     }
 }

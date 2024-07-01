@@ -37,20 +37,19 @@ public class CartDetailEntity {
     private CartEntity cartEntity;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Long amount;
 
-    public CartDetailEntity(ProductEntity productEntity, CartEntity cartEntity, Integer amount) {
+    public CartDetailEntity(ProductEntity productEntity, CartEntity cartEntity, Long amount) {
         this.productEntity = productEntity;
         this.cartEntity = cartEntity;
         this.amount = amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 
     public CartDetailDto toDto() {
-        return CartDetailDto.builder().cartId(this.cartEntity.getCartId()).cartDetailId(this.cartDetailId)
-                .productId(this.productEntity.getProductId()).amount(this.amount).build();
+        return CartDetailDto.builder().productId(this.productEntity.getProductId()).amount(this.amount).build();
     }
 }

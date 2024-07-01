@@ -6,6 +6,8 @@ import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.constant.cart.CartStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,17 +30,13 @@ public class CartEntity {
     private Long cartId;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private CartStatus cartStatus;
 
     @ManyToOne
     @ToString.Exclude
     @JoinColumn(name = "memberId")
     private MemberEntity memberEntity;
-
-    public CartEntity(CartStatus cartStatus, MemberEntity memberEntity) {
-        this.cartStatus = cartStatus;
-        this.memberEntity = memberEntity;
-    }
 
     public void setCartStatus(CartStatus cartStatus) {
         this.cartStatus = cartStatus;
