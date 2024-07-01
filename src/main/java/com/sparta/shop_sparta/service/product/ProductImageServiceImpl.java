@@ -33,8 +33,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     @Transactional
-    public void addProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
-                                 List<MultipartFile> productDetailImages) {
+    public void createProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
+                                    List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
 
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
@@ -105,7 +105,7 @@ public class ProductImageServiceImpl implements ProductImageService {
                                     List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
         deleteProductImages(productEntity);
-        addProductImages(productEntity, productThumbnails, productDetailImages);
+        createProductImages(productEntity, productThumbnails, productDetailImages);
     }
 
     @Override

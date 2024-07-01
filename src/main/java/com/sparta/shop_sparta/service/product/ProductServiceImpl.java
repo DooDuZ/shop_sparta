@@ -2,7 +2,6 @@ package com.sparta.shop_sparta.service.product;
 
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
@@ -35,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> addProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
+    public ResponseEntity<?> createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         ProductEntity productEntity = productRequestDto.toEntity();
 
         CategoryEntity categoryEntity = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(
@@ -47,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(productEntity);
 
         try {
-            productImageService.addProductImages(productEntity, productRequestDto.getProductThumbnails(),
+            productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
                     productRequestDto.getProductDetailImages());
         } catch (ProductException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
