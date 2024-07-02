@@ -7,6 +7,7 @@ import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.entity.cart.CartDetailEntity;
 import com.sparta.shop_sparta.domain.entity.cart.CartEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
@@ -15,8 +16,6 @@ import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.repository.CartRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import jakarta.transaction.Transactional;
-import java.lang.reflect.Member;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,7 +37,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartDto createCart(MemberEntity memberEntity) {
+    public CartEntity createCart(MemberEntity memberEntity) {
         CartEntity cartEntity = cartRepository.save(
                 CartEntity.builder().memberEntity(memberEntity).cartStatus(CartStatus.UNORDERED).build()
         );
@@ -46,20 +45,22 @@ public class CartServiceImpl implements CartService {
         // cartRedisRepository.addKey(cartEntity.getMemberEntity().getMemberId());
         cartRedisRepository.save(cartEntity.getMemberEntity().getMemberId(), 0L, 0L);
 
-        return cartEntity.toDto();
+        return cartEntity;
     }
 
     @Override
     public ResponseEntity<?> createCartDetail(UserDetails userDetails, CartDetailRequestDto cartDetailRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        if(cartRedisRepository.findCart(memberEntity.getMemberId()).isEmpty()){
-            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
-                    CartStatus.UNORDERED).orElseThrow(
-                    () -> new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
-            );
+        if(!cartRedisRepository.hasKey(memberEntity.getMemberId())){
+            Optional<CartEntity> optional = cartRepository.findByMemberEntityAndCartStatus(memberEntity, CartStatus.UNORDERED);
+            CartEntity cartEntity = optional.orElse(null);
 
-            addToRedis(cartEntity);
+            if(cartEntity == null){
+                cartEntity = createCart(memberEntity);
+            }
+
+            addCartToRedis(cartEntity);
         }
 
         // 상품 유효성 검증
@@ -80,49 +81,51 @@ public class CartServiceImpl implements CartService {
     public ResponseEntity<CartDto> getCart(UserDetails userDetails) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        Optional<CartEntity> optional = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
-                CartStatus.UNORDERED);
+        Optional<CartEntity> optional = cartRepository.findByMemberEntityAndCartStatus(memberEntity, CartStatus.UNORDERED);
 
         // 주문 전인 카트 정보가 존재하면
         if (optional.isPresent()) {
-            return getCart(memberEntity, optional.get());
+            return ResponseEntity.ok(getCart(memberEntity, optional.get()));
         }
 
         // 없으면 만들어서 return
-        return ResponseEntity.ok(createCart(memberEntity));
+        return ResponseEntity.ok(createCart(memberEntity).toDto());
     }
 
     // 메서드 overloading
-    private ResponseEntity<CartDto> getCart(MemberEntity memberEntity, CartEntity cartEntity) {
+    private CartDto getCart(MemberEntity memberEntity, CartEntity cartEntity) {
         if (memberEntity.getMemberId() - cartEntity.getMemberEntity().getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
-        Map<Long, Long> cartInfo = cartRedisRepository.findCart(cartEntity.getMemberEntity().getMemberId());
+        Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberEntity.getMemberId());
 
         //레디스에 cart가 존재하면 파싱해서 return
         if (!cartInfo.isEmpty()) {
             CartDto cartDto = cartEntity.toDto();
             cartDto.setCartDetails(cartDetailService.mapToCartDetailDtoList(cartInfo));
-            // return ResponseEntity.ok(optional.get().toDto());
-            return ResponseEntity.ok(cartDto);
+
+            return cartDto;
         }
 
-        CartDto cartDto = addToRedis(cartEntity);
+        CartDto cartDto = cartEntity.toDto();
+        List<CartDetailResponseDto> cartDetailResponseDtoList = cartDetailService.getCartDetailResponseByCartEntity(cartEntity);
+        cartDto.setCartDetails(cartDetailResponseDtoList);
 
-        return ResponseEntity.ok(cartDto);
+        addCartToRedis(cartEntity);
+
+        return cartDto;
     }
 
     public Map<Long, Long> getCartInRedis(MemberEntity memberEntity){
         Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberEntity.getMemberId());
 
         if (cartInfo.isEmpty()) {
-            CartEntity cartEntity = cartRepository.findByMemberEntityAndCartStatus(memberEntity,
-                    CartStatus.UNORDERED).orElseThrow(
-                    ()->new CartException(CartResponseMessage.INVALID_CART_ID.getMessage())
-            );
+            Optional<CartEntity> optional = cartRepository.findByMemberEntityAndCartStatus(memberEntity, CartStatus.UNORDERED);
 
-            addToRedis(cartEntity);
+            if (optional.isPresent()) {
+                addCartToRedis(optional.get());
+            }
         }
 
         return cartRedisRepository.findCart(memberEntity.getMemberId());
@@ -148,31 +151,27 @@ public class CartServiceImpl implements CartService {
         if(cartRedisRepository.findCart(memberId).size() == 1){
             cartEntity.setCartStatus(CartStatus.ORDERED);
             cartRedisRepository.removeKey(memberId);
-            System.out.println();
+
             createCart(memberEntity);
         }
     }
 
 
-    private CartDto addToRedis(CartEntity cartEntity){
-        CartDto cartDto = cartEntity.toDto();
-        List<CartDetailResponseDto> cartDetailResponseDtoList = cartDetailService.getCartDetailsByCartEntity(cartEntity);
-        cartDto.setCartDetails(cartDetailResponseDtoList);
+    private void addCartToRedis(CartEntity cartEntity) {
+        MemberEntity memberEntity = cartEntity.getMemberEntity();
+        Long memberId = memberEntity.getMemberId();
 
-        Long memberId = cartEntity.getMemberEntity().getMemberId();
+        List<CartDetailEntity> cartDetailEntities = cartDetailService.getCartDetailsByCartEntity(cartEntity);
 
-        // cart가 로드될 때 redis에 등록
-        // cartRedisRepository.addKey(memberId); -> 깡통 map이 안들어감
         cartRedisRepository.save(memberId, 0L, 0L);
 
-        for(CartDetailResponseDto cartDetailRequestDto : cartDetailResponseDtoList) {
+        for(CartDetailEntity cartDetailEntity : cartDetailEntities) {
             cartRedisRepository.save(
                     memberId,
-                    cartDetailRequestDto.getProductResponseDto().getProductId(),
-                    cartDetailRequestDto.getAmount());
+                    cartDetailEntity.getProductEntity().getProductId(),
+                    cartDetailEntity.getAmount());
         }
-
-        return cartDto;
+        cartDetailService.removeCart(cartEntity);
     }
 
     @Override
@@ -197,7 +196,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 44 3 * * ?")
+    //@Scheduled(cron = "0 44 3 * * ?")
+    @Scheduled(fixedRate = 120000)
     public void flushRedisRepository(){
         Set<Long> cartKeys = cartRedisRepository.getAllCartKeys();
 

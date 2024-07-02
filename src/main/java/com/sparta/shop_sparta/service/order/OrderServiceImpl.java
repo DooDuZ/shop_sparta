@@ -75,6 +75,7 @@ public class OrderServiceImpl implements OrderService{
 
         for (OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()) {
             Long productId = orderDetailDto.getProductId();
+
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
                 throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());

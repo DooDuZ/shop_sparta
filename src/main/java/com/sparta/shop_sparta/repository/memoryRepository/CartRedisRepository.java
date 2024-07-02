@@ -40,6 +40,10 @@ public class CartRedisRepository {
                 ));
     }
 
+    public Boolean hasKey(Long key){
+        return redisTemplate.hasKey(addPrefix(key));
+    }
+
     public void updateCartDetail(Long key, Long productId, Long amount){
         save(key, productId, amount);
     }
@@ -49,11 +53,7 @@ public class CartRedisRepository {
     }
 
     public void removeKey(Long key){
-        System.out.println("CartRedisRepository.removeKey");
-        System.out.println(key);
-        System.out.println(redisTemplate.hasKey(addPrefix(key)));
         redisTemplate.delete(addPrefix(key));
-        System.out.println(redisTemplate.hasKey(addPrefix(key)));
     }
 
     private String addPrefix(Long key) {

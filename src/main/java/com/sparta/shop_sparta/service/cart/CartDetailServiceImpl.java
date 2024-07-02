@@ -10,6 +10,7 @@ import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.repository.CartDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
+import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public class CartDetailServiceImpl implements CartDetailService {
     private final ProductService productService;
 
     @Override
-    public List<CartDetailResponseDto> getCartDetailsByCartEntity(CartEntity cartEntity) {
+    public List<CartDetailResponseDto> getCartDetailResponseByCartEntity(CartEntity cartEntity) {
         List<CartDetailEntity> cartDetailEntities = cartDetailRepository.findAllByCartEntity(cartEntity);
 
         return cartDetailEntities.stream().map(CartDetailEntity::toResponseDto).toList();
@@ -47,6 +48,11 @@ public class CartDetailServiceImpl implements CartDetailService {
         }
 
         return cartDetailRequestDtoList;
+    }
+
+    @Override
+    public List<CartDetailEntity> getCartDetailsByCartEntity(CartEntity cartEntity) {
+        return cartDetailRepository.findAllByCartEntity(cartEntity);
     }
 
     public void validateProduct(Long productId){
@@ -78,5 +84,11 @@ public class CartDetailServiceImpl implements CartDetailService {
     @Override
     public void removeOrderedProduct(CartEntity cartEntity, Long productId) {
         cartDetailRepository.deleteByCartEntityAndProductEntity_ProductId(cartEntity, productId);
+    }
+
+    @Override
+    @Transactional
+    public void removeCart(CartEntity cartEntity) {
+        cartDetailRepository.deleteAllByCartEntity(cartEntity);
     }
 }
