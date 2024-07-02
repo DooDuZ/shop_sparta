@@ -28,7 +28,7 @@ public class AddrServiceImpl implements AddrService {
     public ResponseEntity<?> addAddr(UserDetails userDetails, AddrDto addrDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        if (addrRepository.findAllByMemberEntity_MemberId(memberEntity.getMemberId()).size() >= 5){
+        if (addrRepository.findAllByMemberEntity(memberEntity).size() >= 5){
             throw new MemberException(MemberResponseMessage.MAX_SAVE_LIMIT.getMessage());
         }
 
@@ -80,8 +80,8 @@ public class AddrServiceImpl implements AddrService {
     }
 
     @Override
-    public List<AddrDto> getAddrList(Long memberId) {
-        return addrRepository.findAllByMemberEntity_MemberId(memberId).stream()
+    public List<AddrDto> getAddrList(UserDetails userDetails, Long memberId) {
+        return addrRepository.findAllByMemberEntity( (MemberEntity) userDetails).stream()
                 .map(AddrEntity::toDto).map(this::decryptAddrDto)
                 .toList();
     }

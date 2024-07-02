@@ -143,8 +143,8 @@ public class CartServiceImpl implements CartService {
         );
 
         for (OrderDetailDto orderedProduct : orderDetails) {
-            cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductId());
-            cartDetailService.removeOrderedProduct(cartEntity, orderedProduct.getProductId());
+            cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductResponseDto().getProductId());
+            cartDetailService.removeOrderedProduct(cartEntity, orderedProduct.getProductResponseDto().getProductId());
         }
 
         // 장바구니의 모든 상품이 주문 됐다면 현재 카트는 주문 완료 처리
@@ -196,8 +196,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    //@Scheduled(cron = "0 44 3 * * ?")
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(cron = "0 15 0 * * ?")
+    //@Scheduled(fixedRate = 120000)
     public void flushRedisRepository(){
         Set<Long> cartKeys = cartRedisRepository.getAllCartKeys();
 

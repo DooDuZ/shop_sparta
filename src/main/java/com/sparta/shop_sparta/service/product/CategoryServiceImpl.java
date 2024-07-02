@@ -20,6 +20,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public ResponseEntity<?> deleteCategory(CategoryDto categoryDto) {
-        return null;
+        categoryRepository.delete(categoryDto.toEntity());
+        return ResponseEntity.ok().build();
     }
 }

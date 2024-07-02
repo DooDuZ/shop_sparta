@@ -1,43 +1,45 @@
 package com.sparta.shop_sparta.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.constant.member.MemberRole;
-import com.sparta.shop_sparta.service.member.MemberService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
+
+import com.sparta.shop_sparta.controller.member.MemberControllerImpl;
+import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.shop_sparta.service.member.MemberServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 
-//@SpringBootTest
-//@AutoConfigureMockMvc
+
+@ExtendWith(MockitoExtension.class)
 public class MemberControllerTest {
-/*
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private MemberControllerImpl memberController;
 
-    @MockBean
-    private MemberService memberService;
-
-    @Autowired
-    private ObjectMapper objectMapper; // ObjectMapper 주입
+    @Mock
+    private BindingResult bindingResult;
 
     @Test
     @DisplayName("회원가입 메서드 요청 확인 Test")
     void requestCheckingTest() throws Exception {
-        MemberEntity memberEntity = MemberEntity.builder().memberId(1L).memberName("지웅이").loginId("sin9158")
-                .password("1234").role(MemberRole.ADMIN).email("sin9158@naver.com").phoneNumber("01027209158").build();
+        // given
+        MemberDto memberDto = MemberDto.builder().memberName("지웅이").email("sin9158@naver.com")
+                .addr("경기도 안산시 단원구 고잔2길 9").addrDetail("541호")
+                .phoneNumber("01027209158").build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/member/").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(memberEntity)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        given(bindingResult.hasErrors()).willReturn(true);
+
+        // when
+        ResponseEntity<?> response = memberController.createAccount(memberDto, bindingResult);
+
+        // then
+        assertThat(response.getStatusCodeValue()).isEqualTo(400);
     }
-
- */
 }

@@ -111,7 +111,6 @@ public class ProductServiceImpl implements ProductService {
     // 주문에서 사용할 수 있도록 분리
     @Override
     public ProductEntity getProductEntity(Long productId){
-        System.out.println(productId);
         return productRepository.findById(productId).orElseThrow(
                 ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
@@ -146,11 +145,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
+        // Todo
         return null;
     }
 
     @Override
     public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
+        // Todo
         return null;
     }
 }
