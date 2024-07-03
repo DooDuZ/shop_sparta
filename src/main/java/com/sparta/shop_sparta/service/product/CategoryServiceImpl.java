@@ -15,11 +15,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<?> addCategory(CategoryDto categoryDto) {
         categoryRepository.save(categoryDto.toEntity());
+
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<?> deleteCategory(CategoryDto categoryDto) {
-        return null;
+        categoryRepository.delete(categoryDto.toEntity());
+        return ResponseEntity.ok().build();
     }
 }

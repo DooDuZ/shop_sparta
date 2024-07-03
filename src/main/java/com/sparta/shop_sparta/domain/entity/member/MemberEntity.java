@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -39,6 +41,7 @@ public class MemberEntity extends BaseEntity implements UserDetails {
     private String loginId;
 
     @Column(nullable = false)
+
     private String password;
 
     @Column(nullable = false)

@@ -49,8 +49,8 @@ public class AddrControllerImpl implements AddrController{
 
     @Override
     @GetMapping("/{memberId}/addr")
-    public List<AddrDto> getAddrList(@PathVariable Long memberId) {
+    public List<AddrDto> getAddrList(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long memberId) {
 
-        return addrService.getAddrList(memberId);
+        return addrService.getAddrList(userDetails, memberId);
     }
 }

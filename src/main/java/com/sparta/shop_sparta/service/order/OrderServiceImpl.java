@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.service.order;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.order.OrderStatus;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -10,10 +11,13 @@ import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderRepository;
+import com.sparta.shop_sparta.service.cart.CartService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -27,11 +31,11 @@ public class OrderServiceImpl implements OrderService{
     private final OrderRepository orderRepository;
     private final OrderDetailService orderDetailService;
     private final PaymentService paymentService;
+    private final CartService cartService;
 
     @Override
     @Transactional
     public ResponseEntity<OrderResponseDto> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
-        // 결제가 성공했다면
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = orderRequestDto.toEntity();
         orderEntity.setMemberEntity(memberEntity);
@@ -40,8 +44,11 @@ public class OrderServiceImpl implements OrderService{
         // 저장하고
         orderRepository.save(orderEntity);
 
+        // 장바구니에 있는 상품만 결제 하도록 처리 -> 정책임!!
+        List<OrderDetailDto> orderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
+
         // orderDetail 정보 처리
-        Long totalPrice = orderDetailService.addOrder(orderEntity, orderRequestDto.getOrderDetails());
+        Long totalPrice = orderDetailService.addOrder(orderEntity, orderDetails);
         // 가격 입력
         orderEntity.setTotalPrice(totalPrice);
 
@@ -52,9 +59,32 @@ public class OrderServiceImpl implements OrderService{
 
         // 결제된 주문 정보 반환을 위해 생성
         OrderResponseDto orderResponseDto = orderEntity.toDto();
-        orderResponseDto.setOrderDetails(orderRequestDto.getOrderDetails());
+        orderResponseDto.setOrderDetails(orderDetails);
+
+        // 결제 성공한 데이터는 장바구니에서 제거
+        cartService.removeOrderedProduct(memberEntity, orderDetails);
 
         return ResponseEntity.ok(orderResponseDto);
+    }
+
+    private List<OrderDetailDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto, MemberEntity memberEntity){
+        List<OrderDetailDto> orderDetails = new ArrayList<>();
+
+        // 장바구니 정보 가져오기
+        Map<Long, Long> cartInfo = cartService.getCartInRedis(memberEntity);
+
+        for (OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()) {
+            Long productId = orderDetailDto.getProductResponseDto().getProductId();
+
+            // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
+            if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
+                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
+            }
+
+            orderDetails.add(orderDetailDto);
+        }
+
+        return orderDetails;
     }
 
     @Override
@@ -122,7 +152,7 @@ public class OrderServiceImpl implements OrderService{
     //@Scheduled(fixedDelay = 60000)
     // 테스트 - 5분마다 상태 변경
     @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 27 3 * * ?")
     protected void updateOrderStatus() {
         updateOrderStatus(OrderStatus.IN_DELIVERY, OrderStatus.DELIVERED);
         updateOrderStatus(OrderStatus.PREPARED, OrderStatus.IN_DELIVERY);

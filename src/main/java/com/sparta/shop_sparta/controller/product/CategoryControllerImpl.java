@@ -17,7 +17,7 @@ public class CategoryControllerImpl implements CategoryController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> addCategory(@RequestBody CategoryDto categoryDto) {
+    public ResponseEntity<?> createCategory(@RequestBody CategoryDto categoryDto) {
         return categoryService.addCategory(categoryDto);
     }
 

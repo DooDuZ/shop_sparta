@@ -15,17 +15,17 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class MailService implements VerifySignUpService<MemberDto>{
-    // 메일 유틸 -> 다른 서비스로 분리
+
     private final MailConfig mailConfig;
     private final JavaMailSender javaMailSender;
     private final SignupVerifyCodeRedisRepository signupVerifyCodeRedisRepository;
 
     @Override
-    public void verifySignup(Long memberId, String verificationCode) {
+    public void verifySignup(Long memberId, String mailCode) {
         String key = String.valueOf(memberId);
-        String verificate = (String) signupVerifyCodeRedisRepository.find(key);
+        String verificationCode = (String) signupVerifyCodeRedisRepository.find(key);
 
-        if (!verificate.equals(verificationCode)) {
+        if (!verificationCode.equals(mailCode)) {
             throw new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE.getMessage());
         }
 
@@ -74,9 +74,9 @@ public class MailService implements VerifySignUpService<MemberDto>{
             String message = getVerificationMessage(memberDto);
 
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-            mimeMessageHelper.setFrom(mailConfig.from, mailConfig.DOMAIN_NAME);
+            mimeMessageHelper.setFrom(mailConfig.from, mailConfig.domainName);
             mimeMessageHelper.setTo(memberDto.getEmail());
-            mimeMessageHelper.setSubject(mailConfig.MAIL_TITLE);
+            mimeMessageHelper.setSubject(mailConfig.mailTitle);
             mimeMessageHelper.setText(message, true);
 
             javaMailSender.send(mimeMessage);

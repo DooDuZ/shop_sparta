@@ -3,10 +3,12 @@ package com.sparta.shop_sparta.controller.member;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.service.member.MemberService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,7 +26,13 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody MemberDto memberDto) {
+    public ResponseEntity<?> createAccount(@Valid @RequestBody MemberDto memberDto, BindingResult bindingResult) {
+        System.out.println(memberDto);
+
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         return memberService.createAccount(memberDto);
     }
 

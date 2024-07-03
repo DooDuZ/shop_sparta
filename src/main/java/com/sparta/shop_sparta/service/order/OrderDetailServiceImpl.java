@@ -30,7 +30,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // 저장 실패시 어짜피 transaction rollback 된다
         for (OrderDetailDto orderDetailDto : orderDetailDtoList) {
-            ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductId());
+            ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductResponseDto().getProductId());
 
             // 주문 수량 0이하거나 재고 없다면
             if (orderDetailDto.getAmount() <= 0 || productEntity.getAmount() < orderDetailDto.getAmount()) {
@@ -56,7 +56,8 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public List<OrderDetailDto> getOrderedProduct(OrderEntity orderEntity) {
         return orderDetailRepository.findByOrderEntity(orderEntity).stream()
-                .map(OrderDetailEntity::toDto).toList();
+                .map(OrderDetailEntity::toDto)
+                .toList();
     }
 
     @Override

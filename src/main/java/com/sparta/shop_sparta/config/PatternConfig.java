@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.validator.member.pattern;
+package com.sparta.shop_sparta.config;
 
 import java.util.regex.Pattern;
 

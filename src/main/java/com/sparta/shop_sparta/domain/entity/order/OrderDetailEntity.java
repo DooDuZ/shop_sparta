@@ -27,7 +27,7 @@ public class OrderDetailEntity {
     private Long orderDetailId;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Long amount;
 
     @ManyToOne
     @ToString.Exclude
@@ -39,7 +39,7 @@ public class OrderDetailEntity {
     @JoinColumn(name = "orderId")
     private OrderEntity orderEntity;
 
-    public OrderDetailEntity(ProductEntity productEntity, Integer amount, OrderEntity orderEntity) {
+    public OrderDetailEntity(ProductEntity productEntity, Long amount, OrderEntity orderEntity) {
         this.productEntity = productEntity;
         this.amount = amount;
         this.orderEntity = orderEntity;
@@ -47,6 +47,6 @@ public class OrderDetailEntity {
 
     public OrderDetailDto toDto(){
         return OrderDetailDto.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
-                .productId(this.productEntity.getProductId()).amount(this.amount).build();
+                .productResponseDto(this.productEntity.toDto()).amount(this.amount).build();
     }
 }

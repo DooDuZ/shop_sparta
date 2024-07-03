@@ -1,7 +1,8 @@
 package com.sparta.shop_sparta.domain.entity.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailDto;
-import com.sparta.shop_sparta.domain.entity.BaseEntity;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,20 +38,18 @@ public class CartDetailEntity {
     private CartEntity cartEntity;
 
     @Column(nullable = false)
-    private Integer amount;
+    private Long amount;
 
-    public CartDetailEntity(ProductEntity productEntity, CartEntity cartEntity, Integer amount) {
-        this.productEntity = productEntity;
-        this.cartEntity = cartEntity;
+
+    public void setAmount(Long amount) {
         this.amount = amount;
     }
 
-    public void setAmount(Integer amount) {
-        this.amount = amount;
+    public CartDetailRequestDto toRequestDto() {
+        return CartDetailRequestDto.builder().productId(this.productEntity.getProductId()).amount(this.amount).build();
     }
 
-    public CartDetailDto toDto() {
-        return CartDetailDto.builder().cartId(this.cartEntity.getCartId()).cartDetailId(this.cartDetailId)
-                .productId(this.productEntity.getProductId()).amount(this.amount).build();
+    public CartDetailResponseDto toResponseDto() {
+        return CartDetailResponseDto.builder().productResponseDto(new ProductResponseDto(this.productEntity)).amount(this.amount).build();
     }
 }

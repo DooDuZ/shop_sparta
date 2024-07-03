@@ -2,7 +2,6 @@ package com.sparta.shop_sparta.service.product;
 
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
@@ -35,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> addProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
+    public ResponseEntity<?> createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         ProductEntity productEntity = productRequestDto.toEntity();
 
         CategoryEntity categoryEntity = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(
@@ -47,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
         productRepository.save(productEntity);
 
         try {
-            productImageService.addProductImages(productEntity, productRequestDto.getProductThumbnails(),
+            productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
                     productRequestDto.getProductDetailImages());
         } catch (ProductException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -65,7 +64,9 @@ public class ProductServiceImpl implements ProductService {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
-        ProductEntity productEntity = productRepository.findById(productRequestDto.getProductId()).orElseThrow(
+        Long productId = productRequestDto.getProductId();
+
+        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
                 () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
 
@@ -115,6 +116,17 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
+    @Override
+    public ProductResponseDto getProductResponseDto(Long productId){
+        ProductEntity productEntity = getProductEntity(productId);
+
+        List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
+        ProductResponseDto productResponseDto = productEntity.toDto();
+        productResponseDto.setProductImages(productImages);
+
+        return productResponseDto;
+    }
+
     // 후에 페이징 처리 할 것
     // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override
@@ -133,11 +145,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
+        // Todo
         return null;
     }
 
     @Override
     public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
+        // Todo
         return null;
     }
 }

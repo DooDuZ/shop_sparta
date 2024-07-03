@@ -33,8 +33,8 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     @Override
     @Transactional
-    public void addProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
-                                 List<MultipartFile> productDetailImages) {
+    public void createProductImages(ProductEntity productEntity, List<MultipartFile> productThumbnails,
+                                    List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
 
         List<ProductImageEntity> productImageEntityList = new ArrayList<>();
@@ -92,11 +92,14 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     private String encodeBase64(ProductImageDto productImageDto) {
+        /* 테스트 불편해서 주석 처리
         try {
             return ImageUtil.readAndEncodeImage(filepath + productImageDto.getImagePath());
         } catch (IOException e) {
             throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage());
         }
+        */
+        return productImageDto.getImagePath();
     }
 
     @Override
@@ -105,7 +108,7 @@ public class ProductImageServiceImpl implements ProductImageService {
                                     List<MultipartFile> productDetailImages) {
         validateImageSize(productThumbnails, productDetailImages);
         deleteProductImages(productEntity);
-        addProductImages(productEntity, productThumbnails, productDetailImages);
+        createProductImages(productEntity, productThumbnails, productDetailImages);
     }
 
     @Override

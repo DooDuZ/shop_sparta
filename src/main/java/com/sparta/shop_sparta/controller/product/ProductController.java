@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface ProductController {
-    ResponseEntity<?> addProduct(UserDetails userDetails, ProductRequestDto productRequestDto);
+    ResponseEntity<?> createProduct(UserDetails userDetails, ProductRequestDto productRequestDto);
     ResponseEntity<?> updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto);
     ResponseEntity<?> deleteProduct(UserDetails userDetails, Long productId);
     ResponseEntity<?> getProduct(Long productId);

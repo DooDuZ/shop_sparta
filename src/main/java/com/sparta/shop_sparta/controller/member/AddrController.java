@@ -10,5 +10,5 @@ public interface AddrController {
     ResponseEntity<?> removeAddr(UserDetails userDetails, Long addrId);
     ResponseEntity<?> updateAddr(UserDetails userDetails, AddrDto addrDto);
     ResponseEntity<?> getAddr(UserDetails userDetails, Long addrId);
-    List<AddrDto> getAddrList(Long memberId);
+    List<AddrDto> getAddrList(UserDetails userDetails, Long memberId);
 }
