@@ -15,6 +15,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<?> addCategory(CategoryDto categoryDto) {
         categoryRepository.save(categoryDto.toEntity());
+
         return ResponseEntity.ok().build();
     }
 

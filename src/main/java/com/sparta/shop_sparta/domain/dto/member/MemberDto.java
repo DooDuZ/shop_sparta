@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 @AllArgsConstructor
 @Builder
 @ToString
+@Setter
 public class MemberDto {
     private Long memberId;
 
@@ -41,12 +43,11 @@ public class MemberDto {
     private String phoneNumber;
 
     @NotNull(message = "이메일은 필수 항목입니다.")
-    @Email(message = "유효한 이메일 형식을 입력해주세요.")
+    @Pattern(regexp = "^[A-z0-9]{2,20}+@[A-z]{2,20}+\\.[a-z]{2,3}$", message = "유효한 이메일 형식을 입력해주세요.")
     private String email;
 
     @NotBlank
     private String addr;
-    @NotBlank
     private String addrDetail;
 
     private MemberRole role;
@@ -57,37 +58,5 @@ public class MemberDto {
     public MemberEntity toEntity() {
         return MemberEntity.builder().memberId(this.memberId).loginId(this.loginId).password(this.password)
                 .memberName(this.memberName).phoneNumber(this.phoneNumber).email(this.email).role(this.role).build();
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
-    }
-
-    public void setMemberName(String memberName) {
-        this.memberName = memberName;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setAddr(String addr) {
-        this.addr = addr;
-    }
-
-    public void setAddrDetail(String addrDetail) {
-        this.addrDetail = addrDetail;
-    }
-
-    public void setAuthorities(Set<GrantedAuthority> authorities){
-        this.authorities = authorities;
     }
 }

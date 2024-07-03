@@ -27,9 +27,12 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody MemberDto memberDto, BindingResult bindingResult) {
+        System.out.println(memberDto);
+
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
+
         return memberService.createAccount(memberDto);
     }
 

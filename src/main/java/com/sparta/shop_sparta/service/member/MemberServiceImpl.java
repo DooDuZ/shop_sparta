@@ -9,6 +9,7 @@ import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import com.sparta.shop_sparta.service.member.addr.AddrService;
@@ -41,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> createAccount(MemberDto memberDto) {
+    public ResponseEntity<Void> createAccount(MemberDto memberDto) {
         // 가입 정보 유효성 검사
         validateSignupRequest(memberDto);
 
@@ -64,42 +65,8 @@ public class MemberServiceImpl implements MemberService {
         return ResponseEntity.ok().build();
     }
 
-    @Override
-    @Transactional
-    public ResponseEntity<?> verifySignup(Long memberId, String verificationCode) {
-        // 메일 서비스를 사용한 검증
-        // 코드 인즈 안되면 exception 발생
-        mailService.verifySignup(memberId, verificationCode);
-
-        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
-        );
-
-        memberEntity.setRole(MemberRole.BASIC);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<?> getMemberInfo(UserDetails userDetails, Long memberId) {
-        MemberEntity memberEntity = (MemberEntity) userDetails;
-
-        if (memberEntity.getMemberId() != memberId) {
-            throw new MemberException(AuthMessage.INVALID_PRINCIPLE.getMessage());
-        }
-
-        MemberDto memberDto = memberEntity.toDto();
-        //decryptMemberDto(memberDto);
-        memberDto.setPassword("");
-
-        // 주소 목록 추가
-        List<AddrDto> addrDtoList = addrService.getAddrList( (UserDetails) memberEntity,memberEntity.getMemberId());
-
-        return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
-    }
-
     private void validateSignupRequest(MemberDto memberDto) {
-        MemberInfoValidator memberInfoValidator = new MemberInfoValidator();
+        //MemberInfoValidator memberInfoValidator = new MemberInfoValidator();
 
         // 이메일 중복 검사
         if (memberRepository.findByEmail(memberDto.getEmail()).isPresent()) {
@@ -114,7 +81,40 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
+    public ResponseEntity<Void> verifySignup(Long memberId, String verificationCode) {
+        // 메일 서비스를 사용한 검증
+        // 코드 인즈 안되면 exception 발생
+        mailService.verifySignup(memberId, verificationCode);
+
+        MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
+
+        memberEntity.setRole(MemberRole.BASIC);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    public ResponseEntity<MemberResponseDto> getMemberInfo(UserDetails userDetails, Long memberId) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        if (memberEntity.getMemberId() != memberId) {
+            throw new AuthorizationException(AuthMessage.INVALID_PRINCIPLE.getMessage());
+        }
+
+        MemberDto memberDto = memberEntity.toDto();
+        memberDto.setPassword("");
+
+        // 주소 목록 추가
+        List<AddrDto> addrDtoList = addrService.getAddrList( (UserDetails) memberEntity,memberEntity.getMemberId());
+
+        return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<Void> updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
@@ -142,21 +142,13 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
+    public ResponseEntity<Void> updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        String phoneNumber = phoneNumberUpdateRequestDto.getPhoneNumber();
-
-        if (!new MemberInfoValidator().checkPattern(PatternConfig.phoneNumberPattern, phoneNumber)) {
-            return ResponseEntity.ok(MemberResponseMessage.UNMATCHED_PHONENUMBER.getMessage());
-        }
-
-        String salt = saltGenerator.generateSalt();
         MemberEntity memberEntity = (MemberEntity) userDetails;
-
-        memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumber, salt));
+        memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumberUpdateRequestDto.getPhoneNumber(), saltGenerator.generateSalt()));
 
         return ResponseEntity.ok().build();
     }
