@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.service.product;
 
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,5 +16,5 @@ public interface ProductService {
     ResponseEntity<?> getAllProducts();
     ResponseEntity<?> getAllProductsBySeller(Long sellerId);
     ResponseEntity<?> getAllByCategory(CategoryDto categoryDto);
-    ProductResponseDto getProductResponseDto(Long productId);
+    ProductDto getProductDto(Long productId);
 }

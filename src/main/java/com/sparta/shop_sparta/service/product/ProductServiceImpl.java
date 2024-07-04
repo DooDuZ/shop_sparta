@@ -3,7 +3,7 @@ package com.sparta.shop_sparta.service.product;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -48,7 +48,7 @@ public class ProductServiceImpl implements ProductService {
         try {
             productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
                     productRequestDto.getProductDetailImages());
-        } catch (ProductException e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
@@ -60,15 +60,11 @@ public class ProductServiceImpl implements ProductService {
     public ResponseEntity<?> updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        if(productRequestDto.getSellerId() - memberEntity.getMemberId() != 0){
+        ProductEntity productEntity = getProductEntity(productRequestDto.getProductId());
+
+        if(productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0){
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
-
-        Long productId = productRequestDto.getProductId();
-
-        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
-        );
 
         productEntity.update(productRequestDto);
 
@@ -78,14 +74,11 @@ public class ProductServiceImpl implements ProductService {
         return ResponseEntity.ok().build();
     }
 
-
     @Override
     public ResponseEntity<?> deleteProduct(UserDetails userDetails, Long productId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        ProductEntity productEntity = productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
-        );
+        ProductEntity productEntity = getProductEntity(productId);
 
         // 래퍼 클래스에 == 쓰면 참조값을 비교한다. + or - 연산 시 자동 언박싱됨
         if (memberEntity.getMemberId() - productEntity.getSellerEntity().getMemberId() != 0) {
@@ -98,14 +91,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<?> getProduct(Long productId) {
-        ProductEntity productEntity = getProductEntity(productId);
-
-        List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
-        ProductResponseDto productResponseDto = productEntity.toDto();
-        productResponseDto.setProductImages(productImages);
-
-        return ResponseEntity.ok(productResponseDto);
+    public ResponseEntity<ProductDto> getProduct(Long productId) {
+        return ResponseEntity.ok(getProductDto(productId));
     }
 
     // 주문에서 사용할 수 있도록 분리
@@ -117,22 +104,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto getProductResponseDto(Long productId){
+    public ProductDto getProductDto(Long productId){
         ProductEntity productEntity = getProductEntity(productId);
 
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
-        ProductResponseDto productResponseDto = productEntity.toDto();
-        productResponseDto.setProductImages(productImages);
+        ProductDto productDto = productEntity.toDto();
+        productDto.setProductImages(productImages);
 
-        return productResponseDto;
+        return productDto;
     }
 
     // 후에 페이징 처리 할 것
     // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override
     public ResponseEntity<?> getAllProducts() {
-        Map<Long, ProductResponseDto> productDtoList = productRepository.findAll().stream().map(ProductEntity::toDto).collect(
-                Collectors.toMap(ProductResponseDto::getProductId, Function.identity()));
+        Map<Long, ProductDto> productDtoList = productRepository.findAll().stream().map(ProductEntity::toDto).collect(
+                Collectors.toMap(ProductDto::getProductId, Function.identity()));
 
         List<ProductImageDto> productImageDtoList = productImageService.getAllProductImages();
 

@@ -57,6 +57,19 @@ public class OrderServiceImpl implements OrderService{
             throw new OrderException(OrderResponseMessage.FAIL_PAYMENT.getMessage());
         }
 
+        /*
+            Todo 결제 완료 후 db commit 실패 시 환불 로직 추가 -> commit 시에 재고 부족 생길 수 있음
+            ex) 재고 3
+            client A가 재고 조회 후 결제창 진입
+            client B가 재고 조회 후 결제창 진입
+
+            client A 제품 3개 결제 후 commit 되면서 재고 0으로 변경
+            client B 결제 성공 -> 그러나 재고 없음 -> db 필드가 unsigned 값이므로 재고 차감 시도 시 sql Exception 발생
+            client B의 작업 roll back -> 그러나 이미 처리된 결제는...?
+
+            db반영 코드 -> exception 발생 시 환불 로직 필요
+         */
+
         // 결제된 주문 정보 반환을 위해 생성
         OrderResponseDto orderResponseDto = orderEntity.toDto();
         orderResponseDto.setOrderDetails(orderDetails);
@@ -74,7 +87,7 @@ public class OrderServiceImpl implements OrderService{
         Map<Long, Long> cartInfo = cartService.getCartInRedis(memberEntity);
 
         for (OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()) {
-            Long productId = orderDetailDto.getProductResponseDto().getProductId();
+            Long productId = orderDetailDto.getProductDto().getProductId();
 
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
@@ -89,9 +102,8 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public ResponseEntity<OrderResponseDto> getOrders(UserDetails userDetails, Long orderId) {
-        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
-        );
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
         OrderResponseDto orderResponseDto = orderEntity.toDto();
         orderResponseDto.setOrderDetails(orderDetailService.getOrderedProduct(orderEntity));
@@ -101,16 +113,9 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId) {
-        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
-        );
-
+    public ResponseEntity<OrderResponseDto> cancelOrder(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
-
-        if (memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0) {
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
-        }
+        OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
         if(orderEntity.getOrderStatus() != OrderStatus.PREPARED){
             throw new OrderException(OrderResponseMessage.FAIL_CANCEL.getMessage());
@@ -128,31 +133,36 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public ResponseEntity<?> requestReturn(UserDetails userDetails, Long orderId) {
-        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
-        );
-
+    public ResponseEntity<OrderResponseDto> requestReturn(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
-
-        if(memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0){
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
-        }
+        OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
         if (orderEntity.getOrderStatus() != OrderStatus.DELIVERED || ChronoUnit.DAYS.between(orderEntity.getLastModifyDate(),
-                LocalDateTime.now()) > 1 ) {
+                LocalDateTime.now()) >= 1 ) {
             throw new OrderException(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
         }
 
         orderEntity.setOrderStatus(OrderStatus.RETURN_REQUESTED);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(orderEntity.toDto());
+    }
+
+    private OrderEntity getValidEntity(MemberEntity memberEntity, Long orderId){
+        OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
+                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
+        );
+
+        if(memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0){
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+        }
+
+        return orderEntity;
     }
 
     //@Scheduled(fixedDelay = 60000)
     // 테스트 - 5분마다 상태 변경
     @Transactional
-    @Scheduled(cron = "0 27 3 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     protected void updateOrderStatus() {
         updateOrderStatus(OrderStatus.IN_DELIVERY, OrderStatus.DELIVERED);
         updateOrderStatus(OrderStatus.PREPARED, OrderStatus.IN_DELIVERY);

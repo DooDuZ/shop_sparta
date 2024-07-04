@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service;
+package com.sparta.shop_sparta.service.member;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -13,7 +13,6 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.AddrRepository;
 import com.sparta.shop_sparta.repository.MemberRepository;
-import com.sparta.shop_sparta.service.member.MemberServiceImpl;
 import com.sparta.shop_sparta.service.member.addr.AddrService;
 import com.sparta.shop_sparta.service.member.verify.MailService;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
@@ -37,6 +36,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
+
     @InjectMocks
     private MemberServiceImpl memberService;
 

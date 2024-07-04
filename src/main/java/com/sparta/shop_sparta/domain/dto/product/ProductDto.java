@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductResponseDto {
+public class ProductDto {
     private Long productId;
     private String productName;
     private String productDetail;
@@ -27,7 +27,11 @@ public class ProductResponseDto {
     private ProductStatus productStatus;
     private Long sellerId;
 
-    public ProductResponseDto(ProductEntity productEntity) {
+    @Setter
+    @Builder.Default
+    private List<ProductImageDto> productImages = new ArrayList<>();
+
+    public ProductDto(ProductEntity productEntity) {
         this.productId = productEntity.getProductId();
         this.productName = productEntity.getProductName();
         this.productDetail = productEntity.getProductDetail();
@@ -39,8 +43,4 @@ public class ProductResponseDto {
         this.productStatus = productEntity.getProductStatus();
         this.sellerId = productEntity.getSellerEntity().getMemberId();
     }
-
-    @Setter
-    @Builder.Default
-    private List<ProductImageDto> productImages = new ArrayList<>();
 }

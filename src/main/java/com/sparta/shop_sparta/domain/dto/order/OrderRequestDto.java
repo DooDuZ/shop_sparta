@@ -19,7 +19,6 @@ public class OrderRequestDto {
     private List<OrderDetailDto> orderDetails;
 
     public OrderEntity toEntity(){
-        return OrderEntity.builder().orderAddr(this.orderAddr).orderAddrDetail(this.orderAddrDetail)
-                .orderStatus(OrderStatus.of(this.orderStatus)).build();
+        return OrderEntity.builder().orderId(this.orderId).orderAddr(this.orderAddr).orderAddrDetail(this.orderAddrDetail).build();
     }
 }

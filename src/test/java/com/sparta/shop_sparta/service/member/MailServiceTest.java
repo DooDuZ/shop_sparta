@@ -1,17 +1,13 @@
-package com.sparta.shop_sparta.service;
+package com.sparta.shop_sparta.service.member;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.sparta.shop_sparta.config.MailConfig;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
-import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.memoryRepository.SignupVerifyCodeRedisRepository;
 import com.sparta.shop_sparta.service.member.verify.MailService;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 
 @ExtendWith(MockitoExtension.class)
 public class MailServiceTest {

@@ -1,10 +1,9 @@
-package com.sparta.shop_sparta.controller;
+package com.sparta.shop_sparta.controller.member;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.shop_sparta.controller.member.MemberControllerImpl;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.service.member.MemberServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

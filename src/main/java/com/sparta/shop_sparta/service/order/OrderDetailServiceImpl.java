@@ -5,7 +5,7 @@ import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.exception.ProductException;
+import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import jakarta.transaction.Transactional;
@@ -30,16 +30,17 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         // 저장 실패시 어짜피 transaction rollback 된다
         for (OrderDetailDto orderDetailDto : orderDetailDtoList) {
-            ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductResponseDto().getProductId());
+            ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductDto().getProductId());
 
+            System.out.println(orderDetailDto.getAmount());
             // 주문 수량 0이하거나 재고 없다면
             if (orderDetailDto.getAmount() <= 0 || productEntity.getAmount() < orderDetailDto.getAmount()) {
                 // 후에 메시지 케이스 별로 분리
-                throw new ProductException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+                throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
             }
 
             totalPrice += productEntity.getPrice() * orderDetailDto.getAmount();
-             productEntity.setAmount(productEntity.getAmount() - orderDetailDto.getAmount());
+            productEntity.setAmount(productEntity.getAmount() - orderDetailDto.getAmount());
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
