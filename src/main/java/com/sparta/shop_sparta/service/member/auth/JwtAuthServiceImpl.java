@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.service.member.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.domain.dto.member.token.TokenWrapper;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.memoryRepository.JwtRedisRepository;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
@@ -35,11 +36,15 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     // controller가 아닌 usernamePasswordAuthenticationFilter -> loginSuccessHandler 에서 접근
     @Override
     public void login(HttpServletRequest request, HttpServletResponse response,
-                                   Authentication authentication) {
+                      Authentication authentication) {
         String username = authentication.getName();
         String role = authentication.getAuthorities().iterator().next().getAuthority();
 
-        TokenWrapper tokenWrapper = generateTokens(username, role, request, response);
+        MemberEntity memberEntity = (MemberEntity) authentication.getPrincipal();
+
+        Long memberId = memberEntity.getMemberId();
+
+        TokenWrapper tokenWrapper = generateTokens(username, role, String.valueOf(memberId), request, response);
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -47,7 +52,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
             response.setStatus(HttpServletResponse.SC_OK);
             response.setContentType("application/json");
             response.getWriter().write(objectMapper.writeValueAsString(tokenWrapper));
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MemberException(AuthMessage.FAIL_CONVERT_TO_JSON.getMessage(), e);
         }
     }
@@ -63,7 +68,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
             jwtRedisRepository.deleteUserAgent(key, userAgent);
 
             setCookie(response, accessTokenCookieName, null, 0);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MemberException(AuthMessage.INVALID_TOKEN.getMessage(), e);
         }
 
@@ -83,27 +88,30 @@ public class JwtAuthServiceImpl implements JwtAuthService {
 
         String username = jwtTokenProvider.getUsernameByRefresh(refreshToken);
         String role = jwtTokenProvider.getRoleByRefresh(refreshToken);
+        String memberId = jwtTokenProvider.getRefreshMemberId(refreshToken);
 
         // 액세스 토큰만 발급으로 변경
         try {
-            String accessToken = jwtTokenProvider.createAccessToken(tokenUsernameEncoder.decrypt(username),role);
+            String accessToken = jwtTokenProvider.createAccessToken(tokenUsernameEncoder.decrypt(username), role, memberId);
             setCookie(response, accessTokenCookieName, accessToken, accessTokenExpirySecond);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MemberException(e);
         }
 
         return ResponseEntity.ok().build();
     }
 
-    private TokenWrapper generateTokens(String username, String role, HttpServletRequest request, HttpServletResponse response) {
-        String accessToken = jwtTokenProvider.createAccessToken(username, role);
+    private TokenWrapper generateTokens(String username, String role, String memberId, HttpServletRequest request,
+                                        HttpServletResponse response) {
+        String accessToken = jwtTokenProvider.createAccessToken(username, role, memberId);
         String userAgent = request.getHeader(USER_AGENT_KEY);
 
-        String refreshToken = jwtTokenProvider.createRefreshToken(username, role, userAgent);
+        String refreshToken = jwtTokenProvider.createRefreshToken(username, role, memberId, userAgent);
 
         // 발급한 refreshToken을 redis에 등록
         // 유저 이름 암호화 되어있으므로 provider에서 뽑아서 써야한다
-        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent, refreshToken);
+        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent,
+                refreshToken);
 
         setCookie(response, accessTokenCookieName, accessToken, accessTokenExpirySecond);
 

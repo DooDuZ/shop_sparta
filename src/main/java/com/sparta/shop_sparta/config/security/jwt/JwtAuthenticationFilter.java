@@ -30,8 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Jws<Claims> claims = jwtTokenProvider.validateToken(token);
 
         if (token != null && claims != null) {
+
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         }else if(token != null && claims == null){
             // 리프레시 토큰으로 재요청 하라고 전달
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

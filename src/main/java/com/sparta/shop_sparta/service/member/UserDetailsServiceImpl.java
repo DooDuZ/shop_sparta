@@ -25,14 +25,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     // 복호화 가능한 인코더
     // private final UserInformationEncoder userInformationEncoder;
 
-
     @Override
     public UserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
         MemberEntity memberEntity = memberRepository.findByLoginId(loginId).orElseThrow(
                 () -> new UsernameNotFoundException(MemberResponseMessage.NOT_FOUND.getMessage())
         );
 
-        Set<GrantedAuthority> authorities = new HashSet<>();
+        Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
 
         // 권한 추가
         authorities.add(new SimpleGrantedAuthority(memberEntity.getRole().getGrade()));

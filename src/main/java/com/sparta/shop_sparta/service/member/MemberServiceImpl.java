@@ -96,25 +96,30 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public ResponseEntity<MemberResponseDto> getMemberInfo(UserDetails userDetails, Long memberId) {
+    public MemberResponseDto getMemberInfo(UserDetails userDetails, Long memberId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if (memberEntity.getMemberId() != memberId) {
             throw new AuthorizationException(AuthMessage.INVALID_PRINCIPLE.getMessage());
         }
 
-        MemberDto memberDto = memberEntity.toDto();
+        MemberEntity memberInfo = memberRepository.findById(memberId).orElseThrow(
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
+
+        MemberDto memberDto = memberInfo.toDto();
+        decryptMemberDto(memberDto);
         memberDto.setPassword("");
 
         // 주소 목록 추가
-        List<AddrDto> addrDtoList = addrService.getAddrList( (UserDetails) memberEntity,memberEntity.getMemberId());
+        List<AddrDto> addrDtoList = addrService.getAddrList(memberInfo, memberId);
 
-        return ResponseEntity.ok(new MemberResponseDto(memberDto, addrDtoList));
+        return new MemberResponseDto(memberDto, addrDtoList);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Void> updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
+    public void updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
@@ -140,22 +145,23 @@ public class MemberServiceImpl implements MemberService {
         );
 
         managedEntity.setPassword(passwordEncoder.encode(confirmPassword));
-
-        return ResponseEntity.ok().build();
     }
 
 
     @Override
     @Transactional
-    public ResponseEntity<Void> updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
+    public void updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
-            return ResponseEntity.badRequest().build();
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
-        memberEntity.setPhoneNumber(userInformationEncoder.encrypt(phoneNumberUpdateRequestDto.getPhoneNumber(), saltGenerator.generateSalt()));
 
-        return ResponseEntity.ok().build();
+        MemberEntity memberInfo = memberRepository.findById(memberEntity.getMemberId()).orElseThrow(
+                ()->new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
+
+        memberInfo.setPhoneNumber(userInformationEncoder.encrypt(phoneNumberUpdateRequestDto.getPhoneNumber(), saltGenerator.generateSalt()));
     }
 
     private void encryptMemberDto(MemberDto memberDto) {

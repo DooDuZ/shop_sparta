@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.controller.member;
 
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
+import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
 import com.sparta.shop_sparta.service.member.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -44,20 +45,19 @@ public class MemberControllerImpl implements MemberController{
 
     @Override
     @GetMapping
-    public ResponseEntity<?> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long memberId) {
-        return memberService.getMemberInfo(userDetails, memberId);
+    public ResponseEntity<MemberResponseDto> getMemberInfo(@AuthenticationPrincipal UserDetails userDetails, @RequestParam Long memberId) {
+        return ResponseEntity.ok(memberService.getMemberInfo(userDetails, memberId));
     }
 
     @Override
     @PatchMapping("/password")
-    public ResponseEntity<?> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo passwordUpdateRequestDto) {
-        return memberService.updatePassword(userDetails, passwordUpdateRequestDto);
+    public ResponseEntity<Void> updatePassword(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo passwordUpdateRequestDto) {
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @PatchMapping("/phoneNumber")
-    public ResponseEntity<?> updatePhoneNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo phoneNumberUpdateRequestDto) {
-        System.out.println(phoneNumberUpdateRequestDto.getPhoneNumber());
-        return memberService.updatePhoneNumber(userDetails, phoneNumberUpdateRequestDto);
+    public ResponseEntity<Void> updatePhoneNumber(@AuthenticationPrincipal UserDetails userDetails, @RequestBody MemberRequestVo phoneNumberUpdateRequestDto) {
+        return ResponseEntity.ok().build();
     }
 }

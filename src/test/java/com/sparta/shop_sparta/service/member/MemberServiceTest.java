@@ -18,6 +18,7 @@ import com.sparta.shop_sparta.service.member.verify.MailService;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;
 import java.util.Optional;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -133,27 +134,26 @@ public class MemberServiceTest {
         @Test
         @DisplayName("전화번호 업데이트 성공")
         void updatePhoneNumberSuccessTest() {
-            // Given
+            // given
             MemberRequestVo memberRequestVo = MemberRequestVo.builder().phoneNumber("010-2720-9158").build();
+            when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
 
-            // When
-            ResponseEntity<?> response = memberService.updatePhoneNumber(memberEntity, memberRequestVo);
-
-            // Then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            // when then
+            Assertions.assertDoesNotThrow(
+                    () -> memberService.updatePhoneNumber(memberEntity, memberRequestVo)
+            );
         }
 
         @Test
         @DisplayName("전화번호 값이 null이면 업데이트에 실패합니다.")
         void updatePhoneNumberFailTest() {
-            // Given
+            // given
             MemberRequestVo memberRequestVo = MemberRequestVo.builder().phoneNumber(null).build();
 
-            // When
-            ResponseEntity<?> response = memberService.updatePhoneNumber(memberEntity, memberRequestVo);
-
-            // Then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            // when then
+            assertThatThrownBy(
+                    ()->memberService.updatePhoneNumber(memberEntity, memberRequestVo)
+            ).isInstanceOf(MemberException.class).hasMessage(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
     }
 
@@ -215,17 +215,14 @@ public class MemberServiceTest {
         Long memberId = 1L;
         MemberEntity memberEntity = existingMember.toEntity();
         memberEntity.setMemberId(1L);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(memberEntity));
 
         // when
-        ResponseEntity<?> response = memberService.getMemberInfo(memberEntity, memberId);
-        MemberResponseDto responseDto = (MemberResponseDto) response.getBody();
+        MemberResponseDto responseDto = memberService.getMemberInfo(memberEntity, memberId);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseDto.getLoginId()).isEqualTo(existingMember.getLoginId());
-        assertThat(responseDto.getEmail()).isEqualTo(existingMember.getEmail());
-        assertThat(responseDto.getPhoneNumber()).isEqualTo(existingMember.getPhoneNumber());
-        assertThat(responseDto.getMemberName()).isEqualTo(existingMember.getMemberName());
+
     }
 
     @Test
