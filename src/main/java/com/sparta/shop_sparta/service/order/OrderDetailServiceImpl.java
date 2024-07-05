@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.service.order;
 
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
@@ -23,35 +24,40 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     @Transactional
-    public Long addOrder(OrderEntity orderEntity, List<OrderDetailDto> orderDetailDtoList) {
-        Long totalPrice = 0L;
-
+    public List<OrderDetailDto> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
         List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
 
         // 저장 실패시 어짜피 transaction rollback 된다
-        for (OrderDetailDto orderDetailDto : orderDetailDtoList) {
-            ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductDto().getProductId());
+        for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
+            ProductEntity productEntity = productService.getProductEntity(orderDetailRequestDto.getProductId());
 
-            System.out.println(orderDetailDto.getAmount());
             // 주문 수량 0이하거나 재고 없다면
-            if (orderDetailDto.getAmount() <= 0 || productEntity.getAmount() < orderDetailDto.getAmount()) {
+            if (orderDetailRequestDto.getAmount() <= 0 || productEntity.getAmount() < orderDetailRequestDto.getAmount()) {
                 // 후에 메시지 케이스 별로 분리
                 throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
             }
 
-            totalPrice += productEntity.getPrice() * orderDetailDto.getAmount();
-            productEntity.setAmount(productEntity.getAmount() - orderDetailDto.getAmount());
+            productEntity.setAmount(productEntity.getAmount() - orderDetailRequestDto.getAmount());
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
                     OrderDetailEntity.builder().orderEntity(orderEntity)
-                            .productEntity(productEntity).amount(orderDetailDto.getAmount()).build()
+                            .productEntity(productEntity).amount(orderDetailRequestDto.getAmount()).build()
             );
         }
 
         orderDetailRepository.saveAll(orderDetailEntities);
 
-        return totalPrice;
+        List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
+
+        for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
+            OrderDetailDto orderDetailDto = orderDetailEntity.toDto();
+            orderDetailDto.setProductDto(productService.getProductDto(orderDetailEntity.getProductEntity()));
+
+            orderDetailDtoList.add(orderDetailDto);
+        }
+
+        return orderDetailDtoList;
     }
 
     @Override

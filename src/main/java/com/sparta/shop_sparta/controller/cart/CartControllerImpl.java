@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.controller.cart;
 
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailRequestDto;
+import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
 import com.sparta.shop_sparta.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,14 +24,14 @@ public class CartControllerImpl implements CartController{
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
-        return cartService.createCartDetail(userDetails, cartDetailRequestDto);
+    public ResponseEntity<?> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
+        return ResponseEntity.ok(cartService.addProductToCart(userDetails, cartRequestDto));
     }
 
     @Override
     @GetMapping
     public ResponseEntity<?> getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        return cartService.getCart(userDetails);
+        return ResponseEntity.ok(cartService.getCart(userDetails));
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CartControllerImpl implements CartController{
 
     @Override
     @PutMapping
-    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartDetailRequestDto cartDetailRequestDto) {
-        return cartService.updateCartDetail(userDetails, cartDetailRequestDto);
+    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
+        return cartService.updateCartDetail(userDetails, cartRequestDto);
     }
 }

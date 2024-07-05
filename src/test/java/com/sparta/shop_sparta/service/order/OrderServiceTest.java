@@ -6,13 +6,15 @@ import static org.mockito.Mockito.*;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.order.OrderStatus;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
+import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
+import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderRepository;
@@ -56,6 +58,8 @@ public class OrderServiceTest {
     private OrderRequestDto orderRequestDto;
     @Mock
     private MemberEntity memberEntity;
+    @Mock
+    private ProductEntity productEntity;
 
     @BeforeEach
     void init(){
@@ -65,14 +69,16 @@ public class OrderServiceTest {
         orderedEntity = OrderEntity.builder().orderId(1L).orderStatus(OrderStatus.PREPARED).orderAddr("지구 어딘가")
                 .orderAddrDetail("한국 어딘가").memberEntity(memberEntity).build();
 
-        List<OrderDetailDto> orderDetails = new ArrayList<>();
+        List<OrderDetailRequestDto> orderDetails = new ArrayList<>();
         orderRequestDto = OrderRequestDto.builder().orderAddr("경기도 어딘가").orderAddrDetail("안산시 어딘가")
                 .orderDetails(orderDetails).build();
         // 넣고 하는 건 말이 안되지만 테스트이므로...
         orderRequestDto.setOrderId(1L);
 
-        orderDetails.add(OrderDetailDto.builder().amount(10L).productDto(ProductDto.builder()
-                .productId(1L).price(10000L).productStatus(ProductStatus.ON_SALE).build()).build());
+        productEntity = ProductEntity.builder().productId(1L).productName("ㅇㅇ").productDetail("ㅇㅇ").categoryEntity(
+                CategoryEntity.builder().categoryName("dd").categoryId(1L).build()).price(10000L).amount(1000L).sellerEntity(memberEntity).build();
+
+        orderDetails.add(OrderDetailRequestDto.builder().amount(10L).productId(1L).build());
     }
 
     @Nested
@@ -82,33 +88,29 @@ public class OrderServiceTest {
         @DisplayName("주문 성공")
         void createOrderSuccessTest(){
             // given
-            Long totalPrice = 0L;
-            for ( OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()){
-                totalPrice += orderDetailDto.getProductDto().getPrice();
-            }
-
             Map<Long, Long> cartInfo = new HashMap<>();
             cartInfo.put(1L, 10L);
 
+            List<OrderDetailDto> details = new ArrayList<>();
+            details.add(OrderDetailDto.builder().amount(10L).productDto(productEntity.toDto()).build());
+
             when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderRequestDto.toEntity());
-            when(cartService.getCartInRedis(any(MemberEntity.class))).thenReturn(cartInfo);
-            when(orderDetailService.addOrder(any(OrderEntity.class), anyList())).thenReturn(totalPrice);
+            when(cartService.getCartInfo(any(MemberEntity.class))).thenReturn(cartInfo);
+            when(orderDetailService.addOrder(any(OrderEntity.class), anyList())).thenReturn(details);
             when(paymentService.pay(any(OrderEntity.class))).thenReturn(true);
             doNothing().when(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
 
             // when
-            ResponseEntity<OrderResponseDto> response = orderService.createOrder(memberEntity, orderRequestDto);
-            OrderResponseDto orderResponseDto = response.getBody();
+            OrderResponseDto orderResponseDto = orderService.createOrder(memberEntity, orderRequestDto);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(orderResponseDto).isNotNull();
             assertThat(orderResponseDto.getOrderId()).isEqualTo(1L);
             assertThat(orderResponseDto.getOrderStatus()).isEqualTo(OrderStatus.PREPARED);
             assertThat(orderResponseDto.getOrderAddr()).isEqualTo(orderRequestDto.getOrderAddr());
             assertThat(orderResponseDto.getOrderAddrDetail()).isEqualTo(orderRequestDto.getOrderAddrDetail());
             assertThat(orderResponseDto.getMemberId()).isEqualTo(memberEntity.getMemberId());
-            assertThat(orderResponseDto.getTotalPrice()).isEqualTo(totalPrice);
+            assertThat(orderResponseDto.getTotalPrice()).isEqualTo(productEntity.getPrice() * 10L);
             verify(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
         }
 
@@ -117,7 +119,7 @@ public class OrderServiceTest {
         void createOrderCartInfoProductFailTest(){
             // given
             when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderRequestDto.toEntity());
-            when(cartService.getCartInRedis(any(MemberEntity.class))).thenReturn(new HashMap<>());
+            when(cartService.getCartInfo(any(MemberEntity.class))).thenReturn(new HashMap<>());
 
             // when then
             assertThatThrownBy(
@@ -133,7 +135,7 @@ public class OrderServiceTest {
             cartInfo.put(1L, 5L);
 
             when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderRequestDto.toEntity());
-            when(cartService.getCartInRedis(any(MemberEntity.class))).thenReturn(cartInfo);
+            when(cartService.getCartInfo(any(MemberEntity.class))).thenReturn(cartInfo);
 
             // when then
             assertThatThrownBy(
@@ -145,17 +147,12 @@ public class OrderServiceTest {
         @DisplayName("결제에 실패하면 Exception이 발생합니다.")
         void createOrderPaymentFailTest(){
             // given
-            Long totalPrice = 0L;
-            for ( OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()){
-                totalPrice += orderDetailDto.getProductDto().getPrice();
-            }
-
             Map<Long, Long> cartInfo = new HashMap<>();
             cartInfo.put(1L, 10L);
 
             when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderRequestDto.toEntity());
-            when(cartService.getCartInRedis(any(MemberEntity.class))).thenReturn(cartInfo);
-            when(orderDetailService.addOrder(any(OrderEntity.class), anyList())).thenReturn(totalPrice);
+            when(cartService.getCartInfo(any(MemberEntity.class))).thenReturn(cartInfo);
+            when(orderDetailService.addOrder(any(OrderEntity.class), anyList())).thenReturn(anyList());
 
             // when then
             assertThatThrownBy(

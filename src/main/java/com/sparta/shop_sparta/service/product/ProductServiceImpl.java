@@ -91,8 +91,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ResponseEntity<ProductDto> getProduct(Long productId) {
-        return ResponseEntity.ok(getProductDto(productId));
+    public ProductDto getProduct(Long productId) {
+        return getProductDto(getProductEntity(productId));
     }
 
     // 주문에서 사용할 수 있도록 분리
@@ -103,10 +103,13 @@ public class ProductServiceImpl implements ProductService {
         );
     }
 
-    @Override
-    public ProductDto getProductDto(Long productId){
-        ProductEntity productEntity = getProductEntity(productId);
+    public List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo){
+        return productRepository.findAllById(cartInfo.keySet()).stream()
+                .map(this::getProductDto).toList();
+    }
 
+    @Override
+    public ProductDto getProductDto(ProductEntity productEntity){
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
         ProductDto productDto = productEntity.toDto();
         productDto.setProductImages(productImages);

@@ -124,17 +124,22 @@ public class MemberServiceImpl implements MemberService {
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
 
+        // 비밀번호 검증
         if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
             throw new MemberException(MemberResponseMessage.INVALID_PASSWORD.getMessage());
         }
 
+        // 새 비밀번호에 대한 패턴 검증
         if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)) {
             throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
         }
 
-        passwordEncoder.matches(password, memberEntity.getPassword());
+        // 영속 상태 엔티티 가져오기
+        MemberEntity managedEntity = memberRepository.findById(memberEntity.getMemberId()).orElseThrow(
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+        );
 
-        memberEntity.setPassword(passwordEncoder.encode(confirmPassword));
+        managedEntity.setPassword(passwordEncoder.encode(confirmPassword));
 
         return ResponseEntity.ok().build();
     }

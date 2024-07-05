@@ -4,6 +4,7 @@ import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.order.OrderStatus;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public ResponseEntity<OrderResponseDto> createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
+    public OrderResponseDto createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = orderRequestDto.toEntity();
         orderEntity.setMemberEntity(memberEntity);
@@ -44,13 +45,15 @@ public class OrderServiceImpl implements OrderService{
         // 저장하고
         orderRepository.save(orderEntity);
 
+        orderRequestDto.setOrderId(orderEntity.getOrderId());
+
         // 장바구니에 있는 상품만 결제 하도록 처리 -> 정책임!!
-        List<OrderDetailDto> orderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
+        List<OrderDetailRequestDto> requestOrderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
 
         // orderDetail 정보 처리
-        Long totalPrice = orderDetailService.addOrder(orderEntity, orderDetails);
+        List<OrderDetailDto> orderDetailDtoList = orderDetailService.addOrder(orderEntity, requestOrderDetails);
         // 가격 입력
-        orderEntity.setTotalPrice(totalPrice);
+        orderEntity.setTotalPrice(getTotalPrice(orderDetailDtoList));
 
         // 재고 확인까지 끝난 상태로 결제한다.
         if (!paymentService.pay(orderEntity)){
@@ -72,22 +75,33 @@ public class OrderServiceImpl implements OrderService{
 
         // 결제된 주문 정보 반환을 위해 생성
         OrderResponseDto orderResponseDto = orderEntity.toDto();
-        orderResponseDto.setOrderDetails(orderDetails);
+        orderResponseDto.setOrderDetails(orderDetailDtoList);
 
         // 결제 성공한 데이터는 장바구니에서 제거
-        cartService.removeOrderedProduct(memberEntity, orderDetails);
+        cartService.removeOrderedProduct(memberEntity, orderDetailDtoList);
 
-        return ResponseEntity.ok(orderResponseDto);
+        return orderResponseDto;
     }
 
-    private List<OrderDetailDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto, MemberEntity memberEntity){
-        List<OrderDetailDto> orderDetails = new ArrayList<>();
+    private Long getTotalPrice(List<OrderDetailDto> orderDetails) {
+        Long totalPrice = 0L;
+
+        for (OrderDetailDto orderDetail : orderDetails) {
+            totalPrice += orderDetail.getAmount() * orderDetail.getProductDto().getPrice();
+        }
+
+        return totalPrice;
+    }
+
+    private List<OrderDetailRequestDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto, MemberEntity memberEntity){
+        List<OrderDetailRequestDto> orderDetails = new ArrayList<>();
 
         // 장바구니 정보 가져오기
-        Map<Long, Long> cartInfo = cartService.getCartInRedis(memberEntity);
+        Map<Long, Long> cartInfo = cartService.getCartInfo(memberEntity);
 
-        for (OrderDetailDto orderDetailDto : orderRequestDto.getOrderDetails()) {
-            Long productId = orderDetailDto.getProductDto().getProductId();
+        for (OrderDetailRequestDto orderDetailDto : orderRequestDto.getOrderDetails()) {
+            // Todo -> 여기서부터 고쳐
+            Long productId = orderDetailDto.getProductId();
 
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {

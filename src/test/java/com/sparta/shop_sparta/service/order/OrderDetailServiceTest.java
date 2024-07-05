@@ -6,7 +6,9 @@ import static org.mockito.Mockito.*;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
@@ -38,14 +40,15 @@ public class OrderDetailServiceTest {
 
     ProductEntity productEntity;
     OrderEntity orderEntity;
-    List<OrderDetailDto> orderDetailDtoList;
+    List<OrderDetailRequestDto> orderDetailDtoList;
 
     @BeforeEach
     void init() {
         productEntity = ProductEntity.builder().amount(1000L).price(200000L).productId(1L).categoryEntity(
-                CategoryEntity.builder().categoryId(1L).categoryName("아이템").build()).productStatus(ProductStatus.ON_SALE).build();
+                CategoryEntity.builder().categoryId(1L).categoryName("아이템").build()).sellerEntity(
+                MemberEntity.builder().build()).productStatus(ProductStatus.ON_SALE).build();
         orderEntity = OrderEntity.builder().orderId(1L).build();
-        OrderDetailDto orderDetailDto = OrderDetailDto.builder().amount(10L).productDto(ProductDto.builder().productId(1L).build()).build();
+        OrderDetailRequestDto orderDetailDto = OrderDetailRequestDto.builder().amount(10L).productId(1L).build();
 
         orderDetailDtoList = new ArrayList<>();
         orderDetailDtoList.add(orderDetailDto);
@@ -60,18 +63,26 @@ public class OrderDetailServiceTest {
         void addOrderDetailTest() {
             // given
             when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
-            when(orderDetailRepository.saveAll(any())).thenReturn(anyList());
+            when(orderDetailRepository.saveAll(any())).thenReturn(new ArrayList<>());
+            when(productService.getProductDto(any(ProductEntity.class))).thenReturn(productEntity.toDto());
 
             Long totalAmount = 0L;
 
-            for(OrderDetailDto orderDetailDto : orderDetailDtoList) {
+            for(OrderDetailRequestDto orderDetailDto : orderDetailDtoList) {
                 totalAmount += orderDetailDto.getAmount();
             }
 
             // when
-            Long totalPrice = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
-            // then
+            List<OrderDetailDto> orderDetails = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
 
+            Long totalPrice = 0L;
+
+            for (OrderDetailDto orderDetailDto : orderDetails) {
+                System.out.println(orderDetailDto.getProductDto() == null);
+                totalPrice += orderDetailDto.getAmount() * orderDetailDto.getProductDto().getPrice();
+            }
+
+            // then
             assertThat(totalPrice).isEqualTo(productEntity.getPrice() * totalAmount);
         }
 
@@ -82,7 +93,7 @@ public class OrderDetailServiceTest {
             // given
             when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
             orderDetailDtoList.clear();
-            orderDetailDtoList.add(OrderDetailDto.builder().productDto(ProductDto.builder().productId(1L).amount(10L).build()).amount(amount).build());
+            orderDetailDtoList.add(OrderDetailRequestDto.builder().productId(1L).amount(amount).build());
 
             // when then
             assertThatThrownBy(
@@ -96,7 +107,7 @@ public class OrderDetailServiceTest {
             // given
             when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
             orderDetailDtoList.clear();
-            orderDetailDtoList.add(OrderDetailDto.builder().amount(1001L).productDto(ProductDto.builder().productId(1L).amount(1000L).build()).build());
+            orderDetailDtoList.add(OrderDetailRequestDto.builder().amount(1001L).productId(1L).build());
 
             // when then
             assertThatThrownBy(

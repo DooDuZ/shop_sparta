@@ -46,6 +46,6 @@ public class OrderDetailEntity {
 
     public OrderDetailDto toDto(){
         return OrderDetailDto.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
-                .productDto(this.productEntity.toDto()).amount(this.amount).build();
+                .amount(this.amount).build();
     }
 }

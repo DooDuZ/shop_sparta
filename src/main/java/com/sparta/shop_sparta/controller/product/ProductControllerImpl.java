@@ -48,7 +48,7 @@ public class ProductControllerImpl implements ProductController {
     @Override
     @GetMapping("/{productId}")
     public ResponseEntity<?> getProduct(@PathVariable Long productId) {
-        return productService.getProduct(productId);
+        return ResponseEntity.ok(productService.getProduct(productId));
     }
 
     // 후에 페이징 적용

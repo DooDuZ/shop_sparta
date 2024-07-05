@@ -8,6 +8,7 @@ public enum ProductMessage {
     NOT_FOUND_PRODUCT("존재하지 않는 상품입니다."),
     INVALID_CATEGORY("카테고리 정보가 존재하지 않습니다."),
     INVALID_STATUS("판매 상태 변경 오류"),
+    OUT_OF_STOCK("재고 부족"),
     ;
 
     private String message;

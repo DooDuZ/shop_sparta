@@ -182,11 +182,10 @@ public class ProductServiceTest {
         @DisplayName("조회 성공")
         void getProductSuccessTest(){
             // given
-            when(productRepository.findById(1L)).thenReturn(Optional.of(productEntity));
             when(productImageService.getProductImages(any())).thenReturn(anyList());
 
             // when
-            ProductDto productDto = productService.getProductDto(1L);
+            ProductDto productDto = productService.getProductDto(productEntity);
 
             // then
             assertThat(productDto.getProductName()).isEqualTo(productEntity.getProductName());
@@ -198,12 +197,11 @@ public class ProductServiceTest {
         @DisplayName("이미지 생성에 실패하면 Exception이 발생합니다.")
         void getProductFailTest(){
             // given
-            when(productRepository.findById(1L)).thenReturn(Optional.of(productEntity));
             when(productImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
 
             // when then
             assertThatThrownBy(
-                    ()->productService.getProductDto(1L)
+                    ()->productService.getProductDto(productEntity)
             ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.FAIL_IO_IMAGE.getMessage());
         }
 

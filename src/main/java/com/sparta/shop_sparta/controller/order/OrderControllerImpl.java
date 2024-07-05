@@ -24,7 +24,7 @@ public class OrderControllerImpl implements OrderController{
     @Override
     @PostMapping
     public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @RequestBody OrderRequestDto orderRequestDto) {
-        return orderService.createOrder(userDetails, orderRequestDto);
+        return ResponseEntity.ok(orderService.createOrder(userDetails, orderRequestDto));
     }
 
     @Override
