@@ -10,10 +10,12 @@ import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
+import com.sparta.shop_sparta.service.product.StockService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,8 @@ public class CartServiceImpl implements CartService {
 
     private final CartRedisRepository cartRedisRepository;
     private final ProductService productService;
+
+    private final StockService stockService;
 
     @Override
     @Transactional
@@ -46,8 +50,9 @@ public class CartServiceImpl implements CartService {
 
         // 상품 유효성 검증
         ProductEntity productEntity = validateProduct(cartRequestDto.getProductId());
+        StockEntity stockEntity = stockService.getStockEntity(productEntity);
 
-        if(productEntity.getAmount() < cartRequestDto.getAmount()){
+        if(stockEntity.getAmount() < cartRequestDto.getAmount()){
             throw new ProductException(ProductMessage.OUT_OF_STOCK.getMessage());
         }
 
@@ -57,7 +62,10 @@ public class CartServiceImpl implements CartService {
                 cartRequestDto.getAmount()
         );
 
-        return productEntity.toDto();
+        ProductDto productDto = productEntity.toDto();
+        productDto.setAmount(stockEntity.getAmount());
+
+        return productDto;
     }
 
     private ProductEntity validateProduct(Long productId){

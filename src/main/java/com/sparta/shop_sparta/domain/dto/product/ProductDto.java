@@ -38,9 +38,12 @@ public class ProductDto {
         this.categoryId = productEntity.getCategoryEntity().getCategoryId();
 
         this.price = productEntity.getPrice();
-        this.amount = productEntity.getAmount();
 
         this.productStatus = productEntity.getProductStatus();
         this.sellerId = productEntity.getSellerEntity().getMemberId();
+    }
+
+    public void setAmount(Long amount) {
+        this.amount = amount;
     }
 }

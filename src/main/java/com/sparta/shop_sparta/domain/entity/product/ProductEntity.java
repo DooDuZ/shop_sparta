@@ -42,9 +42,6 @@ public class ProductEntity extends BaseEntity {
     private String productDetail;
 
     @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
-    private Long amount;
-
-    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long price;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -82,10 +79,6 @@ public class ProductEntity extends BaseEntity {
         this.sellerEntity = sellerEntity;
     }
 
-    public void setAmount(Long stock) {
-        this.amount = stock;
-    }
-
     public void setPrice(Long price) {
         this.price = price;
     }
@@ -93,7 +86,7 @@ public class ProductEntity extends BaseEntity {
     public ProductDto toDto() {
         return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
                 .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
-                .sellerId(sellerEntity.getMemberId()).amount(this.amount).price(this.price).build();
+                .sellerId(sellerEntity.getMemberId()).price(this.price).build();
     }
 
     public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
@@ -107,6 +100,5 @@ public class ProductEntity extends BaseEntity {
         setProductName(productRequestDto.getProductName());
         setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
         setPrice(productRequestDto.getPrice());
-        setAmount(productRequestDto.getAmount());
     }
 }

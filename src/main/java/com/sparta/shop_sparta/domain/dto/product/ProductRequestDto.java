@@ -34,6 +34,6 @@ public class ProductRequestDto {
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
-                .productName(this.productName).price(this.price).amount(this.amount).build();
+                .productName(this.productName).price(this.price).build();
     }
 }

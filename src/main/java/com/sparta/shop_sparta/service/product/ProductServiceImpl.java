@@ -9,6 +9,7 @@ import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
@@ -20,7 +21,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageService productImageService;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final StockService stockService;
 
     @Override
     @Transactional
@@ -44,6 +45,9 @@ public class ProductServiceImpl implements ProductService {
         productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
         ProductEntity product = productRepository.save(productEntity);
+
+        stockService.addProduct(productEntity);
+        stockService.updateStock(productEntity, productRequestDto.getAmount());
 
         productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
                 productRequestDto.getProductDetailImages());
@@ -63,6 +67,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productEntity.update(productRequestDto);
+        StockEntity stockEntity = stockService.getStockEntity(productEntity);
+        stockEntity.setAmount(productRequestDto.getAmount());
 
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
@@ -86,7 +92,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto getProduct(Long productId) {
-        return getProductDto(getProductEntity(productId));
+        ProductEntity productEntity = getProductEntity(productId);
+        return getProductDto(productEntity);
     }
 
     // 주문에서 사용할 수 있도록 분리
@@ -105,13 +112,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void setAmount(ProductEntity productEntity, Long amount) {
-        productEntity.setAmount(amount);
+        stockService.updateStock(productEntity, amount);
     }
 
     @Override
     public ProductDto getProductDto(ProductEntity productEntity){
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
         ProductDto productDto = productEntity.toDto();
+
+        productDto.setAmount(stockService.getStock(productEntity));
         productDto.setProductImages(productImages);
 
         return productDto;
@@ -144,6 +153,4 @@ public class ProductServiceImpl implements ProductService {
         // Todo
         return null;
     }
-
-
 }
