@@ -112,9 +112,7 @@ public class CartServiceImpl implements CartService {
         return cartRedisRepository.findCart(memberEntity.getMemberId());
     }
 
-
-    private List<ProductDto> getProductsIncart(Map<Long, Long> cartInfo){
-        List<ProductDto> productDtoList = new ArrayList<>();
+    List<ProductDto> getProductsIncart(Map<Long, Long> cartInfo){
         return productService.getProductDtoList(cartInfo);
     }
 
@@ -130,15 +128,13 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long productId) {
+    public void removeCartDetail(UserDetails userDetails, Long productId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         cartRedisRepository.removeCartDetail(memberEntity.getMemberId(), productId);
-
-        return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<?> updateCartDetail(UserDetails userDetails, CartRequestDto cartRequestDto) {
+    public void updateCartDetail(UserDetails userDetails, CartRequestDto cartRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         Long memberId = memberEntity.getMemberId();
         Map<Long, Long> cartInfo = cartRedisRepository.findCart(memberId);
@@ -146,7 +142,5 @@ public class CartServiceImpl implements CartService {
         if (cartInfo.containsKey(cartRequestDto.getProductId())) {
             cartRedisRepository.saveWithDuration(memberId, cartRequestDto.getProductId(), cartRequestDto.getAmount());
         }
-
-        return ResponseEntity.ok().build();
     }
 }

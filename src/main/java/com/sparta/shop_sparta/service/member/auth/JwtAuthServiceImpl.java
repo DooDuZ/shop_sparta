@@ -58,7 +58,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     }
 
     @Override
-    public ResponseEntity<?> logout(UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
+    public void logout(UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
         String accessToken = jwtTokenProvider.resolveToken(request);
 
         try {
@@ -71,13 +71,11 @@ public class JwtAuthServiceImpl implements JwtAuthService {
         } catch (Exception e) {
             throw new MemberException(AuthMessage.INVALID_TOKEN.getMessage(), e);
         }
-
-        return ResponseEntity.ok().build();
     }
 
 
     @Override
-    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+    public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
         // 리프레시 토큰이 유효하지 않거나, 레디스에 존재하지 않으면
@@ -97,8 +95,6 @@ public class JwtAuthServiceImpl implements JwtAuthService {
         } catch (Exception e) {
             throw new MemberException(e);
         }
-
-        return ResponseEntity.ok().build();
     }
 
     private TokenWrapper generateTokens(String username, String role, String memberId, HttpServletRequest request,

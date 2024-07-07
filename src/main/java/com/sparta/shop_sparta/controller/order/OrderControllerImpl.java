@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.controller.order;
 
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,19 +30,19 @@ public class OrderControllerImpl implements OrderController{
 
     @Override
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
-        return orderService.getOrders(userDetails, orderId);
+    public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.getOrders(userDetails, orderId));
     }
 
     @Override
     @PutMapping("/cancel/{orderId}")
-    public ResponseEntity<?> cancelOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
-        return orderService.cancelOrder(userDetails, orderId);
+    public ResponseEntity<OrderResponseDto> cancelOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.cancelOrder(userDetails, orderId));
     }
 
     @Override
     @PutMapping("/return/{orderId}")
-    public ResponseEntity<?> requestReturn(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
-        return orderService.requestReturn(userDetails, orderId);
+    public ResponseEntity<OrderResponseDto> requestReturn(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+        return ResponseEntity.ok(orderService.requestReturn(userDetails, orderId));
     }
 }

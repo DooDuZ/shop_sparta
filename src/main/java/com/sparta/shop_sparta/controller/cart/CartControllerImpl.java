@@ -36,13 +36,15 @@ public class CartControllerImpl implements CartController{
 
     @Override
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> removeCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long productId) {
-        return cartService.removeCartDetail(userDetails, productId);
+    public ResponseEntity<Void> removeCartDetail(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long productId) {
+        cartService.removeCartDetail(userDetails, productId);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @PutMapping
-    public ResponseEntity<?> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
-        return cartService.updateCartDetail(userDetails, cartRequestDto);
+    public ResponseEntity<Void> updateCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
+        cartService.updateCartDetail(userDetails, cartRequestDto);
+        return ResponseEntity.ok().build();
     }
 }

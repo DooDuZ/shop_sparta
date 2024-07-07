@@ -7,9 +7,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AddrService {
-    ResponseEntity<?> addAddr(UserDetails userDetails, AddrDto addrDto);
-    ResponseEntity<?> removeAddr(UserDetails userDetails, Long addrId);
-    ResponseEntity<?> updateAddr(UserDetails userDetails, AddrDto addrDto);
-    ResponseEntity<?> getAddr(UserDetails userDetails, Long addrId);
+    void addAddr(UserDetails userDetails, AddrDto addrDto);
+    void removeAddr(UserDetails userDetails, Long addrId);
+    void updateAddr(UserDetails userDetails, AddrDto addrDto);
+    AddrDto getAddr(UserDetails userDetails, Long addrId);
     List<AddrDto> getAddrList(UserDetails userDetails, Long memberId);
 }

@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<Void> createAccount(MemberDto memberDto) {
+    public void createAccount(MemberDto memberDto) {
         // 가입 정보 유효성 검사
         validateSignupRequest(memberDto);
 
@@ -61,8 +61,6 @@ public class MemberServiceImpl implements MemberService {
         // 주소 서비스 통해서 주소 저장
         addrService.addAddr(memberEntity,
                 AddrDto.builder().addr(memberDto.getAddr()).addrDetail(memberDto.getAddrDetail()).build());
-
-        return ResponseEntity.ok().build();
     }
 
     private void validateSignupRequest(MemberDto memberDto) {
@@ -81,9 +79,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ResponseEntity<Void> verifySignup(Long memberId, String verificationCode) {
+    public void verifySignup(Long memberId, String verificationCode) {
         // 메일 서비스를 사용한 검증
-        // 코드 인즈 안되면 exception 발생
+        // 코드 인증 안되면 exception 발생
         mailService.verifySignup(memberId, verificationCode);
 
         MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
@@ -91,8 +89,6 @@ public class MemberServiceImpl implements MemberService {
         );
 
         memberEntity.setRole(MemberRole.BASIC);
-
-        return ResponseEntity.ok().build();
     }
 
     @Override

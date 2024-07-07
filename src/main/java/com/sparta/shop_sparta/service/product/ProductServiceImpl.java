@@ -34,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
+    public ProductDto createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         ProductEntity productEntity = productRequestDto.toEntity();
 
         CategoryEntity categoryEntity = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(
@@ -43,21 +43,17 @@ public class ProductServiceImpl implements ProductService {
 
         productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
-        productRepository.save(productEntity);
+        ProductEntity product = productRepository.save(productEntity);
 
-        try {
-            productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
-                    productRequestDto.getProductDetailImages());
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
+                productRequestDto.getProductDetailImages());
 
-        return ResponseEntity.ok().build();
+        return product.toDto();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
+    public ProductDto updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         ProductEntity productEntity = getProductEntity(productRequestDto.getProductId());
@@ -71,11 +67,11 @@ public class ProductServiceImpl implements ProductService {
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
 
-        return ResponseEntity.ok().build();
+        return productEntity.toDto();
     }
 
     @Override
-    public ResponseEntity<?> deleteProduct(UserDetails userDetails, Long productId) {
+    public void deleteProduct(UserDetails userDetails, Long productId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         ProductEntity productEntity = getProductEntity(productId);
@@ -86,8 +82,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productEntity.setDelete(true);
-
-        return ResponseEntity.ok().build();
     }
 
     @Override
@@ -109,6 +103,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Transactional
+    public void setAmount(ProductEntity productEntity, Long amount) {
+        productEntity.setAmount(amount);
+    }
+
+    @Override
     public ProductDto getProductDto(ProductEntity productEntity){
         List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
         ProductDto productDto = productEntity.toDto();
@@ -120,7 +120,7 @@ public class ProductServiceImpl implements ProductService {
     // 후에 페이징 처리 할 것
     // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override
-    public ResponseEntity<?> getAllProducts() {
+    public List<ProductDto> getAllProducts() {
         Map<Long, ProductDto> productDtoList = productRepository.findAll().stream().map(ProductEntity::toDto).collect(
                 Collectors.toMap(ProductDto::getProductId, Function.identity()));
 
@@ -130,18 +130,20 @@ public class ProductServiceImpl implements ProductService {
             productDtoList.get(productImageDto.getProductId()).getProductImages().add(productImageDto);
         }
 
-        return ResponseEntity.ok(new ArrayList<>(productDtoList.values()));
+        return new ArrayList<>(productDtoList.values());
     }
 
     @Override
-    public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
+    public List<ProductDto> getAllProductsBySeller(Long sellerId) {
         // Todo
         return null;
     }
 
     @Override
-    public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
+    public List<ProductDto> getAllByCategory(CategoryDto categoryDto) {
         // Todo
         return null;
     }
+
+
 }

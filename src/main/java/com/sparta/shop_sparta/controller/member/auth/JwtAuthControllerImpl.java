@@ -21,13 +21,15 @@ public class JwtAuthControllerImpl implements JwtAuthController{
 
     @Override
     @PostMapping("/token")
-    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-        return jwtAuthService.refreshAccessToken(request, response);
+    public ResponseEntity<Void> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+        jwtAuthService.refreshAccessToken(request, response);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
-        return jwtAuthService.logout(userDetails, request, response);
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal UserDetails userDetails, HttpServletRequest request, HttpServletResponse response) {
+        jwtAuthService.logout(userDetails, request, response);
+        return ResponseEntity.ok().build();
     }
 }

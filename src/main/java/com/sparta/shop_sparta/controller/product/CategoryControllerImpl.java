@@ -17,12 +17,13 @@ public class CategoryControllerImpl implements CategoryController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody CategoryDto categoryDto) {
-        return categoryService.addCategory(categoryDto);
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDto) {
+        return ResponseEntity.ok(categoryService.addCategory(categoryDto));
     }
 
     @Override
-    public ResponseEntity<?> deleteCategory(CategoryDto categoryDto) {
-        return null;
+    public ResponseEntity<Void> deleteCategory(CategoryDto categoryDto) {
+        categoryService.deleteCategory(categoryDto);
+        return ResponseEntity.ok().build();
     }
 }

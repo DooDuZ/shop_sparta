@@ -6,14 +6,11 @@ import static org.mockito.Mockito.*;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.repository.CategoryRepository;
-import java.sql.SQLException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
@@ -30,10 +27,10 @@ public class CategoryServiceTest {
         when(categoryRepository.save(any(CategoryEntity.class))).thenReturn(categoryDto.toEntity());
 
         // when
-        ResponseEntity<?> response = categoryService.addCategory(categoryDto);
+        CategoryDto category = categoryService.addCategory(categoryDto);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(category.getCategoryId()).isEqualTo(categoryDto.getCategoryId());
     }
 
     @Test
@@ -43,9 +40,9 @@ public class CategoryServiceTest {
         doNothing().when(categoryRepository).delete(any(CategoryEntity.class));
 
         // when
-        ResponseEntity<?> response = categoryService.deleteCategory(categoryDto);
+        categoryService.deleteCategory(categoryDto);
 
         // then
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        verify(categoryRepository).delete(any(CategoryEntity.class));
     }
 }

@@ -1,8 +1,10 @@
 package com.sparta.shop_sparta.controller.product;
 
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.service.product.ProductService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,45 +28,46 @@ public class ProductControllerImpl implements ProductController {
     // @Secured("ROLE_SELLER")
     @Override
     @PostMapping
-    public ResponseEntity<?> createProduct(@AuthenticationPrincipal UserDetails userDetails,
-                                           @ModelAttribute ProductRequestDto productRequestDto) {
-        return productService.createProduct(userDetails, productRequestDto);
+    public ResponseEntity<ProductDto> createProduct(@AuthenticationPrincipal UserDetails userDetails,
+                                                    @ModelAttribute ProductRequestDto productRequestDto) {
+        return ResponseEntity.ok(productService.createProduct(userDetails, productRequestDto));
     }
 
     @Override
     @PutMapping("/{productId}")
-    public ResponseEntity<?> updateProduct(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<ProductDto> updateProduct(@AuthenticationPrincipal UserDetails userDetails,
                                            @ModelAttribute ProductRequestDto productRequestDto) {
-        return productService.updateProduct(userDetails, productRequestDto);
+        return ResponseEntity.ok(productService.updateProduct(userDetails, productRequestDto));
     }
 
     @Override
     @DeleteMapping("/{productId}")
-    public ResponseEntity<?> deleteProduct(@AuthenticationPrincipal UserDetails userDetails,
+    public ResponseEntity<Void> deleteProduct(@AuthenticationPrincipal UserDetails userDetails,
                                            @PathVariable Long productId) {
-        return null;
+        productService.deleteProduct(userDetails, productId);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @GetMapping("/{productId}")
-    public ResponseEntity<?> getProduct(@PathVariable Long productId) {
+    public ResponseEntity<ProductDto> getProduct(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.getProduct(productId));
     }
 
     // 후에 페이징 적용
     @Override
     @GetMapping("/all")
-    public ResponseEntity<?> getAllProducts() {
-        return productService.getAllProducts();
+    public ResponseEntity<List<ProductDto>> getAllProducts() {
+        return ResponseEntity.ok(productService.getAllProducts());
     }
 
     @Override
     public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
-        return null;
+        return ResponseEntity.ok(productService.getAllByCategory(categoryDto));
     }
 
     @Override
     public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
-        return null;
+        return ResponseEntity.ok(productService.getAllProductsBySeller(sellerId));
     }
 }

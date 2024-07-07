@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -70,14 +71,22 @@ public class ProductServiceTest {
         @DisplayName("상품 등록 성공")
         void createProductSuccessTest() {
             // given
+            productRequestDto = ProductRequestDto.builder().productId(1L).price(100000L)
+                    .amount(20L).categoryId(1L).sellerId(1L).productDetail("메롱").productName("지웅이꺼")
+                    .productThumbnails(new ArrayList<>()).productDetailImages(new ArrayList<>())
+                    .build();
             when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
             when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
             doNothing().when(productImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
-            // when
 
-            ResponseEntity<?> response = productService.createProduct(memberEntity, productRequestDto);
+            // when
+            ProductDto productDto = productService.createProduct(memberEntity, productRequestDto);
+
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(productDto.getAmount()).isEqualTo(productRequestDto.getAmount());
+            assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
+            assertThat(productDto.getPrice()).isEqualTo(productRequestDto.getPrice());
+            assertThat(productDto.getProductStatus()).isEqualTo(ProductStatus.WAITING);
         }
 
         @Test
@@ -92,7 +101,7 @@ public class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("이미지 저장에서 예외 발생 시 bad Request를 반환합니다.")
+        @DisplayName("이미지 저장 실패 시 Exception이 발생합니댜.")
         void createProductImageFailTest() {
             // given
             when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
@@ -100,10 +109,9 @@ public class ProductServiceTest {
             doThrow(new RuntimeException()).when(productImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
             // when
-            ResponseEntity<?> response = productService.createProduct(memberEntity, productRequestDto);
-
-            // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+            assertThatThrownBy(
+                    () -> productService.createProduct(memberEntity, productRequestDto)
+            ).isInstanceOf(RuntimeException.class);
         }
     }
 
@@ -117,10 +125,13 @@ public class ProductServiceTest {
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
 
             // when
-            ResponseEntity<?> response = productService.updateProduct(memberEntity, productRequestDto);
+            ProductDto productDto = productService.updateProduct(memberEntity, productRequestDto);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(productDto.getAmount()).isEqualTo(productRequestDto.getAmount());
+            assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
+            assertThat(productDto.getPrice()).isEqualTo(productRequestDto.getPrice());
+            assertThat(productDto.getProductStatus()).isEqualTo( ProductStatus.of(productRequestDto.getProductStatus()));
         }
 
         @Test
@@ -154,10 +165,9 @@ public class ProductServiceTest {
             when(productRepository.findById(1L)).thenReturn(Optional.of(productEntity));
 
             // when
-            ResponseEntity<?> response = productService.deleteProduct(memberEntity, 1L);
+           productService.deleteProduct(memberEntity, 1L);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(productEntity.getIsDeleted()).isTrue();
         }
 
@@ -220,10 +230,11 @@ public class ProductServiceTest {
             when(productImageService.getAllProductImages()).thenReturn(productImageEntities);
 
             // when
-            ResponseEntity<?> response = productService.getAllProducts();
+            productService.getAllProducts();
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            verify(productRepository).findAll();
+            verify(productImageService).getAllProductImages();
         }
 
         @Test

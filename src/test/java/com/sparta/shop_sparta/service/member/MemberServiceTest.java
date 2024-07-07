@@ -5,9 +5,11 @@ import static org.mockito.Mockito.*;
 
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
+import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.MemberException;
@@ -87,10 +89,11 @@ public class MemberServiceTest {
             when(memberRepository.save(Mockito.any(MemberEntity.class))).thenReturn(requestDto.toEntity());
 
             // when
-            ResponseEntity<?> response = memberService.createAccount(requestDto);
+            memberService.createAccount(requestDto);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            verify(mailService).sendVerification(any(MemberDto.class));
+            verify(addrService).addAddr(any(MemberEntity.class), any(AddrDto.class));
         }
 
         @Test
@@ -170,10 +173,10 @@ public class MemberServiceTest {
             when(memberRepository.findById(memberId)).thenReturn(Optional.of(new MemberEntity()));
 
             // when
-            ResponseEntity<?> response = memberService.verifySignup(memberId, verificationCode);
+            memberService.verifySignup(memberId, verificationCode);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            verify(mailService).verifySignup(memberId, verificationCode);
         }
 
         @Test

@@ -28,19 +28,20 @@ public class MemberControllerImpl implements MemberController{
     @Override
     @PostMapping
     public ResponseEntity<?> createAccount(@Valid @RequestBody MemberDto memberDto, BindingResult bindingResult) {
-        System.out.println(memberDto);
-
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        return memberService.createAccount(memberDto);
+        memberService.createAccount(memberDto);
+
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @GetMapping("/verification")
     public ResponseEntity<?> verifySignup(@RequestParam("memberId") Long memberId, @RequestParam("verificationCode") String verificationCode) {
-        return memberService.verifySignup(memberId, verificationCode);
+        memberService.verifySignup(memberId, verificationCode);
+        return ResponseEntity.ok().build();
     }
 
     @Override

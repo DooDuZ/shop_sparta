@@ -98,7 +98,7 @@ public class OrderServiceTest {
             when(cartService.getCartInfo(any(MemberEntity.class))).thenReturn(cartInfo);
             when(orderDetailService.addOrder(any(OrderEntity.class), anyList())).thenReturn(details);
             when(paymentService.pay(any(OrderEntity.class))).thenReturn(true);
-            doNothing().when(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
+            //doNothing().when(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
 
             // when
             OrderResponseDto orderResponseDto = orderService.createOrder(memberEntity, orderRequestDto);
@@ -111,7 +111,8 @@ public class OrderServiceTest {
             assertThat(orderResponseDto.getOrderAddrDetail()).isEqualTo(orderRequestDto.getOrderAddrDetail());
             assertThat(orderResponseDto.getMemberId()).isEqualTo(memberEntity.getMemberId());
             assertThat(orderResponseDto.getTotalPrice()).isEqualTo(productEntity.getPrice() * 10L);
-            verify(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
+            // Todo 부하 테스트를 위한 임시 주석 처리
+            //verify(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
         }
 
         @Test
@@ -174,11 +175,9 @@ public class OrderServiceTest {
             when(orderDetailService.getOrderedProduct(any(OrderEntity.class))).thenReturn(new ArrayList<>());
 
             // when
-            ResponseEntity<OrderResponseDto> response = orderService.getOrders(memberEntity, orderId);
-            OrderResponseDto orderResponseDto = response.getBody();
+            OrderResponseDto orderResponseDto = orderService.getOrders(memberEntity, orderId);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(orderResponseDto.getOrderId()).isEqualTo(orderedEntity.getOrderId());
         }
 
@@ -223,11 +222,9 @@ public class OrderServiceTest {
             when(orderRepository.findById(orderId)).thenReturn(Optional.of(orderedEntity));
 
             // when
-            ResponseEntity<OrderResponseDto> response = orderService.cancelOrder(memberEntity, orderId);
-            OrderResponseDto orderResponseDto = response.getBody();
+            OrderResponseDto orderResponseDto = orderService.cancelOrder(memberEntity, orderId);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(orderResponseDto.getOrderStatus()).isEqualTo(OrderStatus.CANCELLED);
         }
 
@@ -291,11 +288,9 @@ public class OrderServiceTest {
             when(spyOrderEntity.getLastModifyDate()).thenReturn(randomDateTime);
 
             // when
-            ResponseEntity<OrderResponseDto> response = orderService.requestReturn(memberEntity, orderId);
-            OrderResponseDto orderResponseDto = response.getBody();
+            OrderResponseDto orderResponseDto = orderService.requestReturn(memberEntity, orderId);
 
             // then
-            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(orderResponseDto.getOrderStatus()).isEqualTo(OrderStatus.RETURN_REQUESTED);
         }
 

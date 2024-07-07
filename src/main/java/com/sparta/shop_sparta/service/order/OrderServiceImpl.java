@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.service.order;
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.order.OrderStatus;
+import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -78,7 +78,8 @@ public class OrderServiceImpl implements OrderService{
         orderResponseDto.setOrderDetails(orderDetailDtoList);
 
         // 결제 성공한 데이터는 장바구니에서 제거
-        cartService.removeOrderedProduct(memberEntity, orderDetailDtoList);
+        // Todo - 원상 복구 대상
+        // cartService.removeOrderedProduct(memberEntity, orderDetailDtoList);
 
         return orderResponseDto;
     }
@@ -104,9 +105,18 @@ public class OrderServiceImpl implements OrderService{
             Long productId = orderDetailDto.getProductId();
 
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
+            // Todo 복구 대상
+            /*
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
                 throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
             }
+             */
+            if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() < 0) {
+                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
+            }
+
+            Long amount = cartInfo.get(productId) - orderDetailDto.getAmount();
+            cartService.updateCartDetail(memberEntity, new CartRequestDto(amount, productId));
 
             orderDetails.add(orderDetailDto);
         }
@@ -115,19 +125,19 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public ResponseEntity<OrderResponseDto> getOrders(UserDetails userDetails, Long orderId) {
+    public OrderResponseDto getOrders(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
         OrderResponseDto orderResponseDto = orderEntity.toDto();
         orderResponseDto.setOrderDetails(orderDetailService.getOrderedProduct(orderEntity));
 
-        return ResponseEntity.ok(orderResponseDto);
+        return orderResponseDto;
     }
 
     @Override
     @Transactional
-    public ResponseEntity<OrderResponseDto> cancelOrder(UserDetails userDetails, Long orderId) {
+    public OrderResponseDto cancelOrder(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
@@ -142,12 +152,12 @@ public class OrderServiceImpl implements OrderService{
 
         orderEntity.setOrderStatus(OrderStatus.CANCELLED);
 
-        return ResponseEntity.ok().body(orderEntity.toDto());
+        return orderEntity.toDto();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<OrderResponseDto> requestReturn(UserDetails userDetails, Long orderId) {
+    public OrderResponseDto requestReturn(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
@@ -158,7 +168,7 @@ public class OrderServiceImpl implements OrderService{
 
         orderEntity.setOrderStatus(OrderStatus.RETURN_REQUESTED);
 
-        return ResponseEntity.ok(orderEntity.toDto());
+        return orderEntity.toDto();
     }
 
     private OrderEntity getValidEntity(MemberEntity memberEntity, Long orderId){

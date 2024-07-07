@@ -14,8 +14,8 @@ public interface CartService {
     void createCart(MemberEntity memberEntity);
     ProductDto addProductToCart(UserDetails userDetails, CartRequestDto cartRequestDto);
     CartDto getCart(UserDetails userDetails);
-    ResponseEntity<?> removeCartDetail(UserDetails userDetails, Long productId);
-    ResponseEntity<?> updateCartDetail(UserDetails userDetails, CartRequestDto cartRequestDto);
+    void removeCartDetail(UserDetails userDetails, Long productId);
+    void updateCartDetail(UserDetails userDetails, CartRequestDto cartRequestDto);
     void removeOrderedProduct(MemberEntity memberEntity, List<OrderDetailDto> orderedProductIds);
     Map<Long, Long> getCartInfo(UserDetails userDetails);
 }

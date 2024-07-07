@@ -25,26 +25,29 @@ public class AddrControllerImpl implements AddrController{
 
     @Override
     @PostMapping("/{memberId}/addr")
-    public ResponseEntity<?> addAddr(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddrDto addrDto) {
-        return addrService.addAddr(userDetails, addrDto);
+    public ResponseEntity<Void> addAddr(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddrDto addrDto) {
+        addrService.addAddr(userDetails, addrDto);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @DeleteMapping("/addr/{addrId}")
-    public ResponseEntity<?> removeAddr(@AuthenticationPrincipal UserDetails userDetails, Long addrId) {
-        return addrService.removeAddr(userDetails, addrId);
+    public ResponseEntity<Void> removeAddr(@AuthenticationPrincipal UserDetails userDetails, Long addrId) {
+        addrService.removeAddr(userDetails, addrId);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @PutMapping("/addr/{addrId}")
-    public ResponseEntity<?> updateAddr(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddrDto addrDto) {
-        return addrService.updateAddr(userDetails, addrDto);
+    public ResponseEntity<Void> updateAddr(@AuthenticationPrincipal UserDetails userDetails, @RequestBody AddrDto addrDto) {
+        addrService.updateAddr(userDetails, addrDto);
+        return ResponseEntity.ok().build();
     }
 
     @Override
     @GetMapping("/addr/{addrId}")
     public ResponseEntity<?> getAddr(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long addrId) {
-        return addrService.getAddr(userDetails, addrId);
+        return ResponseEntity.ok(addrService.getAddr(userDetails, addrId));
     }
 
     @Override

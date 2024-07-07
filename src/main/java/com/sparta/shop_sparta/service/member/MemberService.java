@@ -7,10 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface MemberService {
-    ResponseEntity<?> createAccount(MemberDto memberDto);
+    void createAccount(MemberDto memberDto);
     MemberResponseDto getMemberInfo(UserDetails userDetails, Long memberId);
     void updatePassword(UserDetails userDetails, MemberRequestVo passwordUpdateRequestDto);
     void updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto);
 
-    ResponseEntity<?> verifySignup(Long memberId, String verificationCode);
+    void verifySignup(Long memberId, String verificationCode);
 }

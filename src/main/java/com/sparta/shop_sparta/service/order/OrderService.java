@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface OrderService {
     OrderResponseDto createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto);
-    ResponseEntity<?> getOrders(UserDetails userDetails, Long orderId);
-    ResponseEntity<?> cancelOrder(UserDetails userDetails, Long orderId);
-    ResponseEntity<?> requestReturn(UserDetails userDetails, Long orderId);
+    OrderResponseDto getOrders(UserDetails userDetails, Long orderId);
+    OrderResponseDto cancelOrder(UserDetails userDetails, Long orderId);
+    OrderResponseDto requestReturn(UserDetails userDetails, Long orderId);
 }

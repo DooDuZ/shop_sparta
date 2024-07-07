@@ -25,7 +25,7 @@ public class AddrServiceImpl implements AddrService {
     private final AddrRepository addrRepository;
 
     @Override
-    public ResponseEntity<?> addAddr(UserDetails userDetails, AddrDto addrDto) {
+    public void addAddr(UserDetails userDetails, AddrDto addrDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if (addrRepository.findAllByMemberEntity(memberEntity).size() >= 5){
@@ -41,34 +41,28 @@ public class AddrServiceImpl implements AddrService {
                 .build();
 
         addrRepository.save(addrEntity);
-
-        return ResponseEntity.ok().build();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> removeAddr(UserDetails userDetails, Long addrId) {
+    public void removeAddr(UserDetails userDetails, Long addrId) {
         getAuthorizedAddrEntity(userDetails, addrId);
         addrRepository.deleteById(addrId);
-
-        return ResponseEntity.ok().build();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateAddr(UserDetails userDetails, AddrDto addrDto) {
+    public void updateAddr(UserDetails userDetails, AddrDto addrDto) {
         AddrEntity addrEntity = getAuthorizedAddrEntity(userDetails, addrDto.getAddrId());
 
         String salt = saltGenerator.generateSalt();
 
         addrEntity.setAddr(userInformationEncoder.encrypt(addrDto.getAddr(), salt));
         addrEntity.setAddrDetail(userInformationEncoder.encrypt(addrDto.getAddrDetail(), salt));
-
-        return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<?> getAddr(UserDetails userDetails, Long addrId) {
+    public AddrDto getAddr(UserDetails userDetails, Long addrId) {
         AddrEntity addrEntity = getAuthorizedAddrEntity(userDetails, addrId);
 
         AddrDto addrDto = addrEntity.toDto();
@@ -76,7 +70,7 @@ public class AddrServiceImpl implements AddrService {
         addrDto.setAddr(userInformationEncoder.decrypt(addrEntity.getAddr()));
         addrDto.setAddrDetail(userInformationEncoder.decrypt(addrEntity.getAddrDetail()));
 
-        return ResponseEntity.ok().body(addrDto);
+        return addrDto;
     }
 
     @Override

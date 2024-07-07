@@ -4,6 +4,6 @@ import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import org.springframework.http.ResponseEntity;
 
 public interface CategoryController {
-    ResponseEntity<?> createCategory(CategoryDto categoryDto);
-    ResponseEntity<?> deleteCategory(CategoryDto categoryDto);
+    ResponseEntity<CategoryDto> createCategory(CategoryDto categoryDto);
+    ResponseEntity<Void> deleteCategory(CategoryDto categoryDto);
 }

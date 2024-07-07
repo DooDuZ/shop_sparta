@@ -13,11 +13,15 @@ import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
+
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(OrderDetailServiceImpl.class);
 
     private final ProductService productService;
     private final OrderDetailRepository orderDetailRepository;
@@ -37,7 +41,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
             }
 
-            productEntity.setAmount(productEntity.getAmount() - orderDetailRequestDto.getAmount());
+            // Todo - 삭제 대상인지 확인 필요
+            Long amount = productEntity.getAmount() - orderDetailRequestDto.getAmount();
+            productService.setAmount(productEntity, amount);
+
+            log.info(String.valueOf(amount));
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
