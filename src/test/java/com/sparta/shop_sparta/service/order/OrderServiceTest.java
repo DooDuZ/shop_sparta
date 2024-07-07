@@ -15,6 +15,7 @@ import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderRepository;
@@ -61,6 +62,8 @@ public class OrderServiceTest {
     @Mock
     private ProductEntity productEntity;
 
+    private StockEntity stockEntity;
+
     @BeforeEach
     void init(){
         memberEntity = MemberEntity.builder().memberName("지웅이").email("sin9158@naver.com").loginId("sin9158")
@@ -76,7 +79,9 @@ public class OrderServiceTest {
         orderRequestDto.setOrderId(1L);
 
         productEntity = ProductEntity.builder().productId(1L).productName("ㅇㅇ").productDetail("ㅇㅇ").categoryEntity(
-                CategoryEntity.builder().categoryName("dd").categoryId(1L).build()).price(10000L).amount(1000L).sellerEntity(memberEntity).build();
+                CategoryEntity.builder().categoryName("dd").categoryId(1L).build()).price(10000L).sellerEntity(memberEntity).build();
+
+        stockEntity = StockEntity.builder().productEntity(productEntity).amount(1000L).build();
 
         orderDetails.add(OrderDetailRequestDto.builder().amount(10L).productId(1L).build());
     }

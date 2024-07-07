@@ -17,10 +17,12 @@ import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
+import com.sparta.shop_sparta.service.product.StockService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,12 +48,15 @@ public class CartServiceTest {
     private CartRedisRepository cartRedisRepository;
     @Mock
     private ProductService productService;
+    @Mock
+    private StockService stockService;
 
     MemberEntity memberEntity;
     CartRequestDto cartRequestDto;
     ProductEntity productEntity;
     Map<Long, Long> cartInfo;
     List<OrderDetailDto> orderDetails;
+    StockEntity stockEntity;
 
     @BeforeEach
     void init(){
@@ -60,7 +65,8 @@ public class CartServiceTest {
         cartRequestDto = CartRequestDto.builder().productId(1L).amount(10L).build();
         productEntity = ProductEntity.builder().productId(1L).price(10000L).sellerEntity(memberEntity)
                 .categoryEntity(new CategoryEntity()).productName("지웅이").productDetail("없어요")
-                .amount(1000L).productStatus(ProductStatus.ON_SALE).build();
+                .productStatus(ProductStatus.ON_SALE).build();
+        stockEntity = StockEntity.builder().productEntity(productEntity).amount(1000L).build();
 
         cartInfo = new HashMap<>();
         cartInfo.put(1L, 10L);
@@ -90,6 +96,7 @@ public class CartServiceTest {
             // given
             when(cartRedisRepository.hasKey(anyLong())).thenReturn(true);
             when(productService.getProductEntity(1L)).thenReturn(productEntity);
+            when(stockService.getStockEntity(any(ProductEntity.class))).thenReturn(stockEntity);
             doNothing().when(cartRedisRepository).saveWithDuration(anyLong(), anyLong(), anyLong());
             // when
             ProductDto productDto = cartService.addProductToCart(memberEntity, cartRequestDto);
@@ -97,7 +104,7 @@ public class CartServiceTest {
             assertThat(productDto.getProductId()).isEqualTo(productEntity.getProductId());
             assertThat(productDto.getProductDetail()).isEqualTo(productEntity.getProductDetail());
             assertThat(productDto.getPrice()).isEqualTo(productEntity.getPrice());
-            assertThat(productDto.getAmount()).isEqualTo(productEntity.getAmount());
+            assertThat(productDto.getAmount()).isEqualTo(stockEntity.getAmount());
         }
 
         @Test
@@ -106,6 +113,7 @@ public class CartServiceTest {
             // given
             when(cartRedisRepository.hasKey(anyLong())).thenReturn(false);
             when(productService.getProductEntity(1L)).thenReturn(productEntity);
+            when(stockService.getStockEntity(any(ProductEntity.class))).thenReturn(stockEntity);
             doNothing().when(cartRedisRepository).saveWithDuration(anyLong(), anyLong(), anyLong());
             // when
             ProductDto productDto = cartService.addProductToCart(memberEntity, cartRequestDto);
@@ -113,7 +121,7 @@ public class CartServiceTest {
             assertThat(productDto.getProductId()).isEqualTo(productEntity.getProductId());
             assertThat(productDto.getProductDetail()).isEqualTo(productEntity.getProductDetail());
             assertThat(productDto.getPrice()).isEqualTo(productEntity.getPrice());
-            assertThat(productDto.getAmount()).isEqualTo(productEntity.getAmount());
+            assertThat(productDto.getAmount()).isEqualTo(stockEntity.getAmount());
         }
 
         @Test
@@ -146,9 +154,10 @@ public class CartServiceTest {
         @DisplayName("담으려는 상품의 수가 재고보다 많은 경우 Exception이 발생합니다.")
         void addToCartOutOfStockFailTest(){
             // given
-            productEntity.setAmount(1L);
+            stockEntity.setAmount(1L);
             when(cartRedisRepository.hasKey(anyLong())).thenReturn(true);
             when(productService.getProductEntity(1L)).thenReturn(productEntity);
+            when(stockService.getStockEntity(productEntity)).thenReturn(stockEntity);
 
             // when then
             assertThatThrownBy(

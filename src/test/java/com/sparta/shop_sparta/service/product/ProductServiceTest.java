@@ -14,6 +14,7 @@ import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
@@ -29,9 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.multipart.MultipartFile;
+
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -44,12 +43,15 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private StockService stockService;
 
     ProductRequestDto productRequestDto;
     ProductEntity productEntity;
     MemberEntity memberEntity;
     MemberEntity sellerEntity;
     CategoryEntity categoryEntity;
+    StockEntity stockEntity;
 
     @BeforeEach
     void init() {
@@ -61,7 +63,8 @@ public class ProductServiceTest {
         productRequestDto = ProductRequestDto.builder().productName("지웅이꺼").productDetail("메롱이다").productStatus(1L)
                 .price(100000L).productDetailImages(new ArrayList<>()).productThumbnails(new ArrayList<>()).amount(20L).build();
         productEntity = ProductEntity.builder().productId(1L).productStatus(ProductStatus.WAITING).price(100000L)
-                .amount(20L).categoryEntity(categoryEntity).sellerEntity(sellerEntity).productDetail("메롱").productName("지웅이꺼").build();
+                .categoryEntity(categoryEntity).sellerEntity(sellerEntity).productDetail("메롱").productName("지웅이꺼").build();
+        stockEntity = StockEntity.builder().amount(20L).productEntity(productEntity).build();
     }
 
     @Nested
@@ -83,7 +86,6 @@ public class ProductServiceTest {
             ProductDto productDto = productService.createProduct(memberEntity, productRequestDto);
 
             // then
-            assertThat(productDto.getAmount()).isEqualTo(productRequestDto.getAmount());
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
             assertThat(productDto.getPrice()).isEqualTo(productRequestDto.getPrice());
             assertThat(productDto.getProductStatus()).isEqualTo(ProductStatus.WAITING);
@@ -123,12 +125,11 @@ public class ProductServiceTest {
         void updateProductSuccessTest() {
             // given
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
-
+            when(stockService.getStockEntity(productEntity)).thenReturn(stockEntity);
             // when
             ProductDto productDto = productService.updateProduct(memberEntity, productRequestDto);
 
             // then
-            assertThat(productDto.getAmount()).isEqualTo(productRequestDto.getAmount());
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
             assertThat(productDto.getPrice()).isEqualTo(productRequestDto.getPrice());
             assertThat(productDto.getProductStatus()).isEqualTo( ProductStatus.of(productRequestDto.getProductStatus()));
@@ -193,7 +194,7 @@ public class ProductServiceTest {
         void getProductSuccessTest(){
             // given
             when(productImageService.getProductImages(any())).thenReturn(anyList());
-
+            //when(stockService.getStock(any())).thenReturn(anyLong());
             // when
             ProductDto productDto = productService.getProductDto(productEntity);
 

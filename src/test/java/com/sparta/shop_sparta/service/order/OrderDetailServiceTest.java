@@ -7,15 +7,16 @@ import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
+import com.sparta.shop_sparta.service.product.StockService;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,17 +38,22 @@ public class OrderDetailServiceTest {
     private ProductService productService;
     @Mock
     private OrderDetailRepository orderDetailRepository;
+    @Mock
+    private StockService stockService;
 
     ProductEntity productEntity;
     OrderEntity orderEntity;
     List<OrderDetailRequestDto> orderDetailDtoList;
+    StockEntity stockEntity;
 
     @BeforeEach
     void init() {
-        productEntity = ProductEntity.builder().amount(1000L).price(200000L).productId(1L).categoryEntity(
+        productEntity = ProductEntity.builder().price(200000L).productId(1L).categoryEntity(
                 CategoryEntity.builder().categoryId(1L).categoryName("아이템").build()).sellerEntity(
                 MemberEntity.builder().build()).productStatus(ProductStatus.ON_SALE).build();
         orderEntity = OrderEntity.builder().orderId(1L).build();
+        stockEntity = StockEntity.builder().amount(1000L).productEntity(productEntity).build();
+
         OrderDetailRequestDto orderDetailDto = OrderDetailRequestDto.builder().amount(10L).productId(1L).build();
 
         orderDetailDtoList = new ArrayList<>();
@@ -62,7 +68,7 @@ public class OrderDetailServiceTest {
         @DisplayName("주문 상세 추가 성공")
         void addOrderDetailTest() {
             // given
-            when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
+            when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
             when(orderDetailRepository.saveAll(any())).thenReturn(new ArrayList<>());
             when(productService.getProductDto(any(ProductEntity.class))).thenReturn(productEntity.toDto());
 
@@ -91,7 +97,7 @@ public class OrderDetailServiceTest {
         @DisplayName("주문 수량이 0 이하인 경우 Exception이 발생합니다.")
         void addOrderDetailAmountFailTest(Long amount) {
             // given
-            when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
+            when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
             orderDetailDtoList.clear();
             orderDetailDtoList.add(OrderDetailRequestDto.builder().productId(1L).amount(amount).build());
 
@@ -105,7 +111,7 @@ public class OrderDetailServiceTest {
         @DisplayName("주문 수량이 0 이하인 경우 Exception이 발생합니다.")
         void addOrderDetailStockFailTest() {
             // given
-            when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
+            when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
             orderDetailDtoList.clear();
             orderDetailDtoList.add(OrderDetailRequestDto.builder().amount(1001L).productId(1L).build());
 
@@ -124,11 +130,12 @@ public class OrderDetailServiceTest {
         orderDetailEntityList.add(orderDetailEntity);
 
         when(orderDetailRepository.findByOrderEntity(orderEntity)).thenReturn(orderDetailEntityList);
+        when(stockService.getStockEntity(any(ProductEntity.class))).thenReturn(stockEntity);
 
         // when
         orderDetailService.cancelOrder(orderEntity);
 
         // then
-        assertThat(productEntity.getAmount()).isEqualTo(1010L);
+        assertThat(stockEntity.getAmount()).isEqualTo(1010L);
     }
 }
