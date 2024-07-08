@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.service.product;
 
+import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
@@ -20,4 +21,5 @@ public interface ProductService {
     ProductDto getProductDto(ProductEntity productEntity);
     List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo);
     void setAmount(ProductEntity productEntity, Long amount);
+    void updateProductStatus(Long productId, Long productStatusCode);
 }

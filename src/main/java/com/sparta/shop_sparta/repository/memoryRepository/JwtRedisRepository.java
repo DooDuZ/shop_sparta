@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository;
 public class JwtRedisRepository implements RedisRepository<String, Object> {
     private final RedisTemplate<String, Object> redisTemplate;
     private final String prefix = "refresh-code : ";
+    private final Duration timeout = Duration.ofMinutes(10080);
 
     @Override
-    public void saveWithDuration(String key, Object value, Integer minute) {
-        Duration timeout = Duration.ofMinutes(minute);
-        redisTemplate.opsForValue().set(addPrefix(key), value, timeout);
+    public void saveWithDuration(String key, Object value) {
+        redisTemplate.opsForValue().set(addPrefix(key), value);
         redisTemplate.expire(addPrefix(key), timeout);
     }
 
@@ -43,8 +43,7 @@ public class JwtRedisRepository implements RedisRepository<String, Object> {
     }
 
     // hash 사용을 위한 overloading
-    public void saveWithDuration(String key, String userAgent, String refreshToken, Integer minute) {
-        Duration timeout = Duration.ofMinutes(minute);
+    public void saveWithDuration(String key, String userAgent, String refreshToken) {
         redisTemplate.opsForHash().put(addPrefix(key), userAgent, refreshToken);
         redisTemplate.expire(addPrefix(key), timeout);
     }

@@ -53,7 +53,7 @@ public class MailService implements VerifySignUpService<MemberDto>{
         // 레디스에 코드 저장
         // 3분 후 만료
         signupVerifyCodeRedisRepository.saveWithDuration(String.valueOf(memberDto.getMemberId()),
-                verificationCode, 3);
+                verificationCode);
 
         System.out.println(signupVerifyCodeRedisRepository.find(String.valueOf(memberDto.getMemberId())));
 

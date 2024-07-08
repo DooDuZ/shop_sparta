@@ -5,7 +5,6 @@ import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
-import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderDetailRepository;
@@ -16,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,36 +30,66 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     @Transactional
-    public List<OrderDetailDto> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
+    public List<OrderDetailEntity> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
         List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
 
         // 저장 실패시 어짜피 transaction rollback 된다
         for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
-
-            StockEntity stockEntity = stockService.getStockByProductId(orderDetailRequestDto.getProductId());
-            ProductEntity productEntity = stockEntity.getProductEntity();
-
-            // 주문 수량 0이하거나 재고 없다면
-            if (orderDetailRequestDto.getAmount() <= 0 || stockEntity.getAmount() < orderDetailRequestDto.getAmount()) {
-                // 후에 메시지 케이스 별로 분리
-                throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+            Long productId = orderDetailRequestDto.getProductId();
+            if (!stockService.isCached(productId)){
+                StockEntity stockEntity = stockService.getStockByProductId(orderDetailRequestDto.getProductId());
+                if (stockEntity.getAmount() > 0){
+                    stockService.redisCache(productId);
+                }else{
+                    throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+                }
             }
 
-            // Todo - 삭제 대상인지 확인 필요
-            //Long amount = stockEntity.getAmount() - orderDetailRequestDto.getAmount();
-            stockService.updateStockAfterOrder(stockEntity.getStockId(), orderDetailRequestDto.getAmount());
+            Long stock = stockService.getStockInRedis(productId);
+            Long amount = orderDetailRequestDto.getAmount();
 
+            validateOrderRequest(stock, amount);
+
+            // Todo - 삭제 대상인지 확인 필요
+            // update 방식 변경 테스트
+            // update 쿼리로 직접 -하기 -> 비관적락 적용 계산된 수량으로 update 하기
+            //stockService.updateStockAfterOrder(stockEntity.getStockId(), orderDetailRequestDto.getAmount());
+            //stockEntity.setAmount(amount);
             //log.info(String.valueOf(amount));
+
+            // redis에 대한 update로 변경 + db 쿼리는 비동기로 실행
+            stockService.updateStockInRedis(productId, amount);
+            // 비동기 sql query 실행
+            stockService.updateStockAfterOrder(stockService.getStockByProductId(productId).getStockId(), amount);
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
                     OrderDetailEntity.builder().orderEntity(orderEntity)
-                            .productEntity(productEntity).amount(orderDetailRequestDto.getAmount()).build()
+                            .productEntity(productService.getProductEntity(productId)).amount(orderDetailRequestDto.getAmount()).build()
             );
         }
 
-        orderDetailRepository.saveAll(orderDetailEntities);
+        return orderDetailEntities;
+    }
 
+    @Async
+    public void orderDetailSaveAll(List<OrderDetailEntity> orderDetailEntities){
+        orderDetailRepository.saveAll(orderDetailEntities);
+    }
+
+
+    private void validateOrderRequest(Long stock, Long amount){
+        if(amount <= 0){
+            throw new OrderException(OrderResponseMessage.INVALID_AMOUNT.getMessage());
+        }
+
+        if (stock < amount){
+            System.out.println(stock + ", " + amount);
+            throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+        }
+    }
+
+    private List<OrderDetailDto> getOrderDetailDtoList(List<OrderDetailEntity> orderDetailEntities) {
         List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
 
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
@@ -68,7 +98,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             orderDetailDtoList.add(orderDetailDto);
         }
-
         return orderDetailDtoList;
     }
 

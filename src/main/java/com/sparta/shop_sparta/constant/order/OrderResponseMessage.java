@@ -10,6 +10,7 @@ public enum OrderResponseMessage {
     FAIL_CANCEL("[배송중] 주문 취소 불가. 배송 시작 전에만 취소 가능합니다."),
     FAIL_REQUEST_RETURN("[반품 기한 만료] 반품 신청 불가"),
     INVALID_REQUEST("요청 정보와 장바구니 정보가 일치하지 않습니다."),
+    INVALID_AMOUNT("1개 이상 주문 가능"),
     ;
 
     private final String message;

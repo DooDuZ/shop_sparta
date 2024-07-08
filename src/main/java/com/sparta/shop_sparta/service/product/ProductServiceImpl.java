@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.service.product;
 
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
@@ -14,7 +15,7 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final ProductImageService productImageService;
@@ -73,6 +75,8 @@ public class ProductServiceImpl implements ProductService {
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
 
+        // Todo 상품 재고 업데이트 시 redis caching 다시하기 or 기존 캐싱 데이터 삭제
+
         return productEntity.toDto();
     }
 
@@ -113,6 +117,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void setAmount(ProductEntity productEntity, Long amount) {
         stockService.updateStock(productEntity, amount);
+    }
+
+    @Override
+    @Transactional
+    public void updateProductStatus(Long productId, Long productStatusCode) {
+        getProductEntity(productId).setProductStatus(ProductStatus.of(productStatusCode));
     }
 
     @Override

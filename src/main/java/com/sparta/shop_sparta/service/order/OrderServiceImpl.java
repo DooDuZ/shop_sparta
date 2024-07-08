@@ -9,6 +9,7 @@ import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.OrderException;
@@ -36,7 +37,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional
-    public OrderResponseDto createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
+    public void createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = orderRequestDto.toEntity();
         orderEntity.setMemberEntity(memberEntity);
@@ -51,9 +52,11 @@ public class OrderServiceImpl implements OrderService{
         List<OrderDetailRequestDto> requestOrderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
 
         // orderDetail 정보 처리
-        List<OrderDetailDto> orderDetailDtoList = orderDetailService.addOrder(orderEntity, requestOrderDetails);
+        List<OrderDetailEntity> orderDetailEntities = orderDetailService.addOrder(orderEntity, requestOrderDetails);
+        orderDetailService.orderDetailSaveAll(orderDetailEntities);
+
         // 가격 입력
-        orderEntity.setTotalPrice(getTotalPrice(orderDetailDtoList));
+        orderEntity.setTotalPrice(getTotalPrice(orderDetailEntities));
 
         // 재고 확인까지 끝난 상태로 결제한다.
         if (!paymentService.pay(orderEntity)){
@@ -74,21 +77,19 @@ public class OrderServiceImpl implements OrderService{
          */
 
         // 결제된 주문 정보 반환을 위해 생성
-        OrderResponseDto orderResponseDto = orderEntity.toDto();
-        orderResponseDto.setOrderDetails(orderDetailDtoList);
+        /*OrderResponseDto orderResponseDto = orderEntity.toDto();
+        orderResponseDto.setOrderDetails(orderDetailDtoList);*/
 
         // 결제 성공한 데이터는 장바구니에서 제거
         // Todo - 원상 복구 대상
         // cartService.removeOrderedProduct(memberEntity, orderDetailDtoList);
-
-        return orderResponseDto;
     }
 
-    private Long getTotalPrice(List<OrderDetailDto> orderDetails) {
+    private Long getTotalPrice(List<OrderDetailEntity> orderDetails) {
         Long totalPrice = 0L;
 
-        for (OrderDetailDto orderDetail : orderDetails) {
-            totalPrice += orderDetail.getAmount() * orderDetail.getProductDto().getPrice();
+        for (OrderDetailEntity orderDetail : orderDetails) {
+            totalPrice += orderDetail.getAmount() * orderDetail.getProductEntity().getPrice();
         }
 
         return totalPrice;
@@ -112,8 +113,14 @@ public class OrderServiceImpl implements OrderService{
             }
              */
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() < 0) {
-                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
+                //System.out.println(productId);
+                //System.out.println(cartInfo.containsKey(productId));
+                //System.out.println(cartInfo.get(productId) - orderDetailDto.getAmount());
+                throw  new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
             }
+
+            // Todo 테스트용 코드 - 삭제 대상
+            // 수량 완전 일치 시에만 주문 가능. 주문 완료 후 장바구니에서 상품 삭제 예정
 
             Long amount = cartInfo.get(productId) - orderDetailDto.getAmount();
             cartService.updateCartDetail(memberEntity, new CartRequestDto(amount, productId));

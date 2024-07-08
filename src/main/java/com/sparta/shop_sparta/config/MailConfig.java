@@ -29,6 +29,8 @@ public class MailConfig {
     private int port;
     private Properties properties;
 
+    private final Integer timeToLive = 60 * 24 * 7;
+
     @Bean
     JavaMailSender javaMailSender(){
         JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();

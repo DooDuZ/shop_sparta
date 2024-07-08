@@ -5,12 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-@RequiredArgsConstructor
 @Repository
-public class SignupVerifyCodeRedisRepository implements RedisRepository<String, Object>{
-
+@RequiredArgsConstructor
+public class StockRedisRepository implements RedisRepository<String, Object>{
+    private final String prefix = "stock : ";
     private final RedisTemplate<String, Object> redisTemplate;
-    private final String prefix = "signup-code : ";
     private final Duration timeout = Duration.ofMinutes(10);
 
     @Override
@@ -31,6 +30,10 @@ public class SignupVerifyCodeRedisRepository implements RedisRepository<String, 
     @Override
     public void deleteKey(String key) {
         redisTemplate.delete(addPrefix(key));
+    }
+
+    public Boolean hasKey(String key) {
+        return redisTemplate.hasKey(addPrefix(key));
     }
 
     private String addPrefix(String key){

@@ -13,4 +13,5 @@ public interface ProductController {
     ResponseEntity<?> getAllProducts();
     ResponseEntity<?> getAllByCategory(CategoryDto categoryDto);
     ResponseEntity<?> getAllProductsBySeller(Long sellerId);
+    ResponseEntity<?> updateProductStatus(Long productId, Long productStatusCode);
 }

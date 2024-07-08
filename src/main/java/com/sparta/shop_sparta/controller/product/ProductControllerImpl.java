@@ -12,10 +12,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -69,5 +71,12 @@ public class ProductControllerImpl implements ProductController {
     @Override
     public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
         return ResponseEntity.ok(productService.getAllProductsBySeller(sellerId));
+    }
+
+    @Override
+    @PatchMapping("/status")
+    public ResponseEntity<Void> updateProductStatus(@RequestParam("product-id") Long productId, @RequestParam("status-code") Long productStatusCode) {
+        productService.updateProductStatus(productId, productStatusCode);
+        return ResponseEntity.ok().build();
     }
 }
