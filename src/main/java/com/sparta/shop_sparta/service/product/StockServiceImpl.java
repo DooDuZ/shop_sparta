@@ -6,7 +6,10 @@ import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.StockRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.StockRedisRepository;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ public class StockServiceImpl implements StockService{
 
     private final StockRepository stockRepository;
     private final StockRedisRepository stockRedisRepository;
+    private final RedissonClient redissonClient;
 
     @Override
     public void addProduct(ProductEntity productEntity) {
@@ -67,19 +71,42 @@ public class StockServiceImpl implements StockService{
 
     @Override
     public void redisCache(Long productId) {
-        stockRedisRepository.saveWithDuration(String.valueOf(productId), getStockByProductId(productId).getAmount());
+        String key = String.valueOf(productId);
+        StockEntity stockEntity = getStockByProductId(productId);
+
+        if(stockRedisRepository.hasKey(key)){
+            return;
+        }
+
+        stockRedisRepository.saveWithDuration(String.valueOf(productId), stockEntity.getAmount());
     }
 
     @Override
     public void updateStockInRedis(Long productId, Long amount) {
         String key = String.valueOf(productId);
-        Integer stock = (Integer) stockRedisRepository.find(key);
 
-        if(stock - amount < 0){
-            throw new ProductException(ProductMessage.OUT_OF_STOCK.getMessage());
+        RLock lock = redissonClient.getLock(key);
+        boolean isLocked = false;
+
+        try {
+            isLocked = lock.tryLock(10, TimeUnit.SECONDS);
+
+            if (isLocked){
+                Integer stock = (Integer) stockRedisRepository.find(key);
+
+                if(stock - amount < 0){
+                    throw new ProductException(ProductMessage.OUT_OF_STOCK.getMessage());
+                }
+
+                stockRedisRepository.save(key, stock - amount);
+            }
+        }catch (InterruptedException e){
+            throw new ProductException(ProductMessage.FAIL_TO_CONNECT.getMessage());
+        }finally {
+            if(isLocked){
+                lock.unlock();
+            }
         }
-
-        stockRedisRepository.save(key, stock - amount);
     }
 
     @Override

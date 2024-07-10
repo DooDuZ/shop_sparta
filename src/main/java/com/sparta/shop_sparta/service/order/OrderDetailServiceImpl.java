@@ -84,7 +84,6 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
 
         if (stock < amount){
-            System.out.println(stock + ", " + amount);
             throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
         }
     }

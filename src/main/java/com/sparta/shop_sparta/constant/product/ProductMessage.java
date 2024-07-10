@@ -9,6 +9,7 @@ public enum ProductMessage {
     INVALID_CATEGORY("카테고리 정보가 존재하지 않습니다."),
     INVALID_STATUS("판매 상태 변경 오류"),
     OUT_OF_STOCK("재고 부족"),
+    FAIL_TO_CONNECT("요청 과부하 발생"),
     ;
 
     private String message;

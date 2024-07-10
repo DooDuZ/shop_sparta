@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class StockRedisRepository implements RedisRepository<String, Object>{
+public class StockRedisRepository implements RedisRepository<String, Object> {
     private final String prefix = "stock : ";
     private final RedisTemplate<String, Object> redisTemplate;
     private final Duration timeout = Duration.ofMinutes(10);
@@ -36,7 +36,7 @@ public class StockRedisRepository implements RedisRepository<String, Object>{
         return redisTemplate.hasKey(addPrefix(key));
     }
 
-    private String addPrefix(String key){
+    private String addPrefix(String key) {
         return prefix + key;
     }
 }

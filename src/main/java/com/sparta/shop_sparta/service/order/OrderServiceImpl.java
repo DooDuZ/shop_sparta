@@ -116,7 +116,7 @@ public class OrderServiceImpl implements OrderService{
                 //System.out.println(productId);
                 //System.out.println(cartInfo.containsKey(productId));
                 //System.out.println(cartInfo.get(productId) - orderDetailDto.getAmount());
-                throw  new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
+                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
             }
 
             // Todo 테스트용 코드 - 삭제 대상
