@@ -10,7 +10,7 @@ public interface ProductController {
     ResponseEntity<?> updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto);
     ResponseEntity<?> deleteProduct(UserDetails userDetails, Long productId);
     ResponseEntity<?> getProduct(Long productId);
-    ResponseEntity<?> getAllProducts();
+    ResponseEntity<?> getAllProducts(int page, int itemsPerPage);
     ResponseEntity<?> getAllByCategory(CategoryDto categoryDto);
     ResponseEntity<?> getAllProductsBySeller(Long sellerId);
     ResponseEntity<?> updateProductStatus(Long productId, Long productStatusCode);

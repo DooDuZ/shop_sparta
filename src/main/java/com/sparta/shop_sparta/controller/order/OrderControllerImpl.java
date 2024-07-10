@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.controller.order;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.service.order.OrderService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -24,7 +26,7 @@ public class OrderControllerImpl implements OrderController{
 
     @Override
     @PostMapping
-    public ResponseEntity<?> createOrder(@AuthenticationPrincipal UserDetails userDetails, @RequestBody OrderRequestDto orderRequestDto) {
+    public ResponseEntity<Void> createOrder(@AuthenticationPrincipal UserDetails userDetails, @RequestBody OrderRequestDto orderRequestDto) {
         orderService.createOrder(userDetails, orderRequestDto);
         return ResponseEntity.ok().build();
     }
@@ -32,7 +34,13 @@ public class OrderControllerImpl implements OrderController{
     @Override
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
-        return ResponseEntity.ok(orderService.getOrders(userDetails, orderId));
+        return ResponseEntity.ok(orderService.getOrder(userDetails, orderId));
+    }
+
+    @Override
+    @GetMapping
+    public ResponseEntity<List<OrderResponseDto>> getOrders(@AuthenticationPrincipal UserDetails userDetails, @RequestParam int page, @RequestParam int itemsPerPage) {
+        return ResponseEntity.ok(orderService.getOrders(userDetails, page, itemsPerPage));
     }
 
     @Override

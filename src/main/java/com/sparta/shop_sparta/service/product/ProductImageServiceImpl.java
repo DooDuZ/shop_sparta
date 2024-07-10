@@ -13,8 +13,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -118,8 +120,8 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
-    public List<ProductImageDto> getAllProductImages() {
-        return productImageRepository.findAll().stream().map(ProductImageEntity::toDto)
+    public List<ProductImageDto> getProductByPage(List<ProductEntity> productEntities) {
+        return productImageRepository.findAllByProductEntityIn(productEntities).stream().map(ProductImageEntity::toDto)
                 .peek(
                         dto -> dto.setEncodedImageByBase64(encodeBase64(dto))
                 ).toList();

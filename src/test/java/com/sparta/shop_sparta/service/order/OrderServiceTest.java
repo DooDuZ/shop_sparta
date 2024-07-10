@@ -10,7 +10,6 @@ import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
@@ -37,8 +36,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -180,7 +177,7 @@ public class OrderServiceTest {
             when(orderDetailService.getOrderedProduct(any(OrderEntity.class))).thenReturn(new ArrayList<>());
 
             // when
-            OrderResponseDto orderResponseDto = orderService.getOrders(memberEntity, orderId);
+            OrderResponseDto orderResponseDto = orderService.getOrder(memberEntity, orderId);
 
             // then
             assertThat(orderResponseDto.getOrderId()).isEqualTo(orderedEntity.getOrderId());
@@ -196,7 +193,7 @@ public class OrderServiceTest {
 
             // when
             assertThatThrownBy(
-                    () -> orderService.getOrders(memberEntity, orderId)
+                    () -> orderService.getOrder(memberEntity, orderId)
             ).isInstanceOf(OrderException.class).hasMessageContaining(OrderResponseMessage.INVALID_ORDER.getMessage());
         }
 
@@ -211,7 +208,7 @@ public class OrderServiceTest {
 
             // when
             assertThatThrownBy(
-                    () -> orderService.getOrders(otherMemberEntity, orderId)
+                    () -> orderService.getOrder(otherMemberEntity, orderId)
             ).isInstanceOf(AuthorizationException.class).hasMessageContaining(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
     }

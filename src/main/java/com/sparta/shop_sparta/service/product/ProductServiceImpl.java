@@ -10,11 +10,12 @@ import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,13 +65,14 @@ public class ProductServiceImpl implements ProductService {
 
         ProductEntity productEntity = getProductEntity(productRequestDto.getProductId());
 
-        if(productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0){
+        if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
         productEntity.update(productRequestDto);
-        StockEntity stockEntity = stockService.getStockEntity(productEntity);
-        stockEntity.setAmount(productRequestDto.getAmount());
+        stockService.updateStock(productEntity, productRequestDto.getAmount());
+        //StockEntity stockEntity = stockService.getStockEntity(productEntity);
+        //stockEntity.setAmount(productRequestDto.getAmount());
 
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
@@ -102,13 +104,13 @@ public class ProductServiceImpl implements ProductService {
 
     // 주문에서 사용할 수 있도록 분리
     @Override
-    public ProductEntity getProductEntity(Long productId){
+    public ProductEntity getProductEntity(Long productId) {
         return productRepository.findById(productId).orElseThrow(
-                ()-> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
+                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
         );
     }
 
-    public List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo){
+    public List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo) {
         return productRepository.findAllById(cartInfo.keySet()).stream()
                 .map(this::getProductDto).toList();
     }
@@ -126,8 +128,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto getProductDto(ProductEntity productEntity){
-        List<ProductImageDto> productImages =  productImageService.getProductImages(productEntity);
+    public ProductDto getProductDto(ProductEntity productEntity) {
+        List<ProductImageDto> productImages = productImageService.getProductImages(productEntity);
         ProductDto productDto = productEntity.toDto();
 
         productDto.setAmount(stockService.getStock(productEntity));
@@ -139,17 +141,22 @@ public class ProductServiceImpl implements ProductService {
     // 후에 페이징 처리 할 것
     // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override
-    public List<ProductDto> getAllProducts() {
-        Map<Long, ProductDto> productDtoList = productRepository.findAll().stream().map(ProductEntity::toDto).collect(
-                Collectors.toMap(ProductDto::getProductId, Function.identity()));
+    public List<ProductDto> getAllProducts(int page, int itemPerPage) {
+        Pageable pageable = PageRequest.of(page - 1, itemPerPage);
 
-        List<ProductImageDto> productImageDtoList = productImageService.getAllProductImages();
+        List<ProductEntity> productEntities = productRepository.findAll(pageable).getContent();
+
+        Map<Long, ProductDto> productDtoInfo = productEntities.stream().map(ProductEntity::toDto)
+                .collect(
+                        Collectors.toMap(ProductDto::getProductId, Function.identity()));
+
+        List<ProductImageDto> productImageDtoList = productImageService.getProductByPage(productEntities);
 
         for (ProductImageDto productImageDto : productImageDtoList) {
-            productDtoList.get(productImageDto.getProductId()).getProductImages().add(productImageDto);
+            productDtoInfo.get(productImageDto.getProductId()).getProductImages().add(productImageDto);
         }
 
-        return new ArrayList<>(productDtoList.values());
+        return new ArrayList<>(productDtoInfo.values());
     }
 
     @Override

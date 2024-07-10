@@ -4,7 +4,6 @@ import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.order.OrderStatus;
 import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
-import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
@@ -19,16 +18,21 @@ import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderDetailService orderDetailService;
@@ -59,7 +63,7 @@ public class OrderServiceImpl implements OrderService{
         orderEntity.setTotalPrice(getTotalPrice(orderDetailEntities));
 
         // 재고 확인까지 끝난 상태로 결제한다.
-        if (!paymentService.pay(orderEntity)){
+        if (!paymentService.pay(orderEntity)) {
             throw new OrderException(OrderResponseMessage.FAIL_PAYMENT.getMessage());
         }
 
@@ -95,7 +99,8 @@ public class OrderServiceImpl implements OrderService{
         return totalPrice;
     }
 
-    private List<OrderDetailRequestDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto, MemberEntity memberEntity){
+    private List<OrderDetailRequestDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto,
+                                                              MemberEntity memberEntity) {
         List<OrderDetailRequestDto> orderDetails = new ArrayList<>();
 
         // 장바구니 정보 가져오기
@@ -132,7 +137,7 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public OrderResponseDto getOrders(UserDetails userDetails, Long orderId) {
+    public OrderResponseDto getOrder(UserDetails userDetails, Long orderId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
@@ -148,7 +153,7 @@ public class OrderServiceImpl implements OrderService{
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
-        if(orderEntity.getOrderStatus() != OrderStatus.PREPARED){
+        if (orderEntity.getOrderStatus() != OrderStatus.PREPARED) {
             throw new OrderException(OrderResponseMessage.FAIL_CANCEL.getMessage());
         }
 
@@ -168,8 +173,9 @@ public class OrderServiceImpl implements OrderService{
         MemberEntity memberEntity = (MemberEntity) userDetails;
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
-        if (orderEntity.getOrderStatus() != OrderStatus.DELIVERED || ChronoUnit.DAYS.between(orderEntity.getLastModifyDate(),
-                LocalDateTime.now()) >= 1 ) {
+        if (orderEntity.getOrderStatus() != OrderStatus.DELIVERED
+                || ChronoUnit.DAYS.between(orderEntity.getLastModifyDate(),
+                LocalDateTime.now()) >= 1) {
             throw new OrderException(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
         }
 
@@ -178,12 +184,34 @@ public class OrderServiceImpl implements OrderService{
         return orderEntity.toDto();
     }
 
-    private OrderEntity getValidEntity(MemberEntity memberEntity, Long orderId){
+    @Override
+    public List<OrderResponseDto> getOrders(UserDetails userDetails, int page, int itemsPerPage) {
+        PageRequest pageable = PageRequest.of(page - 1, itemsPerPage);
+
+        List<OrderEntity> orderEntities = orderRepository.findAllByMemberEntity(pageable, (MemberEntity) userDetails)
+                .getContent();
+
+        List<OrderDetailEntity> orderDetailEntities = orderDetailService.getOrderDetailsByOrderEntities(orderEntities);
+
+        Map<Long, OrderResponseDto> orderInfo = orderEntities.stream().map(OrderEntity::toDto).collect(
+                Collectors.toMap(OrderResponseDto::getOrderId, Function.identity())
+        );
+
+        for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
+            orderInfo.get(orderDetailEntity.getOrderEntity().getOrderId()).getOrderDetails().add(orderDetailEntity.toDto());
+        }
+
+        return orderInfo.values().stream()
+                .sorted(Comparator.comparing(OrderResponseDto::getOrderId))
+                .collect(Collectors.toList());
+    }
+
+    private OrderEntity getValidEntity(MemberEntity memberEntity, Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
                 () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
         );
 
-        if(memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0){
+        if (memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
@@ -206,7 +234,7 @@ public class OrderServiceImpl implements OrderService{
         for (OrderEntity orderEntity : orderEntities) {
             orderEntity.setOrderStatus(nextStatus);
 
-            if (nextStatus == OrderStatus.RETURN_COMPLETED){
+            if (nextStatus == OrderStatus.RETURN_COMPLETED) {
                 orderDetailService.cancelOrder(orderEntity);
 
                 // Todo 환불 로직 추가

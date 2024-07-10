@@ -69,8 +69,8 @@ public class OrderDetailServiceTest {
         void addOrderDetailTest() {
             // given
             when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
-            when(orderDetailRepository.saveAll(any())).thenReturn(new ArrayList<>());
-            when(productService.getProductDto(any(ProductEntity.class))).thenReturn(productEntity.toDto());
+            when(stockService.getStockInRedis(anyLong())).thenReturn(stockEntity.getAmount());
+            when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
 
             Long totalAmount = 0L;
 
@@ -79,13 +79,12 @@ public class OrderDetailServiceTest {
             }
 
             // when
-            List<OrderDetailDto> orderDetails = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
+            List<OrderDetailEntity> orderDetails = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
 
             Long totalPrice = 0L;
 
-            for (OrderDetailDto orderDetailDto : orderDetails) {
-                System.out.println(orderDetailDto.getProductDto() == null);
-                totalPrice += orderDetailDto.getAmount() * orderDetailDto.getProductDto().getPrice();
+            for (OrderDetailEntity orderDetailEntity : orderDetails) {
+                totalPrice += orderDetailEntity.getAmount() * orderDetailEntity.getProductEntity().getPrice();
             }
 
             // then
@@ -104,7 +103,7 @@ public class OrderDetailServiceTest {
             // when then
             assertThatThrownBy(
                     () -> orderDetailService.addOrder(orderEntity, orderDetailDtoList)
-            ).isInstanceOf(OrderException.class).hasMessage(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+            ).isInstanceOf(OrderException.class).hasMessage(OrderResponseMessage.INVALID_AMOUNT.getMessage());
         }
 
         @Test

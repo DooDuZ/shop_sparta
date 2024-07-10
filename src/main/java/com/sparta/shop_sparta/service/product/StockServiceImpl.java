@@ -37,11 +37,23 @@ public class StockServiceImpl implements StockService{
 
     @Override
     public void updateStock(ProductEntity productEntity, Long amount) {
+        String key = String.valueOf(productEntity.getProductId());
+
+        if (stockRedisRepository.hasKey(key)){
+            stockRedisRepository.deleteKey(key);
+        }
+
         getStockEntity(productEntity).setAmount(amount);
     }
 
     @Override
     public void updateStock(StockEntity stockEntity, Long amount) {
+        String key = String.valueOf(stockEntity.getProductEntity().getProductId());
+
+        if (stockRedisRepository.hasKey(key)){
+            stockRedisRepository.deleteKey(key);
+        }
+
         stockEntity.setAmount(amount);
     }
 

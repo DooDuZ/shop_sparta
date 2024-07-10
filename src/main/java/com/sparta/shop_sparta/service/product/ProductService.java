@@ -15,7 +15,7 @@ public interface ProductService {
     void deleteProduct(UserDetails userDetails, Long productId);
     ProductDto getProduct(Long productId);
     ProductEntity getProductEntity(Long productId);
-    List<ProductDto> getAllProducts();
+    List<ProductDto> getAllProducts(int page, int itemsPerPage);
     List<ProductDto> getAllProductsBySeller(Long sellerId);
     List<ProductDto> getAllByCategory(CategoryDto categoryDto);
     ProductDto getProductDto(ProductEntity productEntity);

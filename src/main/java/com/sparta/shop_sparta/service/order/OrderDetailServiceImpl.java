@@ -57,7 +57,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             //stockEntity.setAmount(amount);
             //log.info(String.valueOf(amount));
 
-            // redis에 대한 update로 변경 + db 쿼리는 비동기로 실행
+            // redis 재고 update
             stockService.updateStockInRedis(productId, amount);
             // 비동기 sql query 실행
             stockService.updateStockAfterOrder(stockService.getStockByProductId(productId).getStockId(), amount);
@@ -75,6 +75,11 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Async
     public void orderDetailSaveAll(List<OrderDetailEntity> orderDetailEntities){
         orderDetailRepository.saveAll(orderDetailEntities);
+    }
+
+    @Override
+    public List<OrderDetailEntity> getOrderDetailsByOrderEntities(List<OrderEntity> orderEntities) {
+        return orderDetailRepository.findAllByOrderEntityIn(orderEntities);
     }
 
 

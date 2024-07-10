@@ -30,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -125,7 +127,6 @@ public class ProductServiceTest {
         void updateProductSuccessTest() {
             // given
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
-            when(stockService.getStockEntity(productEntity)).thenReturn(stockEntity);
             // when
             ProductDto productDto = productService.updateProduct(memberEntity, productRequestDto);
 
@@ -227,26 +228,28 @@ public class ProductServiceTest {
             productImageEntities.add(ProductImageDto.builder().productImageType(ProductImageType.HEADER).productId(1L)
                     .imagePath("어딘가!").imageOrdering((byte) 1).build());
 
-            when(productRepository.findAll()).thenReturn(productEntities);
-            when(productImageService.getAllProductImages()).thenReturn(productImageEntities);
+            when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
+            when(productImageService.getProductByPage(anyList())).thenReturn(new ArrayList<>());
+            //when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
             // when
-            productService.getAllProducts();
+            productService.getAllProducts(1, 10);
 
             // then
-            verify(productRepository).findAll();
-            verify(productImageService).getAllProductImages();
+            verify(productRepository).findAll(any(Pageable.class));
+            verify(productImageService).getProductByPage(anyList());
         }
 
         @Test
-        @DisplayName("")
+        @DisplayName("이미 로드에 실패하면 Exception이 발생합니다.")
         void getAllProductsFailTest(){
             // given
-            when(productImageService.getAllProductImages()).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
+            when(productImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
+            when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
             // when then
             assertThatThrownBy(
-                    ()-> productService.getAllProducts()
+                    ()-> productService.getAllProducts(1, 10)
             ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.FAIL_IO_IMAGE.getMessage());
         }
     }

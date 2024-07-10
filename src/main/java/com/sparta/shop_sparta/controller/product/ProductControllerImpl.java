@@ -58,9 +58,9 @@ public class ProductControllerImpl implements ProductController {
 
     // 후에 페이징 적용
     @Override
-    @GetMapping("/all")
-    public ResponseEntity<List<ProductDto>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProducts());
+    @GetMapping
+    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam int page, @RequestParam int itemsPerPage) {
+        return ResponseEntity.ok(productService.getAllProducts(page, itemsPerPage));
     }
 
     @Override
