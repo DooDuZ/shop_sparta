@@ -16,15 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class StockServiceImpl implements StockService{
+public class StockServiceImpl implements StockService {
 
     private final StockRepository stockRepository;
     private final StockRedisRepository stockRedisRepository;
     private final RedissonClient redissonClient;
 
     @Override
-    public void addProduct(ProductEntity productEntity) {
-        StockEntity stockEntity = StockEntity.builder().productEntity(productEntity).amount(0L).build();
+    public void addProduct(ProductEntity productEntity, Long amount) {
+        StockEntity stockEntity = StockEntity.builder().productEntity(productEntity).amount(amount).build();
         stockRepository.save(stockEntity);
     }
 

@@ -22,4 +22,5 @@ public interface ProductService {
     List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo);
     void setAmount(ProductEntity productEntity, Long amount);
     void updateProductStatus(Long productId, Long productStatusCode);
+    void updateProductStatus(Long productId, ProductStatus productStatus);
 }

@@ -14,8 +14,13 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.concurrent.ScheduledFuture;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +40,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final StockService stockService;
+    private final ReservationService reservationService;
+    private final TaskScheduler taskScheduler;
+    private final Map<Long, ScheduledFuture<?>> scheduledTasks;
 
     @Override
     @Transactional
@@ -49,14 +57,50 @@ public class ProductServiceImpl implements ProductService {
 
         ProductEntity product = productRepository.save(productEntity);
 
-        stockService.addProduct(productEntity);
-        stockService.updateStock(productEntity, productRequestDto.getAmount());
+        stockService.addProduct(productEntity, productRequestDto.getAmount());
+        //stockService.updateStock(productEntity, productRequestDto.getAmount());
 
         productImageService.createProductImages(productEntity, productRequestDto.getProductThumbnails(),
                 productRequestDto.getProductDetailImages());
 
+        if(productRequestDto.isReservation() && productRequestDto.getReservationTime() != null) {
+            createOpenSchedule(productEntity.getProductId(), productRequestDto.getReservationTime());
+        }
+
+        System.out.println("상품등록 끝");
         return product.toDto();
     }
+
+    @Transactional
+    protected void createOpenSchedule(Long productId, LocalDateTime scheduledTime){
+        Instant instant = scheduledTime.atZone(ZoneId.systemDefault()).toInstant();
+
+        ScheduledFuture<?> scheduledFuture = taskScheduler.schedule( ()-> {
+            ProductEntity productEntity = getProductEntity(productId);
+            productEntity.setProductStatus(ProductStatus.ON_SALE);
+            productRepository.save(productEntity);
+            reservationService.reservationCompleted(productEntity);
+        }, instant);
+
+        reservationService.createReservation(getProductEntity(productId), scheduledTime);
+        scheduledTasks.put(productId, scheduledFuture);
+    }
+
+    protected void updateOpenSchedule(Long productId, LocalDateTime scheduledTime){
+        cancelOpenSchedule(productId);
+        createOpenSchedule(productId, scheduledTime);
+    }
+
+    protected void cancelOpenSchedule(Long productId){
+        ScheduledFuture<?> scheduledTask = scheduledTasks.get(productId);
+        if (scheduledTask != null) {
+            scheduledTask.cancel(false); // 예약된 작업 취소
+            scheduledTasks.remove(productId); // 맵에서 작업 제거
+        }
+
+        reservationService.reservationCompleted(getProductEntity(productId));
+    }
+
 
     @Override
     @Transactional
@@ -76,8 +120,6 @@ public class ProductServiceImpl implements ProductService {
 
         // [Todo] 이미지 update 적용
         // version 관리 방법 고민 후 적용
-
-        // Todo 상품 재고 업데이트 시 redis caching 다시하기 or 기존 캐싱 데이터 삭제
 
         return productEntity.toDto();
     }
@@ -125,6 +167,12 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void updateProductStatus(Long productId, Long productStatusCode) {
         getProductEntity(productId).setProductStatus(ProductStatus.of(productStatusCode));
+    }
+
+    @Override
+    @Transactional
+    public void updateProductStatus(Long productId, ProductStatus productStatus) {
+        getProductEntity(productId).setProductStatus(productStatus);
     }
 
     @Override

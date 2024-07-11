@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
-import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;

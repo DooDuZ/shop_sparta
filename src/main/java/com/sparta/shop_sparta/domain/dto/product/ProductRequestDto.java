@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +31,9 @@ public class ProductRequestDto {
     private Long productStatus;
     private List<MultipartFile> productThumbnails;
     private List<MultipartFile> productDetailImages;
+
+    private boolean reservation;
+    private LocalDateTime reservationTime;
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
