@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.service.product;
 
 import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.exception.ProductException;
@@ -65,18 +66,19 @@ public class StockServiceImpl implements StockService {
     @Override
     public StockEntity getStockByProductId(Long productId) {
         return stockRepository.findByProductEntity_ProductId(productId).orElseThrow(
-                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
+                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT)
         );
     }
 
     public StockEntity getStockEntity(ProductEntity productEntity){
         return stockRepository.findByProductEntity(productEntity).orElseThrow(
-                () -> new ProductException(ProductMessage.OUT_OF_STOCK.getMessage())
+                () -> new ProductException(ProductMessage.OUT_OF_STOCK)
         );
     }
 
     @Override
     @Async
+    @Transactional
     public void updateStockAfterOrder(Long stockId, Long amount){
         stockRepository.updateStockAfterOrder(stockId, amount);
     }
@@ -107,13 +109,13 @@ public class StockServiceImpl implements StockService {
                 Integer stock = (Integer) stockRedisRepository.find(key);
 
                 if(stock - amount < 0){
-                    throw new ProductException(ProductMessage.OUT_OF_STOCK.getMessage());
+                    throw new ProductException(ProductMessage.OUT_OF_STOCK);
                 }
 
                 stockRedisRepository.save(key, stock - amount);
             }
         }catch (InterruptedException e){
-            throw new ProductException(ProductMessage.FAIL_TO_CONNECT.getMessage());
+            throw new ProductException(ProductMessage.FAIL_TO_CONNECT);
         }finally {
             if(isLocked){
                 lock.unlock();
@@ -130,5 +132,12 @@ public class StockServiceImpl implements StockService {
     public Long getStockInRedis(Long productId) {
         Integer stock = (Integer) stockRedisRepository.find(String.valueOf(productId));
         return stock.longValue();
+    }
+
+    @Override
+    @Async
+    public void repairStock(OrderDetailEntity orderDetailEntity) {
+        StockEntity stockEntity = getStockEntity(orderDetailEntity.getProductEntity());
+        stockRepository.updateStockAfterOrder(stockEntity.getStockId(), -orderDetailEntity.getAmount());
     }
 }

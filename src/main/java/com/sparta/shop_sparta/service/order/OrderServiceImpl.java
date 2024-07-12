@@ -56,28 +56,19 @@ public class OrderServiceImpl implements OrderService {
 
         // orderDetail 정보 처리
         List<OrderDetailEntity> orderDetailEntities = orderDetailService.addOrder(orderEntity, requestOrderDetails);
+
+        // 비동기 저장 처리 - 결제 실패시 Exception 발생
         orderDetailService.orderDetailSaveAll(orderDetailEntities);
 
         // 가격 입력
         orderEntity.setTotalPrice(getTotalPrice(orderDetailEntities));
 
         // 재고 확인까지 끝난 상태로 결제한다.
+        // 결제 실패 시 재고 복구
         if (!paymentService.pay(orderEntity)) {
-            throw new OrderException(OrderResponseMessage.FAIL_PAYMENT.getMessage());
+            orderDetailService.rollbackOrder(orderDetailEntities);
+            throw new OrderException(OrderResponseMessage.FAIL_PAYMENT);
         }
-
-        /*
-            Todo 결제 완료 후 db commit 실패 시 환불 로직 추가 -> commit 시에 재고 부족 생길 수 있음
-            ex) 재고 3
-            client A가 재고 조회 후 결제창 진입
-            client B가 재고 조회 후 결제창 진입
-
-            client A 제품 3개 결제 후 commit 되면서 재고 0으로 변경
-            client B 결제 성공 -> 그러나 재고 없음 -> db 필드가 unsigned 값이므로 재고 차감 시도 시 sql Exception 발생
-            client B의 작업 roll back -> 그러나 이미 처리된 결제는...?
-
-            db반영 코드 -> exception 발생 시 환불 로직 필요
-         */
 
         // 결제된 주문 정보 반환을 위해 생성
         /*OrderResponseDto orderResponseDto = orderEntity.toDto();
@@ -116,11 +107,9 @@ public class OrderServiceImpl implements OrderService {
                 throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
             }
              */
+
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() < 0) {
-                //System.out.println(productId);
-                //System.out.println(cartInfo.containsKey(productId));
-                //System.out.println(cartInfo.get(productId) - orderDetailDto.getAmount());
-                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
+                throw new OrderException(OrderResponseMessage.INVALID_REQUEST);
             }
 
             // Todo 테스트용 코드 - 삭제 대상
@@ -153,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity orderEntity = getValidEntity(memberEntity, orderId);
 
         if (orderEntity.getOrderStatus() != OrderStatus.PREPARED) {
-            throw new OrderException(OrderResponseMessage.FAIL_CANCEL.getMessage());
+            throw new OrderException(OrderResponseMessage.FAIL_CANCEL);
         }
 
         // [Todo] 환불 로직 추가
@@ -175,7 +164,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderEntity.getOrderStatus() != OrderStatus.DELIVERED
                 || ChronoUnit.DAYS.between(orderEntity.getLastModifyDate(),
                 LocalDateTime.now()) >= 1) {
-            throw new OrderException(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
+            throw new OrderException(OrderResponseMessage.FAIL_REQUEST_RETURN);
         }
 
         orderEntity.setOrderStatus(OrderStatus.RETURN_REQUESTED);
@@ -207,11 +196,11 @@ public class OrderServiceImpl implements OrderService {
 
     private OrderEntity getValidEntity(MemberEntity memberEntity, Long orderId) {
         OrderEntity orderEntity = orderRepository.findById(orderId).orElseThrow(
-                () -> new OrderException(OrderResponseMessage.INVALID_ORDER.getMessage())
+                () -> new OrderException(OrderResponseMessage.INVALID_ORDER)
         );
 
         if (memberEntity.getMemberId() - orderEntity.getMemberEntity().getMemberId() != 0) {
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
         return orderEntity;

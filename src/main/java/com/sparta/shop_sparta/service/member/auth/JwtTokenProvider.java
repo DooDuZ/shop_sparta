@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.service.member.auth;
 
+import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
@@ -81,7 +82,7 @@ public class JwtTokenProvider {
             claims.put("member-id", memberId);
             claims.put("user-agent", userAgent);
         }catch (Exception e){
-            throw new MemberException(e);
+            throw new MemberException(MemberResponseMessage.FAIL_CONVERT_TO_JSON);
         }
 
         Date now = new Date();

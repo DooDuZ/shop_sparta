@@ -15,15 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class OrderDetailServiceImpl implements OrderDetailService {
-
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(OrderDetailServiceImpl.class);
-
     private final ProductService productService;
     private final OrderDetailRepository orderDetailRepository;
     private final StockService stockService;
@@ -41,7 +39,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 if (stockEntity.getAmount() > 0){
                     stockService.redisCache(productId);
                 }else{
-                    throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+                    throw new OrderException(OrderResponseMessage.OUT_OF_STOCK);
                 }
             }
 
@@ -50,22 +48,16 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
             validateOrderRequest(stock, amount);
 
-            // Todo - 삭제 대상인지 확인 필요
-            // update 방식 변경 테스트
-            // update 쿼리로 직접 -하기 -> 비관적락 적용 계산된 수량으로 update 하기
-            //stockService.updateStockAfterOrder(stockEntity.getStockId(), orderDetailRequestDto.getAmount());
-            //stockEntity.setAmount(amount);
-            //log.info(String.valueOf(amount));
-
             // redis 재고 update
             stockService.updateStockInRedis(productId, amount);
             // 비동기 sql query 실행
-            stockService.updateStockAfterOrder(stockService.getStockByProductId(productId).getStockId(), amount);
+            StockEntity stockEntity = stockService.getStockByProductId(productId);
+            stockService.updateStockAfterOrder(stockEntity.getStockId(), amount);
 
             // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
             orderDetailEntities.add(
                     OrderDetailEntity.builder().orderEntity(orderEntity)
-                            .productEntity(productService.getProductEntity(productId)).amount(orderDetailRequestDto.getAmount()).build()
+                            .productEntity(stockEntity.getProductEntity()).amount(orderDetailRequestDto.getAmount()).build()
             );
         }
 
@@ -82,14 +74,22 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         return orderDetailRepository.findAllByOrderEntityIn(orderEntities);
     }
 
+    @Override
+    public void rollbackOrder(List<OrderDetailEntity> orderDetailEntityList) {
+        for (OrderDetailEntity orderDetailEntity : orderDetailEntityList) {
+            stockService.repairStock(orderDetailEntity);
+            stockService.updateStockInRedis(orderDetailEntity.getProductEntity().getProductId(), -orderDetailEntity.getAmount());
+        }
+    }
+
 
     private void validateOrderRequest(Long stock, Long amount){
         if(amount <= 0){
-            throw new OrderException(OrderResponseMessage.INVALID_AMOUNT.getMessage());
+            throw new OrderException(OrderResponseMessage.INVALID_AMOUNT);
         }
 
         if (stock < amount){
-            throw new OrderException(OrderResponseMessage.OUT_OF_STOCK.getMessage());
+            throw new OrderException(OrderResponseMessage.OUT_OF_STOCK);
         }
     }
 

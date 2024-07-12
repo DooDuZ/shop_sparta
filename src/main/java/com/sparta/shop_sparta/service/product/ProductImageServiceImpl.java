@@ -68,9 +68,9 @@ public class ProductImageServiceImpl implements ProductImageService {
                         .productImageType(productImageType).imageOrdering(i).imagePath(uniqueFilename).build());
             }
         } catch (IOException e) {
-            throw new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage(), e);
+            throw new ProductException(ProductMessage.FAIL_IO_IMAGE, e);
         } catch (RuntimeException e) {
-            throw new ProductException(ProductMessage.FILE_SIZE_EXCEEDED.getMessage(), e);
+            throw new ProductException(ProductMessage.FILE_SIZE_EXCEEDED, e);
         }
 
         return productImageEntityList;
@@ -78,9 +78,9 @@ public class ProductImageServiceImpl implements ProductImageService {
 
     private void validateImageSize(List<MultipartFile> thumbnails, List<MultipartFile> detailImages) {
         if (thumbnails.size() == 0) {
-            throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL.getMessage());
+            throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL);
         } else if (thumbnails.size() > maxThumbnails || detailImages.size() > maxDetail) {
-            throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL.getMessage());
+            throw new ProductException(ProductMessage.NOT_FOUND_THUMBNAIL);
         }
     }
 

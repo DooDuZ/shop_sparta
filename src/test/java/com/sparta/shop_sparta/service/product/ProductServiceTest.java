@@ -209,7 +209,7 @@ public class ProductServiceTest {
         @DisplayName("이미지 생성에 실패하면 Exception이 발생합니다.")
         void getProductFailTest(){
             // given
-            when(productImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
+            when(productImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
 
             // when then
             assertThatThrownBy(
@@ -244,7 +244,7 @@ public class ProductServiceTest {
         @DisplayName("이미 로드에 실패하면 Exception이 발생합니다.")
         void getAllProductsFailTest(){
             // given
-            when(productImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
+            when(productImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
             when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
             // when then

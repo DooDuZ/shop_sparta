@@ -1,8 +1,8 @@
 package com.sparta.shop_sparta.service.product;
 
+import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import java.util.Map;
 
 public interface StockService {
     void addProduct(ProductEntity productEntity, Long amount);
@@ -18,4 +18,6 @@ public interface StockService {
     void updateStockInRedis(Long productId, Long amount);
     Boolean isCached(Long productId);
     Long getStockInRedis(Long productId);
+
+    void repairStock(OrderDetailEntity orderDetailEntity);
 }

@@ -26,7 +26,7 @@ public class MailService implements VerifySignUpService<MemberDto>{
         String verificationCode = (String) signupVerifyCodeRedisRepository.find(key);
 
         if (!verificationCode.equals(mailCode)) {
-            throw new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE.getMessage());
+            throw new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE);
         }
 
         // 사용한 인증 코드 삭제

@@ -12,4 +12,5 @@ public interface OrderDetailService {
     void cancelOrder(OrderEntity orderEntity);
     void orderDetailSaveAll(List<OrderDetailEntity> orderDetailEntityList);
     List<OrderDetailEntity> getOrderDetailsByOrderEntities(List<OrderEntity> orderEntities);
+    void rollbackOrder(List<OrderDetailEntity> orderDetailEntityList);
 }

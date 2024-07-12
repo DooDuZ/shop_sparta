@@ -50,7 +50,7 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity = productRequestDto.toEntity();
 
         CategoryEntity categoryEntity = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(
-                () -> new ProductException(ProductMessage.INVALID_CATEGORY.getMessage())
+                () -> new ProductException(ProductMessage.INVALID_CATEGORY)
         );
 
         productEntity.init(categoryEntity, (MemberEntity) userDetails);
@@ -67,7 +67,6 @@ public class ProductServiceImpl implements ProductService {
             createOpenSchedule(productEntity.getProductId(), productRequestDto.getReservationTime());
         }
 
-        System.out.println("상품등록 끝");
         return product.toDto();
     }
 
@@ -96,9 +95,8 @@ public class ProductServiceImpl implements ProductService {
         if (scheduledTask != null) {
             scheduledTask.cancel(false); // 예약된 작업 취소
             scheduledTasks.remove(productId); // 맵에서 작업 제거
+            reservationService.reservationCompleted(getProductEntity(productId)); // 레코드 완료 처리
         }
-
-        reservationService.reservationCompleted(getProductEntity(productId));
     }
 
 
@@ -110,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity = getProductEntity(productRequestDto.getProductId());
 
         if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
         productEntity.update(productRequestDto);
@@ -132,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 래퍼 클래스에 == 쓰면 참조값을 비교한다. + or - 연산 시 자동 언박싱됨
         if (memberEntity.getMemberId() - productEntity.getSellerEntity().getMemberId() != 0) {
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
         productEntity.setDelete(true);
@@ -148,7 +146,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductEntity getProductEntity(Long productId) {
         return productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage())
+                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT)
         );
     }
 
@@ -186,8 +184,6 @@ public class ProductServiceImpl implements ProductService {
         return productDto;
     }
 
-    // 후에 페이징 처리 할 것
-    // 다 때려박으면 이미지 용량 어쩔 건데...
     @Override
     public List<ProductDto> getAllProducts(int page, int itemPerPage) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);

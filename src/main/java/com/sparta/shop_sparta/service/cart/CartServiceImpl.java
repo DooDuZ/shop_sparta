@@ -53,7 +53,7 @@ public class CartServiceImpl implements CartService {
         StockEntity stockEntity = stockService.getStockEntity(productEntity);
 
         if(stockEntity.getAmount() < cartRequestDto.getAmount()){
-            throw new ProductException(ProductMessage.OUT_OF_STOCK.getMessage());
+            throw new ProductException(ProductMessage.OUT_OF_STOCK);
         }
 
         cartRedisRepository.saveWithDuration(
@@ -73,7 +73,7 @@ public class CartServiceImpl implements CartService {
         ProductEntity productEntity = productService.getProductEntity(productId);
 
         if(productEntity.getProductStatus() != ProductStatus.ON_SALE){
-            throw new CartException(CartResponseMessage.NOT_ON_SALE.getMessage());
+            throw new ProductException(ProductMessage.NOT_ON_SALE);
         }
 
         return productEntity;

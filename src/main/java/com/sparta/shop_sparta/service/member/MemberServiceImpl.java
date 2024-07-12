@@ -68,12 +68,12 @@ public class MemberServiceImpl implements MemberService {
 
         // 이메일 중복 검사
         if (memberRepository.findByEmail(memberDto.getEmail()).isPresent()) {
-            throw new MemberException(MemberResponseMessage.DUPLICATED_EMAIL.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_EMAIL);
         }
 
         // 아이디 중복 검사
         if (memberRepository.findByLoginId(memberDto.getLoginId()).isPresent()) {
-            throw new MemberException(MemberResponseMessage.DUPLICATED_LOGIN_ID.getMessage());
+            throw new MemberException(MemberResponseMessage.DUPLICATED_LOGIN_ID);
         }
     }
 
@@ -85,7 +85,7 @@ public class MemberServiceImpl implements MemberService {
         mailService.verifySignup(memberId, verificationCode);
 
         MemberEntity memberEntity = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND)
         );
 
         memberEntity.setRole(MemberRole.BASIC);
@@ -96,11 +96,11 @@ public class MemberServiceImpl implements MemberService {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if (memberEntity.getMemberId() != memberId) {
-            throw new AuthorizationException(AuthMessage.INVALID_PRINCIPLE.getMessage());
+            throw new AuthorizationException(AuthMessage.INVALID_PRINCIPLE);
         }
 
         MemberEntity memberInfo = memberRepository.findById(memberId).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND)
         );
 
         MemberDto memberDto = memberInfo.toDto();
@@ -117,7 +117,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
-            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD);
         }
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
@@ -127,17 +127,17 @@ public class MemberServiceImpl implements MemberService {
 
         // 비밀번호 검증
         if (!passwordEncoder.matches(password, memberEntity.getPassword())) {
-            throw new MemberException(MemberResponseMessage.INVALID_PASSWORD.getMessage());
+            throw new MemberException(MemberResponseMessage.INVALID_PASSWORD);
         }
 
         // 새 비밀번호에 대한 패턴 검증
         if (!new MemberInfoValidator().checkPattern(PatternConfig.passwordPattern, confirmPassword)) {
-            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD.getMessage());
+            throw new MemberException(MemberResponseMessage.UNMATCHED_PASSWORD);
         }
 
         // 영속 상태 엔티티 가져오기
         MemberEntity managedEntity = memberRepository.findById(memberEntity.getMemberId()).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_FOUND)
         );
 
         managedEntity.setPassword(passwordEncoder.encode(confirmPassword));
@@ -148,13 +148,13 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
-            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
+            throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD);
         }
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         MemberEntity memberInfo = memberRepository.findById(memberEntity.getMemberId()).orElseThrow(
-                ()->new MemberException(MemberResponseMessage.NOT_FOUND.getMessage())
+                ()->new MemberException(MemberResponseMessage.NOT_FOUND)
         );
 
         memberInfo.setPhoneNumber(userInformationEncoder.encrypt(phoneNumberUpdateRequestDto.getPhoneNumber(), saltGenerator.generateSalt()));

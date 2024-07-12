@@ -29,7 +29,7 @@ public class AddrServiceImpl implements AddrService {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if (addrRepository.findAllByMemberEntity(memberEntity).size() >= 5){
-            throw new MemberException(MemberResponseMessage.MAX_SAVE_LIMIT.getMessage());
+            throw new MemberException(MemberResponseMessage.MAX_SAVE_LIMIT);
         }
 
         String salt = saltGenerator.generateSalt();
@@ -90,11 +90,11 @@ public class AddrServiceImpl implements AddrService {
 
     private AddrEntity getAuthorizedAddrEntity(UserDetails userDetails, Long addrId){
         AddrEntity addrEntity = addrRepository.findById(addrId).orElseThrow(
-                () -> new MemberException(MemberResponseMessage.NOT_SEARCH_ADDR.getMessage())
+                () -> new MemberException(MemberResponseMessage.NOT_SEARCH_ADDR)
         );
 
         if(!addrEntity.getMemberEntity().getLoginId().equals(userDetails.getUsername())){
-            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED.getMessage());
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
         return addrEntity;

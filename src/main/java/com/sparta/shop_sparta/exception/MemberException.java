@@ -1,16 +1,20 @@
 package com.sparta.shop_sparta.exception;
 
+import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import lombok.Getter;
+
+@Getter
 public class MemberException extends RuntimeException{
 
-    public MemberException(String message) {
-        super(message);
+    private final MemberResponseMessage error;
+
+    public MemberException(MemberResponseMessage error) {
+        super(error.getMessage());
+        this.error = error;
     }
 
-    public MemberException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public MemberException(Throwable cause) {
-        super(cause);
+    public MemberException(MemberResponseMessage error, Throwable cause) {
+        super(error.getMessage(), cause);
+        this.error = error;
     }
 }

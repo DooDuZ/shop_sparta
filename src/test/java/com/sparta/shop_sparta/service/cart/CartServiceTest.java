@@ -128,7 +128,7 @@ public class CartServiceTest {
         @DisplayName("존재하지 않는 상품을 담으려고 하는 경우 Exception이 발생합니다.")
         void addToCartInvalidProductIdFailTest(){
             // given
-            when(productService.getProductEntity(anyLong())).thenThrow(new ProductException(ProductMessage.NOT_FOUND_PRODUCT.getMessage()));
+            when(productService.getProductEntity(anyLong())).thenThrow(new ProductException(ProductMessage.NOT_FOUND_PRODUCT));
 
             // when then
             assertThatThrownBy(
@@ -209,7 +209,7 @@ public class CartServiceTest {
             // given
             cartInfo = new HashMap<>();
             when(cartRedisRepository.findCart(memberEntity.getMemberId())).thenReturn(cartInfo);
-            when(cartService.getProductsIncart(cartInfo)).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE.getMessage()));
+            when(cartService.getProductsIncart(cartInfo)).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
 
             // when then
             assertThatThrownBy(

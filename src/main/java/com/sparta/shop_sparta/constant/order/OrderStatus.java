@@ -29,6 +29,6 @@ public enum OrderStatus {
             }
         }
 
-        throw new OrderException(OrderResponseMessage.INVALID_ORDER_STATUS.getMessage());
+        throw new OrderException(OrderResponseMessage.INVALID_ORDER_STATUS);
     }
 }

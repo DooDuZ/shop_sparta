@@ -201,7 +201,7 @@ public class MemberServiceTest {
             Long memberId = 1L;
             String verificationCode = "393904";
 
-            doThrow(new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE.getMessage()))
+            doThrow(new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE))
                     .when(mailService).verifySignup(memberId, verificationCode);
 
             // when then
