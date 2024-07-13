@@ -90,7 +90,7 @@ public class ProductEntity extends BaseEntity {
     }
 
     public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
-        setProductStatus(ProductStatus.WAITING);
+        setProductStatus(ProductStatus.NOT_PUBLISHED);
         setCategoryEntity(categoryEntity);
         setSellerEntity(sellerEntity);
     }

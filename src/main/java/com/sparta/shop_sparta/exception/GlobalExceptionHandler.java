@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice
 @Slf4j
@@ -21,28 +20,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OrderException.class)
     public ResponseEntity<String> handleOrderException(OrderException ex) {
         // ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        log.error(ex.getMessage());
+        log.error(ex.getError().getMessage());
         return new ResponseEntity<>(ex.getError().getMessage(), ex.getError().getHttpStatus());
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<String> handleAuthException(AuthorizationException ex) {
         // ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        log.error(ex.getMessage());
+        log.error(ex.getError().getMessage());
         return new ResponseEntity<>(ex.getError().getMessage(), ex.getError().getHttpStatus());
     }
 
     @ExceptionHandler(ProductException.class)
     public ResponseEntity<String> handleProductException(ProductException ex) {
         // ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        log.error(ex.getMessage());
+        log.error(ex.getError().getMessage());
         return new ResponseEntity<>(ex.getError().getMessage(), ex.getError().getHttpStatus());
     }
 
     @ExceptionHandler(MemberException.class)
     public ResponseEntity<String> handleMemberException(MemberException ex) {
         // ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        log.error(ex.getMessage());
+        log.error(ex.getError().getMessage());
         return new ResponseEntity<>(ex.getError().getMessage(), ex.getError().getHttpStatus());
     }
 }

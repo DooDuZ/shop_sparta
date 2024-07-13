@@ -9,11 +9,12 @@ import com.sparta.shop_sparta.repository.StockRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.StockRedisRepository;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+/*import org.redisson.api.RedissonClient;
+import org.redisson.api.RLock;*/
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +22,7 @@ public class StockServiceImpl implements StockService {
 
     private final StockRepository stockRepository;
     private final StockRedisRepository stockRedisRepository;
-    private final RedissonClient redissonClient;
+    //private final RedissonClient redissonClient;
 
     @Override
     public void addProduct(ProductEntity productEntity, Long amount) {
@@ -95,7 +96,7 @@ public class StockServiceImpl implements StockService {
         stockRedisRepository.saveWithDuration(String.valueOf(productId), stockEntity.getAmount());
     }
 
-    @Override
+    /*@Override
     public void updateStockInRedis(Long productId, Long amount) {
         String key = String.valueOf(productId);
 
@@ -121,6 +122,11 @@ public class StockServiceImpl implements StockService {
                 lock.unlock();
             }
         }
+    }*/
+    @Override
+    public void updateStockInRedis(Long productId, Long amount) {
+        String key = String.valueOf(productId);
+        stockRedisRepository.increment(key, -amount);
     }
 
     @Override

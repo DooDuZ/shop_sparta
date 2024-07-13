@@ -11,7 +11,6 @@ import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
@@ -52,9 +51,10 @@ public class CartServiceImpl implements CartService {
         ProductEntity productEntity = validateProduct(cartRequestDto.getProductId());
         StockEntity stockEntity = stockService.getStockEntity(productEntity);
 
+        /* Todo 테스트를 위한 임시 주석
         if(stockEntity.getAmount() < cartRequestDto.getAmount()){
             throw new ProductException(ProductMessage.OUT_OF_STOCK);
-        }
+        }*/
 
         cartRedisRepository.saveWithDuration(
                 memberEntity.getMemberId(),

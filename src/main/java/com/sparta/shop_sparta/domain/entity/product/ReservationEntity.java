@@ -1,5 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
+import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +28,10 @@ public class ReservationEntity {
 
     @Column(nullable = false)
     private LocalDateTime openDateTime;
+
+    @Column(nullable = false)
+    private ProductStatus reserveStatus;
+
     @Column(nullable = false)
     private boolean completed;
 

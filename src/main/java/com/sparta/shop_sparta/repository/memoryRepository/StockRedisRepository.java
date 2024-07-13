@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.repository.memoryRepository;
 
 import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -38,5 +39,9 @@ public class StockRedisRepository implements RedisRepository<String, Object> {
 
     private String addPrefix(String key) {
         return prefix + key;
+    }
+
+    public void increment(String key, Long amount) {
+        redisTemplate.opsForValue().increment(addPrefix(key), amount);
     }
 }

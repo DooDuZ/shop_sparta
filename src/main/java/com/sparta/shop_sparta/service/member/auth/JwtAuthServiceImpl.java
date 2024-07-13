@@ -109,7 +109,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
 
         // 발급한 refreshToken을 redis에 등록
         // 유저 이름 암호화 되어있으므로 provider에서 뽑아서 써야한다
-        jwtRedisRepository.save(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent,
+        jwtRedisRepository.saveWithDuration(jwtTokenProvider.getUsernameByRefresh(refreshToken).toString(), userAgent,
                 refreshToken);
 
         setCookie(response, accessTokenCookieName, accessToken, accessTokenExpirySecond);
