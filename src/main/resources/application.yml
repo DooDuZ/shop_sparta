@@ -2,6 +2,10 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
+  batch:
+    jdbc:
+      initialize-schema: always
+
   data:
     redis:
       host: ${REDIS_HOST}

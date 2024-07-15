@@ -4,6 +4,8 @@ import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import java.util.List;
 import java.util.Map;
@@ -23,4 +25,8 @@ public interface ProductService {
     void setAmount(ProductEntity productEntity, Long amount);
     void updateProductStatus(Long productId, Long productStatusCode);
     void updateProductStatus(Long productId, ProductStatus productStatus);
+
+    ReservationResponseDto createReservation(UserDetails userDetails, ReservationRequestDto reservationRequestDto);
+    ReservationResponseDto updateReservation(UserDetails userDetails, ReservationRequestDto reservationRequestDto);
+    void cancelReservation(UserDetails userDetails, Long reservationId);
 }

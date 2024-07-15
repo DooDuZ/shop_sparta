@@ -7,6 +7,8 @@ import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
@@ -14,13 +16,8 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.concurrent.ScheduledFuture;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.TaskScheduler;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +38,6 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
     private final StockService stockService;
     private final ReservationService reservationService;
-    private final TaskScheduler taskScheduler;
-    private final Map<Long, ScheduledFuture<?>> scheduledTasks;
 
     @Override
     @Transactional
@@ -64,41 +59,11 @@ public class ProductServiceImpl implements ProductService {
                 productRequestDto.getProductDetailImages());
 
         if(productRequestDto.isReservation() && productRequestDto.getReservationTime() != null) {
-            createOpenSchedule(productEntity.getProductId(), productRequestDto.getReservationTime());
+            reservationService.createReservation(productEntity, productRequestDto.getReservationTime(), ProductStatus.of(productRequestDto.getReservationStatus()));
         }
 
         return product.toDto();
     }
-
-    @Transactional
-    protected void createOpenSchedule(Long productId, LocalDateTime scheduledTime){
-        Instant instant = scheduledTime.atZone(ZoneId.systemDefault()).toInstant();
-
-        ScheduledFuture<?> scheduledFuture = taskScheduler.schedule( ()-> {
-            ProductEntity productEntity = getProductEntity(productId);
-            productEntity.setProductStatus(ProductStatus.ON_SALE);
-            productRepository.save(productEntity);
-            reservationService.reservationCompleted(productEntity);
-        }, instant);
-
-        reservationService.createReservation(getProductEntity(productId), scheduledTime);
-        scheduledTasks.put(productId, scheduledFuture);
-    }
-
-    protected void updateOpenSchedule(Long productId, LocalDateTime scheduledTime){
-        cancelOpenSchedule(productId);
-        createOpenSchedule(productId, scheduledTime);
-    }
-
-    protected void cancelOpenSchedule(Long productId){
-        ScheduledFuture<?> scheduledTask = scheduledTasks.get(productId);
-        if (scheduledTask != null) {
-            scheduledTask.cancel(false); // 예약된 작업 취소
-            scheduledTasks.remove(productId); // 맵에서 작업 제거
-            reservationService.reservationCompleted(getProductEntity(productId)); // 레코드 완료 처리
-        }
-    }
-
 
     @Override
     @Transactional
@@ -171,6 +136,41 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public void updateProductStatus(Long productId, ProductStatus productStatus) {
         getProductEntity(productId).setProductStatus(productStatus);
+    }
+
+    @Override
+    @Transactional
+    public ReservationResponseDto createReservation(UserDetails userDetails,
+                                                    ReservationRequestDto reservationRequestDto) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        ProductEntity productEntity = getProductEntity(reservationRequestDto.getProductId());
+
+        if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
+
+        return reservationService.createReservation(productEntity, reservationRequestDto.getReservationTime(), ProductStatus.of(
+                reservationRequestDto.getReserveStatus()));
+    }
+
+    @Override
+    @Transactional
+    public ReservationResponseDto updateReservation(UserDetails userDetails,
+                                                    ReservationRequestDto reservationRequestDto) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        ProductEntity productEntity = getProductEntity(reservationRequestDto.getProductId());
+
+        if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
+
+        return reservationService.updateReservation(reservationRequestDto);
+    }
+
+    @Override
+    @Transactional
+    public void cancelReservation(UserDetails userDetails, Long reservationId) {
+        reservationService.cancelReservation(reservationId);
     }
 
     @Override

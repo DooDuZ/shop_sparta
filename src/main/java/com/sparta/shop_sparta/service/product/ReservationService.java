@@ -1,11 +1,16 @@
 package com.sparta.shop_sparta.service.product;
 
+import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ReservationEntity;
+import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ReservationRepository;
-import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,32 +20,48 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public ReservationEntity createReservation(ProductEntity productEntity, LocalDateTime openDateTime) {
-        return reservationRepository.save(
-                ReservationEntity.builder().completed(false).openDateTime(openDateTime).productEntity(productEntity)
+    public ReservationResponseDto createReservation(ProductEntity productEntity, LocalDateTime reservationTime, ProductStatus reserveStatus) {
+        ReservationEntity reservationEntity = reservationRepository.save(
+                ReservationEntity.builder()
+                        .completed(false)
+                        .reservationTime(reservationTime)
+                        .reserveStatus(reserveStatus)
+                        .productEntity(productEntity)
                         .build()
         );
+
+        return reservationEntity.toResponseDto();
     }
 
     @Transactional
-    public ReservationEntity updateReservationTime(ProductEntity productEntity, LocalDateTime openDateTime) {
-        ReservationEntity reservationEntity = reservationRepository.findByProductEntity(productEntity).orElseThrow(
-                () -> new RuntimeException("reservation not found")
+    public ReservationResponseDto updateReservation(ReservationRequestDto reservationRequestDto) {
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationRequestDto.getReservationId()).orElseThrow(
+                () -> new ProductException(ProductMessage.INVALID_RESERVATION)
         );
 
-        reservationEntity.setOpenDateTime(openDateTime);
+        reservationEntity.setReservationTime(reservationRequestDto.getReservationTime());
+        reservationEntity.setReserveStatus(ProductStatus.of(reservationRequestDto.getReserveStatus()));
 
-        return reservationEntity;
+        return reservationEntity.toResponseDto();
     }
 
     @Transactional
-    public ReservationEntity reservationCompleted(ProductEntity productEntity) {
-        ReservationEntity reservationEntity = reservationRepository.findByProductEntity(productEntity).orElseThrow(
-                () -> new RuntimeException("reservation not found")
+    public ReservationEntity cancelReservation(Long reservationId) {
+        ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElseThrow(
+                () -> new ProductException(ProductMessage.INVALID_RESERVATION)
         );
 
         reservationEntity.setCompleted(true);
 
         return reservationEntity;
+    }
+
+    @Transactional
+    public void cancelProductReservation(ProductEntity productEntity) {
+        List<ReservationEntity> reservationEntities = reservationRepository.findAllByProductEntity(productEntity);
+
+        for (ReservationEntity reservationEntity : reservationEntities) {
+            reservationEntity.setCompleted(true);
+        }
     }
 }

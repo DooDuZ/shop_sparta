@@ -34,6 +34,7 @@ public class ProductRequestDto {
 
     private boolean reservation;
     private LocalDateTime reservationTime;
+    private Long reservationStatus;
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)

@@ -3,6 +3,8 @@ package com.sparta.shop_sparta.controller.product;
 import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.service.product.ProductService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +13,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,6 +81,25 @@ public class ProductControllerImpl implements ProductController {
     @PatchMapping("/status")
     public ResponseEntity<Void> updateProductStatus(@RequestParam("product-id") Long productId, @RequestParam("status-code") Long productStatusCode) {
         productService.updateProductStatus(productId, productStatusCode);
+        return ResponseEntity.ok().build();
+    }
+
+    @Override
+    @PostMapping("/reservation")
+    public ResponseEntity<ReservationResponseDto> createReservation(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ReservationRequestDto reservationRequestDto) {
+        return ResponseEntity.ok(productService.createReservation(userDetails, reservationRequestDto));
+    }
+
+    @Override
+    @PutMapping("/reservation/{reservationId}")
+    public ResponseEntity<ReservationResponseDto> updateReservation(@AuthenticationPrincipal UserDetails userDetails, @RequestBody ReservationRequestDto reservationRequestDto) {
+        return ResponseEntity.ok(productService.updateReservation(userDetails, reservationRequestDto));
+    }
+
+    @Override
+    @DeleteMapping("/reservation/{reservationId}")
+    public ResponseEntity<Void> cancelReservation(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long reservationId) {
+        productService.cancelReservation(userDetails, reservationId);
         return ResponseEntity.ok().build();
     }
 }

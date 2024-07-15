@@ -13,6 +13,7 @@ public enum ProductMessage {
     OUT_OF_STOCK("재고 부족", HttpStatus.BAD_REQUEST),
     FAIL_TO_CONNECT("요청 과부하 발생", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_ON_SALE("판매 중인 상품이 아닙니다.", HttpStatus.BAD_REQUEST),
+    INVALID_RESERVATION("예약 정보가 없습니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;

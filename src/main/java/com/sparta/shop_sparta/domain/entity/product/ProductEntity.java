@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -29,6 +30,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @AllArgsConstructor
 @Builder
 @ToString
+@Setter
 public class ProductEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,31 +59,6 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
-
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public void setProductDetail(String productDetail) {
-        this.productDetail = productDetail;
-    }
-
-    public void setCategoryEntity(CategoryEntity categoryEntity) {
-        this.categoryEntity = categoryEntity;
-    }
-
-    public void setProductStatus(ProductStatus productStatus) {
-        this.productStatus = productStatus;
-    }
-
-    public void setSellerEntity(MemberEntity sellerEntity) {
-        this.sellerEntity = sellerEntity;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
-    }
 
     public ProductDto toDto() {
         return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())

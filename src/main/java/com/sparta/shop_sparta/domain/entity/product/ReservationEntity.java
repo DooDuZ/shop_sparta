@@ -1,9 +1,12 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
 import com.sparta.shop_sparta.constant.product.ProductStatus;
-import com.sparta.shop_sparta.domain.entity.BaseEntity;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,24 +30,38 @@ public class ReservationEntity {
     private Long reservationId;
 
     @Column(nullable = false)
-    private LocalDateTime openDateTime;
+    private LocalDateTime reservationTime;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductStatus reserveStatus;
 
     @Column(nullable = false)
     private boolean completed;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @ToString.Exclude
     @JoinColumn(name = "productId")
     private ProductEntity productEntity;
 
-    public void setOpenDateTime(LocalDateTime openDateTime) {
-        this.openDateTime = openDateTime;
+    public void setReservationTime(LocalDateTime openDateTime) {
+        this.reservationTime = openDateTime;
     }
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public void setReserveStatus(ProductStatus reserveStatus) {
+        this.reserveStatus = reserveStatus;
+    }
+
+    public ReservationResponseDto toResponseDto(){
+        return ReservationResponseDto.builder()
+                .reservationId(this.getReservationId())
+                .reservationTime(this.getReservationTime())
+                .reserveStatus(this.getReserveStatus())
+                .productId(productEntity.getProductId())
+                .build();
     }
 }

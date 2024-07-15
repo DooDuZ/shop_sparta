@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
-import com.sparta.shop_sparta.constant.cart.CartResponseMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
-import com.sparta.shop_sparta.constant.order.OrderStatus;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
@@ -18,12 +16,10 @@ import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.CartException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import com.sparta.shop_sparta.service.product.StockService;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -147,7 +143,7 @@ public class CartServiceTest {
             // when then
             assertThatThrownBy(
                     () -> cartService.addProductToCart(memberEntity, cartRequestDto)
-            ).isInstanceOf(CartException.class).hasMessageContaining(CartResponseMessage.NOT_ON_SALE.getMessage());
+            ).isInstanceOf(ProductException.class).hasMessageContaining(ProductMessage.NOT_ON_SALE.getMessage());
         }
 
         @Test

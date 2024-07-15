@@ -1,6 +1,5 @@
 package com.sparta.shop_sparta.service.cart;
 
-import com.sparta.shop_sparta.constant.cart.CartResponseMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
