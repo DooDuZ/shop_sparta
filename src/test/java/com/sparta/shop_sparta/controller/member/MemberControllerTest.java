@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.service.member.MemberServiceImpl;
+import com.sparta.shop_sparta.service.member.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -26,10 +26,10 @@ public class MemberControllerTest {
     private MockMvc mockMvc;   // HTTP 호출을 위한 MockMVC 사용
 
     @InjectMocks
-    MemberControllerImpl memberController;
+    MemberController memberController;
 
     @Mock
-    MemberServiceImpl memberService;
+    MemberService memberService;
 
     @BeforeEach
     void setUp() {

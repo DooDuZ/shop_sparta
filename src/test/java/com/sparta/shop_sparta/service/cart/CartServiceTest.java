@@ -39,7 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CartServiceTest {
     @InjectMocks
-    CartServiceImpl cartService;
+    CartService cartService;
     @Mock
     private CartRedisRepository cartRedisRepository;
     @Mock

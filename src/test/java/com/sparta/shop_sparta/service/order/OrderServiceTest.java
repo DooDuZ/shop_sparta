@@ -40,7 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
     @InjectMocks
-    private OrderServiceImpl orderService;
+    private OrderService orderService;
     @Mock
     private OrderRepository orderRepository;
     @Mock

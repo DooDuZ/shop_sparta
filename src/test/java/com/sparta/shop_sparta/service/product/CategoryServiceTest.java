@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
     @InjectMocks
-    CategoryServiceImpl categoryService;
+    CategoryService categoryService;
 
     @Mock
     private CategoryRepository categoryRepository;

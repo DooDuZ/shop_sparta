@@ -9,7 +9,6 @@ import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
-import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.MemberException;
@@ -30,8 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,7 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class MemberServiceTest {
 
     @InjectMocks
-    private MemberServiceImpl memberService;
+    private MemberService memberService;
 
     @Mock
     private MemberRepository memberRepository;

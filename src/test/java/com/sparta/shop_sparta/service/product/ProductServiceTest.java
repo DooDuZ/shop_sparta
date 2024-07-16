@@ -38,7 +38,7 @@ import org.springframework.data.domain.Pageable;
 public class ProductServiceTest {
 
     @InjectMocks
-    private ProductServiceImpl productService;
+    private ProductService productService;
     @Mock
     private ProductImageService productImageService;
     @Mock
