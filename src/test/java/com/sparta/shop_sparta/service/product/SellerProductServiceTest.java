@@ -2,8 +2,7 @@ package com.sparta.shop_sparta.service.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -43,6 +42,8 @@ public class SellerProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private StockService stockService;
 
     ProductRequestDto productRequestDto;
     ProductEntity productEntity;
@@ -123,6 +124,7 @@ public class SellerProductServiceTest {
         void updateProductSuccessTest() {
             // given
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
+            when(stockService.updateStock(any(ProductEntity.class), anyLong())).thenReturn(stockEntity);
             // when
             ProductDto productDto = sellerProductService.updateProduct(memberEntity, productRequestDto);
 

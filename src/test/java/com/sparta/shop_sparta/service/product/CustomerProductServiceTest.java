@@ -2,8 +2,7 @@ package com.sparta.shop_sparta.service.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +40,10 @@ public class CustomerProductServiceTest {
     private ProductImageService productImageService;
     @Mock
     private ProductRepository productRepository;
+    @Mock
+    private StockService stockService;
+    @Mock
+    private ReservationService reservationService;
 
     ProductRequestDto productRequestDto;
     ProductEntity productEntity;
@@ -70,8 +73,9 @@ public class CustomerProductServiceTest {
         @DisplayName("조회 성공")
         void getProductSuccessTest(){
             // given
-            when(productImageService.getProductImages(any())).thenReturn(anyList());
+            //when(productImageService.getProductImages(any())).thenReturn(anyList());
             //when(stockService.getStock(any())).thenReturn(anyLong());
+            when(reservationService.getReservationsByProductEntity(any(ProductEntity.class))).thenReturn(new ArrayList<>());
             // when
             ProductDto productDto = customerProductService.getProductDto(productEntity);
 
