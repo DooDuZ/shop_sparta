@@ -1,6 +1,5 @@
 package com.sparta.shop_sparta.controller.product;
 
-import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.service.product.CustomerProductService;
 import java.util.List;
@@ -23,17 +22,18 @@ public class CustomerProductController {
         return ResponseEntity.ok(customerProductService.getProduct(productId));
     }
 
-    // 후에 페이징 적용
-    @GetMapping
-    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam int page, @RequestParam int itemsPerPage) {
-        return ResponseEntity.ok(customerProductService.getAllProducts(page, itemsPerPage));
+    @GetMapping("/on-sale/all")
+    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam long productStatus) {
+        return ResponseEntity.ok(customerProductService.getAllProductsByProductStatus(page, itemsPerPage, productStatus));
     }
 
-    public ResponseEntity<?> getAllByCategory(CategoryDto categoryDto) {
-        return ResponseEntity.ok(customerProductService.getAllByCategory(categoryDto));
+    @GetMapping("/on-sale/category")
+    public ResponseEntity<?> getAllByCategory(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam Long categoryId) {
+        return ResponseEntity.ok(customerProductService.getAllByCategory(page, itemsPerPage, categoryId));
     }
 
-    public ResponseEntity<?> getAllProductsBySeller(Long sellerId) {
-        return ResponseEntity.ok(customerProductService.getAllProductsBySeller(sellerId));
+    @GetMapping("/on-sale/seller")
+    public ResponseEntity<?> getAllProductsBySeller(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam Long sellerId) {
+        return ResponseEntity.ok(customerProductService.getAllProductsBySeller(page, itemsPerPage, sellerId));
     }
 }

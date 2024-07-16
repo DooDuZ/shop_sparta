@@ -12,6 +12,8 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ReservationRepository;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ReservationService {
     private final ReservationRepository reservationRepository;
 
@@ -70,5 +73,19 @@ public class ReservationService {
         for (ReservationEntity reservationEntity : reservationEntities) {
             reservationEntity.setCompleted(true);
         }
+    }
+
+    public List<ReservationResponseDto> getReservationsByProductEntity(ProductEntity productEntity) {
+        return reservationRepository.findByProductEntityAndCompletedFalse(productEntity)
+                .stream()
+                .map(ReservationEntity::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ReservationResponseDto> getAllReservationsByProductEntities(List<ProductEntity> productEntities) {
+        return reservationRepository.findAllByProductEntityInAndCompletedFalse(productEntities)
+                .stream()
+                .map(ReservationEntity::toResponseDto)
+                .collect(Collectors.toList());
     }
 }

@@ -17,24 +17,26 @@ import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("sellerProductService")
+@Transactional(readOnly = true)
 public class SellerProductService extends ProductService {
 
     private final CategoryRepository categoryRepository;
-    private final ReservationService reservationService;
 
     @Autowired
     public SellerProductService(ProductImageService productImageService, ProductRepository productRepository,
                                 StockService stockService, CategoryRepository categoryRepository,
                                 ReservationService reservationService) {
-        super(productImageService, productRepository, stockService);
+        super(productImageService, productRepository, stockService, reservationService);
         this.categoryRepository = categoryRepository;
-        this.reservationService = reservationService;
     }
 
     @Transactional
@@ -65,6 +67,20 @@ public class SellerProductService extends ProductService {
         }
 
         return product.toDto();
+    }
+
+    public List<ProductDto> getSellerProducts(UserDetails userDetails, int page, int itemsPerPage, Long productStatus) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
+        
+        List<ProductEntity> productEntities = productRepository.findAllBySellerEntityAndProductStatus(
+                pageable,
+                memberEntity,
+                ProductStatus.of(productStatus)
+        ).getContent();
+
+        return getProductDtos(productEntities);
     }
 
     @Transactional
