@@ -69,7 +69,6 @@ public class OrderDetailServiceTest {
             // given
             when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
             when(stockService.getStockInRedis(anyLong())).thenReturn(stockEntity.getAmount());
-            when(productService.getProductEntity(anyLong())).thenReturn(productEntity);
 
             Long totalAmount = 0L;
 

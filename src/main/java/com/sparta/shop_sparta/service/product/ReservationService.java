@@ -1,11 +1,14 @@
 package com.sparta.shop_sparta.service.product;
 
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ReservationEntity;
+import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ReservationRepository;
 import java.util.List;
@@ -46,10 +49,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationEntity cancelReservation(Long reservationId) {
+    public ReservationEntity cancelReservation(MemberEntity memberEntity, Long reservationId) {
         ReservationEntity reservationEntity = reservationRepository.findById(reservationId).orElseThrow(
                 () -> new ProductException(ProductMessage.INVALID_RESERVATION)
         );
+
+        if(memberEntity.getMemberId() - reservationEntity.getProductEntity().getSellerEntity().getMemberId() != 0){
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
 
         reservationEntity.setCompleted(true);
 

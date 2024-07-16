@@ -1,50 +1,42 @@
 package com.sparta.shop_sparta.service.product;
 
+import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.StockRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.StockResponseDto;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
+import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import com.sparta.shop_sparta.domain.entity.product.StockEntity;
+import com.sparta.shop_sparta.exception.AuthorizationException;
 import com.sparta.shop_sparta.exception.ProductException;
+import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
 
+@Service("sellerProductService")
+public class SellerProductService extends ProductService {
 
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-@Service
-public class ProductService {
+    private final CategoryRepository categoryRepository;
+    private final ReservationService reservationService;
 
-    protected final ProductImageService productImageService;
-    protected final ProductRepository productRepository;
-    protected final StockService stockService;
-
-
-    public ProductEntity getProductEntity(Long productId) {
-        return productRepository.findById(productId).orElseThrow(
-                () -> new ProductException(ProductMessage.NOT_FOUND_PRODUCT)
-        );
+    @Autowired
+    public SellerProductService(ProductImageService productImageService, ProductRepository productRepository,
+                                StockService stockService, CategoryRepository categoryRepository,
+                                ReservationService reservationService) {
+        super(productImageService, productRepository, stockService);
+        this.categoryRepository = categoryRepository;
+        this.reservationService = reservationService;
     }
 
-    public ProductDto getProductDto(ProductEntity productEntity) {
-        List<ProductImageDto> productImages = productImageService.getProductImages(productEntity);
-        ProductDto productDto = productEntity.toDto();
-
-        productDto.setAmount(stockService.getStock(productEntity));
-        productDto.setProductImages(productImages);
-
-        return productDto;
-    }
-
-    public List<ProductDto> getProductDtoList(Map<Long, Long> cartInfo) {
-        return productRepository.findAllById(cartInfo.keySet()).stream()
-                .map(this::getProductDto).toList();
-    }
-}
-/*
     @Transactional
     public ProductDto createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         ProductEntity productEntity = productRequestDto.toEntity();
@@ -170,45 +162,5 @@ public class ProductService {
     @Transactional
     public void cancelReservation(UserDetails userDetails, Long reservationId) {
         reservationService.cancelReservation((MemberEntity) userDetails, reservationId);
-    }*/
-
-/*
-    public ProductDto getProduct(Long productId) {
-        ProductEntity productEntity = getProductEntity(productId);
-
-        // 공개되지 않은 상품이면 throw
-        if (productEntity.getProductStatus() == ProductStatus.NOT_PUBLISHED){
-            throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
-        }
-
-        return getProductDto(productEntity);
     }
-
-    public List<ProductDto> getAllProducts(int page, int itemPerPage) {
-        Pageable pageable = PageRequest.of(page - 1, itemPerPage);
-
-        List<ProductEntity> productEntities = productRepository.findAll(pageable).getContent();
-
-        Map<Long, ProductDto> productDtoInfo = productEntities.stream().map(ProductEntity::toDto)
-                .collect(
-                        Collectors.toMap(ProductDto::getProductId, Function.identity()));
-
-        List<ProductImageDto> productImageDtoList = productImageService.getProductByPage(productEntities);
-
-        for (ProductImageDto productImageDto : productImageDtoList) {
-            productDtoInfo.get(productImageDto.getProductId()).getProductImages().add(productImageDto);
-        }
-
-        return new ArrayList<>(productDtoInfo.values());
-    }
-
-    public List<ProductDto> getAllProductsBySeller(Long sellerId) {
-        // Todo
-        return null;
-    }
-
-    public List<ProductDto> getAllByCategory(CategoryDto categoryDto) {
-        // Todo
-        return null;
-    }*/
-
+}

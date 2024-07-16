@@ -1,15 +1,18 @@
 package com.sparta.shop_sparta.service.product;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 import com.sparta.shop_sparta.constant.member.AuthMessage;
 import com.sparta.shop_sparta.constant.member.MemberRole;
-import com.sparta.shop_sparta.constant.product.ProductImageType;
 import com.sparta.shop_sparta.constant.product.ProductMessage;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
@@ -20,7 +23,6 @@ import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,23 +32,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 
 @ExtendWith(MockitoExtension.class)
-public class ProductServiceTest {
-
+public class SellerProductServiceTest {
     @InjectMocks
-    private ProductService productService;
+    private SellerProductService sellerProductService;
     @Mock
     private ProductImageService productImageService;
     @Mock
     private ProductRepository productRepository;
     @Mock
     private CategoryRepository categoryRepository;
-    @Mock
-    private StockService stockService;
 
     ProductRequestDto productRequestDto;
     ProductEntity productEntity;
@@ -85,7 +81,7 @@ public class ProductServiceTest {
             doNothing().when(productImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
             // when
-            ProductDto productDto = productService.createProduct(memberEntity, productRequestDto);
+            ProductDto productDto = sellerProductService.createProduct(memberEntity, productRequestDto);
 
             // then
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
@@ -100,7 +96,7 @@ public class ProductServiceTest {
             when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.ofNullable(null));
             // when then
             assertThatThrownBy(
-                    () -> productService.createProduct(memberEntity, productRequestDto)
+                    () -> sellerProductService.createProduct(memberEntity, productRequestDto)
             ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.INVALID_CATEGORY.getMessage());
         }
 
@@ -114,7 +110,7 @@ public class ProductServiceTest {
 
             // when
             assertThatThrownBy(
-                    () -> productService.createProduct(memberEntity, productRequestDto)
+                    () -> sellerProductService.createProduct(memberEntity, productRequestDto)
             ).isInstanceOf(RuntimeException.class);
         }
     }
@@ -128,7 +124,7 @@ public class ProductServiceTest {
             // given
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
             // when
-            ProductDto productDto = productService.updateProduct(memberEntity, productRequestDto);
+            ProductDto productDto = sellerProductService.updateProduct(memberEntity, productRequestDto);
 
             // then
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
@@ -144,7 +140,7 @@ public class ProductServiceTest {
 
             // when then
             assertThatThrownBy(
-                    ()-> productService.updateProduct(memberEntity, productRequestDto)
+                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto)
             ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.NOT_FOUND_PRODUCT.getMessage());
         }
 
@@ -156,7 +152,7 @@ public class ProductServiceTest {
             memberEntity.setMemberId(2L);
             // when then
             assertThatThrownBy(
-                    ()-> productService.updateProduct(memberEntity, productRequestDto)
+                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto)
             ).isInstanceOf(AuthorizationException.class).hasMessage(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 
@@ -167,7 +163,7 @@ public class ProductServiceTest {
             when(productRepository.findById(1L)).thenReturn(Optional.of(productEntity));
 
             // when
-           productService.deleteProduct(memberEntity, 1L);
+            sellerProductService.deleteProduct(memberEntity, 1L);
 
             // then
             assertThat(productEntity.getIsDeleted()).isTrue();
@@ -182,75 +178,8 @@ public class ProductServiceTest {
 
             // when
             assertThatThrownBy(
-                    ()-> productService.deleteProduct(memberEntity, 1L)
+                    ()-> sellerProductService.deleteProduct(memberEntity, 1L)
             ).isInstanceOf(AuthorizationException.class).hasMessage(AuthMessage.AUTHORIZATION_DENIED.getMessage());
-        }
-    }
-
-    @Nested
-    @DisplayName("[상품 조회 테스트]")
-    class GetProductTest{
-        @Test
-        @DisplayName("조회 성공")
-        void getProductSuccessTest(){
-            // given
-            when(productImageService.getProductImages(any())).thenReturn(anyList());
-            //when(stockService.getStock(any())).thenReturn(anyLong());
-            // when
-            ProductDto productDto = productService.getProductDto(productEntity);
-
-            // then
-            assertThat(productDto.getProductName()).isEqualTo(productEntity.getProductName());
-            assertThat(productDto.getProductDetail()).isEqualTo(productEntity.getProductDetail());
-            assertThat(productDto.getPrice()).isEqualTo(productEntity.getPrice());
-        }
-
-        @Test
-        @DisplayName("이미지 생성에 실패하면 Exception이 발생합니다.")
-        void getProductFailTest(){
-            // given
-            when(productImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
-
-            // when then
-            assertThatThrownBy(
-                    ()->productService.getProductDto(productEntity)
-            ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.FAIL_IO_IMAGE.getMessage());
-        }
-
-        @Test
-        @DisplayName("전체 상품 조회 성공")
-        void getAllProductsSuccessTest(){
-            // given
-            List<ProductEntity> productEntities = new ArrayList<>();
-            productEntities.add(productEntity);
-
-            List<ProductImageDto> productImageEntities = new ArrayList<>();
-            productImageEntities.add(ProductImageDto.builder().productImageType(ProductImageType.HEADER).productId(1L)
-                    .imagePath("어딘가!").imageOrdering((byte) 1).build());
-
-            when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
-            when(productImageService.getProductByPage(anyList())).thenReturn(new ArrayList<>());
-            //when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
-
-            // when
-            productService.getAllProducts(1, 10);
-
-            // then
-            verify(productRepository).findAll(any(Pageable.class));
-            verify(productImageService).getProductByPage(anyList());
-        }
-
-        @Test
-        @DisplayName("이미 로드에 실패하면 Exception이 발생합니다.")
-        void getAllProductsFailTest(){
-            // given
-            when(productImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
-            when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
-
-            // when then
-            assertThatThrownBy(
-                    ()-> productService.getAllProducts(1, 10)
-            ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.FAIL_IO_IMAGE.getMessage());
         }
     }
 }
