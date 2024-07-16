@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductResponseDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
@@ -20,7 +20,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Entity(name = "product")
 @Getter
@@ -28,6 +30,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
+@Setter
 public class ProductEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +42,6 @@ public class ProductEntity extends BaseEntity {
     @Lob
     @Column(nullable = false)
     private String productDetail;
-
-    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
-    private Long amount;
 
     @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
     private Long price;
@@ -60,43 +60,14 @@ public class ProductEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public void setProductDetail(String productDetail) {
-        this.productDetail = productDetail;
-    }
-
-    public void setCategoryEntity(CategoryEntity categoryEntity) {
-        this.categoryEntity = categoryEntity;
-    }
-
-    public void setProductStatus(ProductStatus productStatus) {
-        this.productStatus = productStatus;
-    }
-
-    public void setSellerEntity(MemberEntity sellerEntity) {
-        this.sellerEntity = sellerEntity;
-    }
-
-    public void setAmount(Long stock) {
-        this.amount = stock;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
-    }
-
-    public ProductResponseDto toDto() {
-        return ProductResponseDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
+    public ProductDto toDto() {
+        return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
                 .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
-                .sellerId(sellerEntity.getMemberId()).amount(this.amount).price(this.price).build();
+                .sellerId(sellerEntity.getMemberId()).price(this.price).build();
     }
 
     public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
-        setProductStatus(ProductStatus.WAITING);
+        setProductStatus(ProductStatus.NOT_PUBLISHED);
         setCategoryEntity(categoryEntity);
         setSellerEntity(sellerEntity);
     }
@@ -106,6 +77,5 @@ public class ProductEntity extends BaseEntity {
         setProductName(productRequestDto.getProductName());
         setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
         setPrice(productRequestDto.getPrice());
-        setAmount(productRequestDto.getAmount());
     }
 }

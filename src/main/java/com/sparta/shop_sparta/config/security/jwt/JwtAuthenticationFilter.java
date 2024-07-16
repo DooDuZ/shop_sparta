@@ -25,6 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
         String token = jwtTokenProvider.resolveToken(request);
         // 서명 확인
         Jws<Claims> claims = jwtTokenProvider.validateToken(token);
@@ -32,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && claims != null) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
+
         }else if(token != null && claims == null){
             // 리프레시 토큰으로 재요청 하라고 전달
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

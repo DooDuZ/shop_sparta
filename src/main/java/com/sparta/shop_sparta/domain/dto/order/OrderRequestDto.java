@@ -6,20 +6,21 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @Builder
+@ToString
 public class OrderRequestDto {
     private Long orderId;
     private String orderAddr;
     private String orderAddrDetail;
     private Long memberId;
     private Long orderStatus;
-    private List<OrderDetailDto> orderDetails;
+    private List<OrderDetailRequestDto> orderDetails;
 
     public OrderEntity toEntity(){
-        return OrderEntity.builder().orderAddr(this.orderAddr).orderAddrDetail(this.orderAddrDetail)
-                .orderStatus(OrderStatus.of(this.orderStatus)).build();
+        return OrderEntity.builder().orderId(this.orderId).orderAddr(this.orderAddr).orderAddrDetail(this.orderAddrDetail).build();
     }
 }

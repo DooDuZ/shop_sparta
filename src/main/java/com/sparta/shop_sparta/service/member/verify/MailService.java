@@ -26,7 +26,7 @@ public class MailService implements VerifySignUpService<MemberDto>{
         String verificationCode = (String) signupVerifyCodeRedisRepository.find(key);
 
         if (!verificationCode.equals(mailCode)) {
-            throw new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE.getMessage());
+            throw new MemberException(MemberResponseMessage.UNMATCHED_VERIFICATION_CODE);
         }
 
         // 사용한 인증 코드 삭제
@@ -53,9 +53,7 @@ public class MailService implements VerifySignUpService<MemberDto>{
         // 레디스에 코드 저장
         // 3분 후 만료
         signupVerifyCodeRedisRepository.saveWithDuration(String.valueOf(memberDto.getMemberId()),
-                verificationCode, 3);
-
-        System.out.println(signupVerifyCodeRedisRepository.find(String.valueOf(memberDto.getMemberId())));
+                verificationCode);
 
         verificationMessage.append("<h3>")
                 .append("<a href=\"").append(mailConfig.requestUrl).append("/member/verification?memberId=")

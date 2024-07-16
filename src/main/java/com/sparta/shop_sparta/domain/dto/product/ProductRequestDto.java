@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,8 +32,12 @@ public class ProductRequestDto {
     private List<MultipartFile> productThumbnails;
     private List<MultipartFile> productDetailImages;
 
+    private boolean reservation;
+    private LocalDateTime reservationTime;
+    private Long reservationStatus;
+
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)
-                .productName(this.productName).price(this.price).amount(this.amount).build();
+                .productName(this.productName).price(this.price).build();
     }
 }

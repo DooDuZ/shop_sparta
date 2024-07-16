@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.order;
 
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
-import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,6 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class OrderDetailEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,6 +47,6 @@ public class OrderDetailEntity {
 
     public OrderDetailDto toDto(){
         return OrderDetailDto.builder().orderDetailId(this.orderDetailId).orderId(this.orderEntity.getOrderId())
-                .productResponseDto(this.productEntity.toDto()).amount(this.amount).build();
+                .amount(this.amount).build();
     }
 }

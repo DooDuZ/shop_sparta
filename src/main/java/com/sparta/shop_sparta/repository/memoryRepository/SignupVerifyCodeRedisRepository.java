@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository;
 public class SignupVerifyCodeRedisRepository implements RedisRepository<String, Object>{
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final String prefix = "signup-code";
+    private final String prefix = "signup-code : ";
+    private final Duration timeout = Duration.ofMinutes(10);
 
     @Override
-    public void saveWithDuration(String key, Object value, Integer minute) {
-        Duration timeout = Duration.ofMinutes(minute);
-        redisTemplate.opsForValue().set(addPrefix(key), value,timeout);
+    public void saveWithDuration(String key, Object value) {
+        redisTemplate.opsForValue().set(addPrefix(key), value, timeout);
     }
 
     @Override

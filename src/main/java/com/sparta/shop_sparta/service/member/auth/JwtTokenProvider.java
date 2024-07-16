@@ -1,5 +1,7 @@
 package com.sparta.shop_sparta.service.member.auth;
 
+import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
 import io.jsonwebtoken.Claims;
@@ -14,11 +16,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
@@ -48,10 +54,11 @@ public class JwtTokenProvider {
         refreshSecretKey = Base64.getEncoder().encodeToString(refreshSecretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createAccessToken(String username, String role){
+    public String createAccessToken(String username, String role, String memberId){
         Map<String, Object> claims = new HashMap<>();
         claims.put("sub", username);
         claims.put("role", role);
+        claims.put("member-id", memberId);
 
         Date now = new Date();
 
@@ -65,16 +72,17 @@ public class JwtTokenProvider {
         return token;
     }
 
-    public String createRefreshToken(String username, String role, String userAgent){
+    public String createRefreshToken(String username, String role, String memberId, String userAgent){
         Map<String, Object> claims = new HashMap<>();
 
         //claims.put("sub", UUID.nameUUIDFromBytes(username.getBytes(StandardCharsets.UTF_8)).toString());
         try {
             claims.put("sub", tokenUsernameEncoder.encrypt(username));
             claims.put("role", role);
+            claims.put("member-id", memberId);
             claims.put("user-agent", userAgent);
         }catch (Exception e){
-            throw new MemberException(e);
+            throw new MemberException(MemberResponseMessage.FAIL_CONVERT_TO_JSON);
         }
 
         Date now = new Date();
@@ -90,7 +98,15 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token){
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUsername(token));
+        //UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUsername(token));
+        Set<GrantedAuthority> authorities = new HashSet<>();
+        authorities.add(new SimpleGrantedAuthority(getRole(token)));
+
+        MemberEntity memberEntity =  MemberEntity.builder().loginId(getUsername(token))
+                .authorities(authorities).memberId(Long.parseLong(getMemberId(token))).build();
+
+        UserDetails userDetails = (UserDetails) memberEntity;
+
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
     // access 전용
@@ -100,6 +116,10 @@ public class JwtTokenProvider {
 
     public String getRole(String token){
         return Jwts.parser().setSigningKey(accessSecretKey).build().parseSignedClaims(token).getPayload().get("role").toString();
+    }
+
+    public String getMemberId(String token){
+        return Jwts.parser().setSigningKey(accessSecretKey).build().parseSignedClaims(token).getPayload().get("member-id").toString();
     }
 
     public String resolveToken(HttpServletRequest request){
@@ -145,6 +165,10 @@ public class JwtTokenProvider {
 
     public String getUserAgentByRefresh(String refreshToken){
         return Jwts.parser().setSigningKey(refreshSecretKey).build().parseSignedClaims(refreshToken).getPayload().get("user-agent").toString();
+    }
+
+    public String getRefreshMemberId(String token){
+        return Jwts.parser().setSigningKey(refreshSecretKey).build().parseSignedClaims(token).getPayload().get("member-id").toString();
     }
 
     public String resolveRefreshToken(HttpServletRequest request){

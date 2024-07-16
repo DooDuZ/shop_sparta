@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 public class CartRedisRepository {
     private final RedisTemplate<String, Object> redisTemplate;
     private final String prefix = "cart-code : ";
-    private final Integer timeToLive = 60 * 24;
+    private final Integer timeToLive = 60 * 24 * 15;
 
     public void saveWithDuration(Long key, Long productId, Long amount) {
         Duration timeout = Duration.ofMinutes(timeToLive);
