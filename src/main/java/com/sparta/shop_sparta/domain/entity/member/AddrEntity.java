@@ -20,7 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddrEntity extends BaseEntity {
+public class AddrEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addrId;

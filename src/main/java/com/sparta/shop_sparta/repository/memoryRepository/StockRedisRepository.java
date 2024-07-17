@@ -11,11 +11,12 @@ import org.springframework.stereotype.Repository;
 public class StockRedisRepository implements RedisRepository<String, Object> {
     private final String prefix = "stock : ";
     private final RedisTemplate<String, Object> redisTemplate;
-    private final Duration timeout = Duration.ofMinutes(10);
+    private final Duration timeout = Duration.ofMinutes(20);
 
     @Override
     public void saveWithDuration(String key, Object value) {
         redisTemplate.opsForValue().set(addPrefix(key), value, timeout);
+        redisTemplate.expire(addPrefix(key), timeout);
     }
 
     @Override

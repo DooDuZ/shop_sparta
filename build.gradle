@@ -51,6 +51,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     //implementation 'org.redisson:redisson:3.32.0'
 
+    // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.3.0'
+
     // batch 서버 분리
     // implementation 'org.springframework.boot:spring-boot-starter-batch'
     // testImplementation 'org.springframework.batch:spring-batch-test'
