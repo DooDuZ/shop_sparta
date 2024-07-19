@@ -32,9 +32,13 @@ public class SellerProductService extends ProductService {
     private final CategoryRepository categoryRepository;
 
     @Autowired
-    public SellerProductService(ProductImageService productImageService, ProductRepository productRepository,
-                                StockService stockService, CategoryRepository categoryRepository,
-                                ReservationService reservationService) {
+    public SellerProductService(
+            ProductImageService productImageService,
+            ProductRepository productRepository,
+            StockService stockService,
+            CategoryRepository categoryRepository,
+            ReservationService reservationService
+    ) {
         super(productImageService, productRepository, stockService, reservationService);
         this.categoryRepository = categoryRepository;
     }

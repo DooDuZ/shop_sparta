@@ -20,7 +20,7 @@ public class ProductImageDto {
     private Byte imageOrdering;
     private Long productId;
     private ProductImageType productImageType;
-    private String EncodedImageByBase64;
+    private String imageData;
 
     public ProductImageEntity toEntity(){
         return ProductImageEntity.builder().productImageId(this.productImageId).imagePath(this.imagePath).imageOrdering(this.imageOrdering)

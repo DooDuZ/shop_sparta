@@ -60,6 +60,9 @@ public class ProductEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long imageVersion;
+
     public ProductDto toDto() {
         return ProductDto.builder().productId(this.productId).categoryId(this.categoryEntity.getCategoryId())
                 .productDetail(this.productDetail).productStatus(this.productStatus).productName(this.productName)
@@ -70,6 +73,7 @@ public class ProductEntity extends BaseEntity {
         setProductStatus(ProductStatus.NOT_PUBLISHED);
         setCategoryEntity(categoryEntity);
         setSellerEntity(sellerEntity);
+        setImageVersion(1L);
     }
 
     public void update(ProductRequestDto productRequestDto) {
@@ -77,5 +81,9 @@ public class ProductEntity extends BaseEntity {
         setProductName(productRequestDto.getProductName());
         setProductStatus(ProductStatus.of(productRequestDto.getProductStatus()));
         setPrice(productRequestDto.getPrice());
+    }
+
+    public void updateVersion() {
+        this.imageVersion++;
     }
 }

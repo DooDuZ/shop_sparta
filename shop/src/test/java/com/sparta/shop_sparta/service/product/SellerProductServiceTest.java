@@ -37,7 +37,7 @@ public class SellerProductServiceTest {
     @InjectMocks
     private SellerProductService sellerProductService;
     @Mock
-    private ProductImageService productImageService;
+    private LocalStorageImageService localStorageImageService;
     @Mock
     private ProductRepository productRepository;
     @Mock
@@ -79,7 +79,7 @@ public class SellerProductServiceTest {
                     .build();
             when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
             when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
-            doNothing().when(productImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
+            doNothing().when(localStorageImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
             // when
             ProductDto productDto = sellerProductService.createProduct(memberEntity, productRequestDto);
@@ -107,7 +107,7 @@ public class SellerProductServiceTest {
             // given
             when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
             when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
-            doThrow(new RuntimeException()).when(productImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
+            doThrow(new RuntimeException()).when(localStorageImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
             // when
             assertThatThrownBy(

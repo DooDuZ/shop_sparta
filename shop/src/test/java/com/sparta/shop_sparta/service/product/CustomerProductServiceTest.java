@@ -37,7 +37,7 @@ public class CustomerProductServiceTest {
     @InjectMocks
     private CustomerProductService customerProductService;
     @Mock
-    private ProductImageService productImageService;
+    private LocalStorageImageService localStorageImageService;
     @Mock
     private ProductRepository productRepository;
     @Mock
@@ -89,7 +89,7 @@ public class CustomerProductServiceTest {
         @DisplayName("이미지 생성에 실패하면 Exception이 발생합니다.")
         void getProductFailTest(){
             // given
-            when(productImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
+            when(localStorageImageService.getProductImages(any())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
 
             // when then
             assertThatThrownBy(
@@ -109,7 +109,7 @@ public class CustomerProductServiceTest {
                     .imagePath("어딘가!").imageOrdering((byte) 1).build());
 
             when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
-            when(productImageService.getProductByPage(anyList())).thenReturn(new ArrayList<>());
+            when(localStorageImageService.getProductByPage(anyList())).thenReturn(new ArrayList<>());
             //when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
             // when
@@ -117,14 +117,14 @@ public class CustomerProductServiceTest {
 
             // then
             verify(productRepository).findAll(any(Pageable.class));
-            verify(productImageService).getProductByPage(anyList());
+            verify(localStorageImageService).getProductByPage(anyList());
         }
 
         @Test
         @DisplayName("이미 로드에 실패하면 Exception이 발생합니다.")
         void getAllProductsFailTest(){
             // given
-            when(productImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
+            when(localStorageImageService.getProductByPage(anyList())).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
             when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
 
             // when then

@@ -57,6 +57,9 @@ public class ProductEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ProductStatus productStatus;
 
+    @Column(nullable = false, columnDefinition = "BIGINT UNSIGNED")
+    private Long imageVersion;
+
     public void init(CategoryEntity categoryEntity, MemberEntity sellerEntity) {
         setProductStatus(ProductStatus.NOT_PUBLISHED);
         setCategoryEntity(categoryEntity);

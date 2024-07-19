@@ -1,6 +1,14 @@
+server:
+  port: ${SERVER_PORT}
+
 spring:
   config:
     import: optional:file:.env[.properties]
+
+  servlet:
+    multipart:
+      max-request-size: 30MB
+      max-file-size: 30MB
 
   batch:
     jdbc:
@@ -9,7 +17,6 @@ spring:
   data:
     redis:
       host: ${REDIS_HOST}
-      #host: redis
       port: ${REDIS_PORT}
       repositories:
         enabled: false
@@ -53,8 +60,13 @@ logging:
   level:
     root: INFO
 
-
-server:
-  port: ${SERVER_PORT}
-  #port: 8080
-
+# S3
+cloud:
+  aws:
+    credentials:
+      accessKey: ${S3_ACCESS_KEY}
+      secretKey: ${S3_SECRET_KEY}
+    s3:
+      bucket: ${S3_BUCKET}
+    stack.auto: false
+    region.static: ${S3_REGION}

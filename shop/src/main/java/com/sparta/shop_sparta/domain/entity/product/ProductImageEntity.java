@@ -42,6 +42,9 @@ public class ProductImageEntity {
     @JoinColumn(name = "productId")
     private ProductEntity productEntity;
 
+    @Column(nullable = false)
+    private Long imageVersion;
+
     public void setProductImageType(ProductImageType productImageType) {
         this.productImageType = productImageType;
     }

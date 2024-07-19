@@ -14,6 +14,7 @@ public enum ProductMessage {
     FAIL_TO_CONNECT("요청 과부하 발생", HttpStatus.INTERNAL_SERVER_ERROR),
     NOT_ON_SALE("판매 중인 상품이 아닙니다.", HttpStatus.BAD_REQUEST),
     INVALID_RESERVATION("예약 정보가 없습니다.", HttpStatus.BAD_REQUEST),
+    FAIL_S3_UPLOAD("S3 업로드 실패", HttpStatus.INTERNAL_SERVER_ERROR),
     ;
 
     private final String message;
