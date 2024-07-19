@@ -2,32 +2,58 @@
 
 
 ## 프로잭트 개요
+
+---
+
 ### 원하는 물품을 구매하고 판매하는 e-commerce
 ```
 예약 구매/판매를 위한 API를 제공합니다.
-회원은 상품을 등록하고 대기/ 판매 / 판매 중단 등 여러 상태를 예약할 수 있습니다.
+회원은 상품을 등록하고 대기 / 판매 / 판매 중단 등 여러 상태를 예약할 수 있습니다.
 구매자는 원하는 상품을 wish list에 등록하거나 장바구니에 추가하고 주문할 수 있습니다.
 ```
+## 개발 환경
 
-### 기술 스택
-<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=Spring%20Boot&logoColor=white"><br/>
-<img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"><br/>
-<img src="https://img.shields.io/badge/Spring%20Batch-6DB33F?style=for-the-badge&logo=Spring&logoColor=white"><br/>
-<img src="https://img.shields.io/badge/JPA/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white"><br/>
-<img src="https://img.shields.io/badge/Mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"><br/>
+---
+
+* **JDK** : Amazon Corretto 21.0.3
+* **Framework** : Spring Boot 3.3.0
+  * Spring Security
+  * Spring Data JPA
+  * Spring Batch
+* **Database** : 
+  * **RDBMS** : Mysql 9.0.0
+  * **Cache** : Storage : Redis 7.2.5
+* **ETC** : AWS S3, Docker
+
+
+<img src="https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=Spring%20Boot&logoColor=white">
+<img src="https://img.shields.io/badge/Spring%20Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white">
+<img src="https://img.shields.io/badge/Spring%20Batch-6DB33F?style=for-the-badge&logo=Spring&logoColor=white">
+<img src="https://img.shields.io/badge/JPA/Hibernate-59666C?style=for-the-badge&logo=hibernate&logoColor=white">
+<img src="https://img.shields.io/badge/Mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
 <img src="https://img.shields.io/badge/redis-ff4438?style=for-the-badge&logo=redis&logoColor=white"><br/>
-<img src="https://img.shields.io/badge/docker-2496ed?style=for-the-badge&logo=docker&logoColor=white"><br/>
+<img src="https://img.shields.io/badge/docker-2496ed?style=for-the-badge&logo=docker&logoColor=white">
 <img src="https://img.shields.io/badge/AWS%20S3-ff9900?style=for-the-badge&logo=amazons3&logoColor=white"><br/>
 
-### Architecture
+
+## Architecture
+
+---
+
 ![architect-screenshot]
 
-### ERD diagram
+## ERD diagram
+
+---
+
 ![erd-diagram]
 
 
 <!-- GETTING STARTED -->
 ## Getting Started
+
+---
+
 이 프로젝트를 시작하려면 아래의 단계들을 따르세요.
 
 ### 필수 요소
@@ -57,32 +83,61 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
   
   docker compose up -d
   ```
-<!--
-** 멀티 모듈 통합 후 한 번에 실행 적용 예정
-* batch 프로젝트를 클론합니다.
-  ```bash
-  git clone https://github.com/DooDuZ/shop_batch.git
-  ```
-* clone한 디렉토리로 이동하여 docker compose를 실행합니다
-  ```bash
-  cd shop_batch
-  
-  docker compose up -d
-  ```
--->
-
 
 <!-- USAGE EXAMPLES -->
 ## API 명세
+
+---
+
+* 추가 예정
+<!--
 * 회원
 * 상품
 * 장바구니
 * 주문
+-->
+
+## 주요 기능
+
+---
+### 회원
+* EMAIL 인증(SMTP)
+* JWT 인증 / 인가 (Access / Refresh)
+* 회원 정보 암호화
+* 마이 페이지
+  * 정보 조회
+  * 주소 관리
+  * 개인 정보 변경
+
+### 상품
+* 상품 상태 예약
+  * 상품 공개
+  * 판매 오픈
+  * 판매 중단/종료
+* S3 연동 이미지 관리
+
+### 주문
+* 장바구니 기능
+* 주문 상태 조회
+* 주문 시간 별 발송 / 반품
+* 주문 속도 향상
+  * 캐시 스토리지를 통한 주문
+  * 캐싱-DB 동기화 비동기 처리
+
+
+## 트러블 슈팅
+
+---
+* 상세 내용 추가 예정
+* 트래픽 부하 - 주문 응답 속도 개선
+* 동시성 이슈
+  * 재고 불일치
+
 
 <!-- CONTACT -->
 ## Contact
 
-신지웅 - [@your_twitter](https://twitter.com/your_username) - email@example.com
+신지웅 - sin9158@naver.com
 
 Project Link: [https://github.com/DooDuZ/shop_sparta](https://github.com/DooDuZ/shop_sparta)
 
