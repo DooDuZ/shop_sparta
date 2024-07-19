@@ -22,7 +22,7 @@
   * Spring Batch
 * **Database** : 
   * **RDBMS** : Mysql 9.0.0
-  * **Cache** : Storage : Redis 7.2.5
+  * **Cache Storage** : Redis 7.2.5
 * **ETC** : AWS S3, Docker
 
 
