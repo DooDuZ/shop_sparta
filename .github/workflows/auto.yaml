@@ -17,6 +17,8 @@ jobs:
       # 해당 브랜치의 코드를 가져온다
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # 고급 빌드를 위한 buildx - 없어도 사용 가능
       - name: Set up Docker Buildx
