@@ -1,7 +1,8 @@
 package com.sparta.shop_sparta.service.cart;
 
-import com.sparta.shop_sparta.constant.product.ProductMessage;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductStatus;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDto;
@@ -10,7 +11,6 @@ import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import com.sparta.shop_sparta.service.product.StockService;

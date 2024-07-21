@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.service.member;
 
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
-import com.sparta.shop_sparta.domain.dto.member.MemberDto;
+import com.sparta.common.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;

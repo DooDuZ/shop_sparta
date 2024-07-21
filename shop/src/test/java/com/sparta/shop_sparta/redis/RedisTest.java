@@ -11,7 +11,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 @SpringBootTest
 public class RedisTest {
 
-
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
@@ -30,10 +29,10 @@ public class RedisTest {
         redisTemplate.opsForSet().add(key, "value2");
         redisTemplate.opsForSet().add(key, "PostmanRuntime/7.37.3");
 
-         Set<Object> values = redisTemplate.opsForSet().members(key);
+        Set<Object> values = redisTemplate.opsForSet().members(key);
         System.out.println(redisTemplate.opsForSet().isMember(key, "PostmanRuntime/7.37.3"));
 
-         redisTemplate.delete(key);
+        redisTemplate.delete(key);
     }
 
     @Test

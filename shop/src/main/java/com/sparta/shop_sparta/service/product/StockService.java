@@ -1,10 +1,10 @@
 package com.sparta.shop_sparta.service.product;
 
-import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.StockRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.StockRedisRepository;
 import lombok.RequiredArgsConstructor;

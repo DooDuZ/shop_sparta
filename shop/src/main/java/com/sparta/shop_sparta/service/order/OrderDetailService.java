@@ -1,12 +1,12 @@
 package com.sparta.shop_sparta.service.order;
 
-import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
+import com.sparta.common.constant.order.OrderResponseMessage;
+import com.sparta.common.exception.OrderException;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderDetailRepository;
 import com.sparta.shop_sparta.service.product.ProductService;
 import com.sparta.shop_sparta.service.product.StockService;

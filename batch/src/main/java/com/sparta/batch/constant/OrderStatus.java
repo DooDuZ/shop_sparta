@@ -1,5 +1,8 @@
 package com.sparta.batch.constant;
 
+import com.sparta.common.constant.order.OrderResponseMessage;
+import com.sparta.common.exception.OrderException;
+
 public enum OrderStatus {
     PREPARED(0),           // 상품 준비중, 배송 시작 전
     CANCELLED(1),          // 주문 취소
@@ -18,5 +21,15 @@ public enum OrderStatus {
 
     public long getStatus() {
         return this.status;
+    }
+
+    public static OrderStatus of(long status){
+        for (OrderStatus orderStatus : OrderStatus.values()) {
+            if (orderStatus.getStatus() == status) {
+                return orderStatus;
+            }
+        }
+
+        throw new OrderException(OrderResponseMessage.INVALID_ORDER_STATUS);
     }
 }

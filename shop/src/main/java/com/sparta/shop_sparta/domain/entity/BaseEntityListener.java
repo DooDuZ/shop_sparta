@@ -1,8 +1,7 @@
 package com.sparta.shop_sparta.domain.entity;
 
 
-import com.sparta.shop_sparta.constant.ServerErrorMessage;
-import jakarta.persistence.EntityManager;
+import com.sparta.common.constant.ServerErrorMessage;
 import jakarta.persistence.PreRemove;
 
 public class BaseEntityListener {

@@ -1,10 +1,10 @@
 package com.sparta.shop_sparta.service.product;
 
-import com.sparta.shop_sparta.constant.product.ProductMessage;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductStatus;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ProductRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

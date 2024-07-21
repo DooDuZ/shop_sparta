@@ -106,7 +106,7 @@ public class CustomerProductServiceTest {
 
             List<ProductImageDto> productImageEntities = new ArrayList<>();
             productImageEntities.add(ProductImageDto.builder().productImageType(ProductImageType.HEADER).productId(1L)
-                    .imagePath("어딘가!").imageOrdering((byte) 1).build());
+                    .imageData("어딘가!").imageOrdering((byte) 1).build());
 
             when(productRepository.findAll(any(Pageable.class))).thenReturn(Page.empty());
             when(localStorageImageService.getProductByPage(anyList())).thenReturn(new ArrayList<>());

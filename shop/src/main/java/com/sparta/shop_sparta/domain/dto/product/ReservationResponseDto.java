@@ -1,7 +1,6 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
-import com.sparta.shop_sparta.constant.product.ProductStatus;
-import com.sparta.shop_sparta.domain.entity.product.ReservationEntity;
+import com.sparta.common.constant.product.ProductStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

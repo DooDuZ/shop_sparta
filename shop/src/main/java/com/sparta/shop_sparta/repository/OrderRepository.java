@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.repository;
 
-import com.sparta.shop_sparta.constant.order.OrderStatus;
+import com.sparta.common.constant.order.OrderStatus;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import java.util.List;

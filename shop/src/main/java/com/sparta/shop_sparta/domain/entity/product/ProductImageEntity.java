@@ -1,9 +1,12 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
+import com.sparta.common.constant.product.ProductImageType;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
-import com.sparta.shop_sparta.constant.product.ProductImageType;
+import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +24,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductImageEntity {
+public class ProductImageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productImageId;
@@ -31,6 +34,7 @@ public class ProductImageEntity {
     private String imagePath;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductImageType productImageType;
 
     // 이미지 등록, 수정 등에서 순서를 계속 바꿀 수 있음
@@ -56,6 +60,6 @@ public class ProductImageEntity {
     public ProductImageDto toDto(){
         return ProductImageDto.builder().productImageId(this.productImageId).productImageType(this.productImageType)
                 .productId(this.productEntity.getProductId()).imageOrdering(this.imageOrdering)
-                .imagePath(this.imagePath).build();
+                .imageData(this.imagePath).build();
     }
 }

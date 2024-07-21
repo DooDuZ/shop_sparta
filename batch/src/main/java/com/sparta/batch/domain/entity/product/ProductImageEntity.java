@@ -1,7 +1,10 @@
 package com.sparta.batch.domain.entity.product;
 
+import com.sparta.batch.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,7 +25,7 @@ import com.sparta.batch.constant.ProductImageType;
 @AllArgsConstructor
 @Builder
 @Setter
-public class ProductImageEntity {
+public class ProductImageEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productImageId;
@@ -32,6 +35,7 @@ public class ProductImageEntity {
     private String imagePath;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private ProductImageType productImageType;
 
     // 이미지 등록, 수정 등에서 순서를 계속 바꿀 수 있음
@@ -42,4 +46,7 @@ public class ProductImageEntity {
     @ToString.Exclude
     @JoinColumn(name = "productId")
     private ProductEntity productEntity;
+
+    @Column(nullable = false)
+    private Long imageVersion;
 }

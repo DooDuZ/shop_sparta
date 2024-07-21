@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.member;
 
-import com.sparta.shop_sparta.constant.member.MemberRole;
+import com.sparta.common.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import jakarta.persistence.Column;
@@ -11,10 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

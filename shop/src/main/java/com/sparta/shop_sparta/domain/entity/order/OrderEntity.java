@@ -1,9 +1,9 @@
 package com.sparta.shop_sparta.domain.entity.order;
 
+import com.sparta.common.constant.order.OrderStatus;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.entity.BaseEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.constant.order.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-@Entity(name = "`order`")
+@Entity(name = "orders")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

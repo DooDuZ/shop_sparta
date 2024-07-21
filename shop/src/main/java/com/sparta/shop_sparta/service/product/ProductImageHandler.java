@@ -1,10 +1,10 @@
 package com.sparta.shop_sparta.service.product;
 
-import com.sparta.shop_sparta.constant.product.ProductImageType;
-import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductImageType;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ProductImageRepository;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;

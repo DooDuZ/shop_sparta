@@ -1,8 +1,7 @@
 package com.sparta.shop_sparta.config.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import com.sparta.common.constant.member.AuthMessage;
 import com.sparta.shop_sparta.service.member.auth.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

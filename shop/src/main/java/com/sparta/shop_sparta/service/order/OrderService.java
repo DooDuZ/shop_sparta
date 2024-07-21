@@ -1,8 +1,10 @@
 package com.sparta.shop_sparta.service.order;
 
-import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.order.OrderResponseMessage;
-import com.sparta.shop_sparta.constant.order.OrderStatus;
+import com.sparta.common.constant.member.AuthMessage;
+import com.sparta.common.constant.order.OrderResponseMessage;
+import com.sparta.common.constant.order.OrderStatus;
+import com.sparta.common.exception.AuthorizationException;
+import com.sparta.common.exception.OrderException;
 import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
@@ -10,8 +12,6 @@ import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
-import com.sparta.shop_sparta.exception.AuthorizationException;
-import com.sparta.shop_sparta.exception.OrderException;
 import com.sparta.shop_sparta.repository.OrderRepository;
 import com.sparta.shop_sparta.service.cart.CartService;
 import jakarta.transaction.Transactional;

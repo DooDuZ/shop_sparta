@@ -1,6 +1,7 @@
 package com.sparta.batch.config;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
@@ -25,17 +26,61 @@ public class SchedulerConfig {
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void performReservationJob() {
         try {
             log.info("Performing reservation Job");
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .addLocalDateTime("date", LocalDateTime.now().minus(24, ChronoUnit.HOURS))
+                    .addLong("chunkSize", 1000L)
+                    .toJobParameters();
+
+            Job job = jobRegistry.getJob("reservationJob");
+            jobLauncher.run(job, jobParameters);
+        } catch (NoSuchJobException e) {
+            // 해당 이름의 Job이 없을 경우 예외 처리
+            log.error("No such job found", e);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
+                 JobParametersInvalidException e) {
+            // Job 실행 중 발생할 수 있는 예외 처리
+            log.error("Job execution failed", e);
+        }
+    }
+
+    //@Scheduled(cron = "0 0 4 * * ?")
+    @Scheduled(cron = "0 * * * * ?")
+    public void performImageJob() {
+        try {
+            log.info("Performing Image Job");
+            JobParameters jobParameters = new JobParametersBuilder()
+                    .addLong("time", System.currentTimeMillis())
+                    .addLong("chunkSize", 1000L)
+                    .toJobParameters();
+
+            Job job = jobRegistry.getJob("imageJob");
+            jobLauncher.run(job, jobParameters);
+        } catch (NoSuchJobException e) {
+            // 해당 이름의 Job이 없을 경우 예외 처리
+            log.error("No such job found", e);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException |
+                 JobParametersInvalidException e) {
+            // Job 실행 중 발생할 수 있는 예외 처리
+            log.error("Job execution failed", e);
+        }
+    }
+
+    @Scheduled(cron = "0 * * * * ?")
+    public void performOrderJob() {
+        try {
+            log.info("Performing Order Job");
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("time", System.currentTimeMillis())
                     .addLocalDateTime("date", LocalDateTime.now())
                     .addLong("chunkSize", 1000L)
                     .toJobParameters();
 
-            Job job = jobRegistry.getJob("reservationJob");
+            Job job = jobRegistry.getJob("orderJob");
             jobLauncher.run(job, jobParameters);
         } catch (NoSuchJobException e) {
             // 해당 이름의 Job이 없을 경우 예외 처리

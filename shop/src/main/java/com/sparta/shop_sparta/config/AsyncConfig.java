@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.config;
 
-import com.sparta.shop_sparta.exception.AsyncExceptionHandler;
+import com.sparta.common.exception.AsyncExceptionHandler;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;

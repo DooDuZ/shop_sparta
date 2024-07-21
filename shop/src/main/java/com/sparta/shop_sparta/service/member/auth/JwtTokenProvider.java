@@ -1,8 +1,8 @@
 package com.sparta.shop_sparta.service.member.auth;
 
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import com.sparta.common.constant.member.MemberResponseMessage;
+import com.sparta.common.exception.MemberException;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.util.encoder.TokenUsernameEncoder;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;

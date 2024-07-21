@@ -1,13 +1,11 @@
 package com.sparta.shop_sparta.domain.dto.member;
 
 
+import com.sparta.common.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.constant.member.MemberRole;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import java.util.Collection;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 @NoArgsConstructor

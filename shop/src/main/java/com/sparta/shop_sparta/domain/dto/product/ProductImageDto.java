@@ -1,8 +1,8 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
 
+import com.sparta.common.constant.product.ProductImageType;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
-import com.sparta.shop_sparta.constant.product.ProductImageType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,14 +16,13 @@ import lombok.Setter;
 @Setter
 public class ProductImageDto {
     private Long productImageId;
-    private String imagePath;
+    private String imageData;
     private Byte imageOrdering;
     private Long productId;
     private ProductImageType productImageType;
-    private String imageData;
 
     public ProductImageEntity toEntity(){
-        return ProductImageEntity.builder().productImageId(this.productImageId).imagePath(this.imagePath).imageOrdering(this.imageOrdering)
+        return ProductImageEntity.builder().productImageId(this.productImageId).imagePath(this.imageData).imageOrdering(this.imageOrdering)
                 .productImageType(this.productImageType).build();
     }
 }

@@ -1,16 +1,16 @@
 package com.sparta.shop_sparta.service.member;
 
+import com.sparta.common.constant.member.AuthMessage;
+import com.sparta.common.constant.member.MemberResponseMessage;
+import com.sparta.common.constant.member.MemberRole;
+import com.sparta.common.exception.AuthorizationException;
+import com.sparta.common.exception.MemberException;
 import com.sparta.shop_sparta.config.PatternConfig;
-import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
-import com.sparta.shop_sparta.constant.member.MemberRole;
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberResponseDto;
 import com.sparta.shop_sparta.domain.dto.member.MemberRequestVo;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.exception.AuthorizationException;
-import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.MemberRepository;
 import com.sparta.shop_sparta.service.member.addr.AddrService;
 import com.sparta.shop_sparta.service.member.verify.MailService;

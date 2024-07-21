@@ -1,8 +1,10 @@
 package com.sparta.shop_sparta.service.product;
 
-import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.product.ProductMessage;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.common.constant.member.AuthMessage;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductStatus;
+import com.sparta.common.exception.AuthorizationException;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
@@ -13,8 +15,6 @@ import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.exception.AuthorizationException;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.CategoryRepository;
 import com.sparta.shop_sparta.repository.ProductRepository;
 import java.util.List;
@@ -99,9 +99,7 @@ public class SellerProductService extends ProductService {
 
         productEntity.update(productRequestDto);
         stockService.updateStock(productEntity, productRequestDto.getAmount());
-
-        // [Todo] 이미지 update 적용
-        // version 관리 방법 고민 후 적용
+        productImageService.updateProductImages(productEntity, productRequestDto.getProductThumbnails(), productRequestDto.getProductDetailImages());
 
         return productEntity.toDto();
     }

@@ -3,17 +3,18 @@ package com.sparta.shop_sparta.service.product;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.sparta.shop_sparta.constant.product.ProductImageType;
-import com.sparta.shop_sparta.constant.product.ProductMessage;
+import com.sparta.common.constant.product.ProductImageType;
+import com.sparta.common.constant.product.ProductMessage;
+import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.product.ProductImageDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
-import com.sparta.shop_sparta.exception.ProductException;
 import com.sparta.shop_sparta.repository.ProductImageRepository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,7 +45,7 @@ public class S3ImageService extends ProductImageHandler {
 
         try {
             for (byte i = 1; i <= images.size(); i++) {
-                String fileUrl = uploadToS3(images.get(i - 1));
+                String fileName = uploadToS3(images.get(i - 1));
 
                 productImageEntityList.add(
                         ProductImageEntity.builder()
@@ -52,7 +53,7 @@ public class S3ImageService extends ProductImageHandler {
                                 .imageVersion(productEntity.getImageVersion())
                                 .productImageType(productImageType)
                                 .imageOrdering(i)
-                                .imagePath(fileUrl).build()
+                                .imagePath(fileName).build()
                 );
             }
         } catch (AmazonS3Exception e) {
@@ -65,24 +66,31 @@ public class S3ImageService extends ProductImageHandler {
     }
 
     private String uploadToS3(MultipartFile productImage) throws IOException, AmazonS3Exception {
-        String uniqueFilename =
-                UUID.randomUUID().toString() + "_" + productImage.getOriginalFilename().replaceAll("\\s", "_");
+        String key = UUID.randomUUID().toString();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(productImage.getContentType());
         objectMetadata.setContentLength(productImage.getSize());
 
-        amazonS3Client.putObject(bucket, uniqueFilename, productImage.getInputStream(), objectMetadata);
+        amazonS3Client.putObject(bucket, key, productImage.getInputStream(), objectMetadata);
 
-        String fileUrl = amazonS3Client.getUrl(bucket, uniqueFilename).toString();
+        String url = amazonS3Client.getUrl(bucket, key).toString();
 
-        return fileUrl;
+        return url;
     }
 
     @Override
     public List<ProductImageDto> getProductImages(ProductEntity productEntity) {
-        return productImageRepository.findAllByImageVersion(productEntity.getProductId())
+        return productImageRepository.findAllByProductAndImageVersion(productEntity.getProductId())
                 .stream().map(ProductImageEntity::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<ProductImageDto> getProductByPage(List<ProductEntity> productEntities) {
+        List<Long> productIds = productEntities.stream().map(ProductEntity::getProductId).collect(Collectors.toList());
+
+        return productImageRepository.findAllByProductsAndImageVersion(productIds).stream().map(ProductImageEntity::toDto)
                 .toList();
     }
 
@@ -97,11 +105,5 @@ public class S3ImageService extends ProductImageHandler {
     @Override
     public void deleteProductImages(ProductEntity productEntity) {
 
-    }
-
-    @Override
-    public List<ProductImageDto> getProductByPage(List<ProductEntity> productEntities) {
-        return productImageRepository.findAllByProductEntityIn(productEntities).stream().map(ProductImageEntity::toDto)
-                .toList();
     }
 }

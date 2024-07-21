@@ -3,7 +3,10 @@ server:
 
 spring:
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+      - optional:file:../../.env[.properties]
 
   batch:
     jdbc:
@@ -23,3 +26,8 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
+
+logging:
+  level:
+    com.amazonaws: DEBUG
+    com.amazonaws.services.s3: DEBUG

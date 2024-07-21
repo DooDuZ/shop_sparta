@@ -1,12 +1,12 @@
 package com.sparta.shop_sparta.service.member.addr;
 
-import com.sparta.shop_sparta.constant.member.AuthMessage;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
+import com.sparta.common.constant.member.AuthMessage;
+import com.sparta.common.constant.member.MemberResponseMessage;
+import com.sparta.common.exception.AuthorizationException;
+import com.sparta.common.exception.MemberException;
 import com.sparta.shop_sparta.domain.dto.member.AddrDto;
 import com.sparta.shop_sparta.domain.entity.member.AddrEntity;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.exception.AuthorizationException;
-import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.AddrRepository;
 import com.sparta.shop_sparta.util.encoder.SaltGenerator;
 import com.sparta.shop_sparta.util.encoder.UserInformationEncoder;

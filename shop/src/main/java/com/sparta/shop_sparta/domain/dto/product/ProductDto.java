@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
+import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.constant.product.ProductStatus;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;

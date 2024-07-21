@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.entity.product;
 
-import com.sparta.shop_sparta.constant.product.ProductStatus;
+import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

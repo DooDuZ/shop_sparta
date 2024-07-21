@@ -3,16 +3,15 @@ server:
 
 spring:
   config:
-    import: optional:file:.env[.properties]
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:../.env[.properties]
+      - optional:file:../../.env[.properties]
 
   servlet:
     multipart:
       max-request-size: 30MB
       max-file-size: 30MB
-
-  batch:
-    jdbc:
-      initialize-schema: always
 
   data:
     redis:
@@ -58,7 +57,7 @@ logging:
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss} - %msg%n'
   level:
-    root: INFO
+    root: info
 
 # S3
 cloud:

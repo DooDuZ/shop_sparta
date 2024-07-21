@@ -1,9 +1,9 @@
 package com.sparta.shop_sparta.service.member.verify;
 
+import com.sparta.common.constant.member.MemberResponseMessage;
+import com.sparta.common.exception.MemberException;
 import com.sparta.shop_sparta.config.MailConfig;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
 import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.memoryRepository.SignupVerifyCodeRedisRepository;
 import jakarta.mail.internet.MimeMessage;
 import java.security.SecureRandom;

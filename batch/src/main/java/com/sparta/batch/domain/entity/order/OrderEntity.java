@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import com.sparta.batch.constant.OrderStatus;
 
-@Entity(name = "`order`")
+@Entity(name = "orders")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

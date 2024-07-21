@@ -52,6 +52,7 @@ public class SellerProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDto> updateProduct(@AuthenticationPrincipal UserDetails userDetails,
                                                     @ModelAttribute ProductRequestDto productRequestDto) {
+        System.out.println("들어옴1");
         return ResponseEntity.ok(sellerProductService.updateProduct(userDetails, productRequestDto));
     }
 

@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.domain.dto.member;
 
-import com.sparta.shop_sparta.constant.member.MemberRole;
+import com.sparta.common.constant.member.MemberRole;
 import java.util.List;
 import lombok.Getter;
 
