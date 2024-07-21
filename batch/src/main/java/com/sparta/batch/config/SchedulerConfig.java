@@ -48,8 +48,8 @@ public class SchedulerConfig {
         }
     }
 
-    //@Scheduled(cron = "0 0 4 * * ?")
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 0 4 * * ?")
+    //@Scheduled(cron = "0 * * * * ?")
     public void performImageJob() {
         try {
             log.info("Performing Image Job");
@@ -70,7 +70,7 @@ public class SchedulerConfig {
         }
     }
 
-    @Scheduled(cron = "0 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     public void performOrderJob() {
         try {
             log.info("Performing Order Job");
@@ -92,18 +92,3 @@ public class SchedulerConfig {
         }
     }
 }
-
-/*    @Scheduled(cron = "0 * * * * ?")
-    public void performReservationJob() throws Exception {
-        //log.info("Performing reservation Job");
-        //jobLauncher.run(reservationJob, new JobParametersBuilder().addLong("time", System.currentTimeMillis()).toJobParameters());
-        try {
-            log.info("Performing reservation Job");
-            JobParameters jobParameters = new JobParametersBuilder()
-                    .addLong("time", System.currentTimeMillis(), true)
-                    .toJobParameters();
-            jobLauncher.run(reservationJob, jobParameters);
-        } catch (Exception e) {
-            log.error("Error occurred while performing reservation Job", e);
-        }
-    }*/
