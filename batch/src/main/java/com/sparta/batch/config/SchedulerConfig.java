@@ -32,7 +32,7 @@ public class SchedulerConfig {
             log.info("Performing reservation Job");
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("time", System.currentTimeMillis())
-                    .addLocalDateTime("date", LocalDateTime.now().minus(24, ChronoUnit.HOURS))
+                    .addLocalDateTime("date", LocalDateTime.now())
                     .addLong("chunkSize", 1000L)
                     .toJobParameters();
 
@@ -76,7 +76,7 @@ public class SchedulerConfig {
             log.info("Performing Order Job");
             JobParameters jobParameters = new JobParametersBuilder()
                     .addLong("time", System.currentTimeMillis())
-                    .addLocalDateTime("date", LocalDateTime.now())
+                    .addLocalDateTime("date", LocalDateTime.now().minus(24, ChronoUnit.HOURS))
                     .addLong("chunkSize", 1000L)
                     .toJobParameters();
 

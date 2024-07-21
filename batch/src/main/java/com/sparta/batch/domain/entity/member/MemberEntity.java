@@ -1,5 +1,6 @@
 package com.sparta.batch.domain.entity.member;
 
+import com.sparta.common.constant.member.MemberRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import com.sparta.batch.constant.MemberRole;
 import com.sparta.batch.domain.BaseEntity;
 
 @Entity(name = "member")

@@ -1,6 +1,7 @@
 package com.sparta.batch.domain.entity.product;
 
 import com.sparta.batch.domain.BaseEntity;
+import com.sparta.common.constant.product.ProductImageType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import com.sparta.batch.constant.ProductImageType;
 
 @Entity(name = "productImage")
 @Getter

@@ -2,6 +2,7 @@ package com.sparta.batch.image.processor;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.sparta.batch.domain.entity.product.ProductImageEntity;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemProcessor;
@@ -30,6 +31,7 @@ public class ImageProcessor implements ItemProcessor<ProductImageEntity, Product
             String key =  path.startsWith("/") ? path.substring(1) : path;*/
 
             amazonS3Client.deleteObject(bucket, key);
+            productImageEntity.setLastModifyDate(LocalDateTime.now());
             productImageEntity.setDelete(true);
             log.info("Deleted S3 object: {}", url);
         } catch (Exception e) {

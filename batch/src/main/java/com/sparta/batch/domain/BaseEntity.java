@@ -27,4 +27,8 @@ public abstract class BaseEntity {
     public void setDelete(Boolean isDelete) {
         this.isDeleted = isDelete;
     }
+
+    public void setLastModifyDate(LocalDateTime lastModifyDate) {
+        this.lastModifyDate = lastModifyDate;
+    }
 }

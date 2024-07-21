@@ -1,5 +1,6 @@
 package com.sparta.batch.domain.entity.product;
 
+import com.sparta.common.constant.product.ProductStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,7 +18,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import com.sparta.batch.constant.ProductStatus;
 
 @Entity(name = "reservation")
 @Getter

@@ -2,6 +2,7 @@ package com.sparta.batch.domain.entity.order;
 
 import com.sparta.batch.domain.BaseEntity;
 import com.sparta.batch.domain.entity.member.MemberEntity;
+import com.sparta.common.constant.order.OrderStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import com.sparta.batch.constant.OrderStatus;
 
 @Entity(name = "orders")
 @Getter

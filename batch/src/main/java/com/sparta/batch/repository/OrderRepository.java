@@ -1,9 +1,9 @@
 package com.sparta.batch.repository;
 
 
-import com.sparta.batch.constant.OrderStatus;
 import com.sparta.batch.domain.entity.member.MemberEntity;
 import com.sparta.batch.domain.entity.order.OrderEntity;
+import com.sparta.common.constant.order.OrderStatus;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

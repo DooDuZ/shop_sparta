@@ -1,7 +1,7 @@
 package com.sparta.batch.repository;
 
-import com.sparta.batch.constant.ProductStatus;
 import com.sparta.batch.domain.entity.product.ProductEntity;
+import com.sparta.common.constant.product.ProductStatus;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

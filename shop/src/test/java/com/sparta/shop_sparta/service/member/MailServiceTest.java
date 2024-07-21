@@ -3,9 +3,9 @@ package com.sparta.shop_sparta.service.member;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.sparta.common.constant.member.MemberResponseMessage;
+import com.sparta.common.exception.MemberException;
 import com.sparta.shop_sparta.config.MailConfig;
-import com.sparta.shop_sparta.constant.member.MemberResponseMessage;
-import com.sparta.shop_sparta.exception.MemberException;
 import com.sparta.shop_sparta.repository.memoryRepository.SignupVerifyCodeRedisRepository;
 import com.sparta.shop_sparta.service.member.verify.MailService;
 import org.junit.jupiter.api.DisplayName;
