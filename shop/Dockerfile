@@ -9,5 +9,5 @@ FROM amazoncorretto:21
 WORKDIR /app
 COPY . .
 RUN chmod +x ./gradlew
-RUN ./gradlew :shop:build -x test
+RUN ./gradlew :shop:build
 CMD ["java", "-jar", "/app/shop/build/libs/shop-0.0.1-SNAPSHOT.jar"]
