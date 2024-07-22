@@ -66,9 +66,23 @@ jobs:
           S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
           S3_REGION: ${{secrets.S3_REGION}}
 
-      # compose up
-      - name: Run Docker Compose build and test
+      # compose-up
+      - name: Build and run Docker containers
+        run: docker-compose up -d
+
+      # 대기 처리
+      - name: Wait for services to be ready
         run: |
-          docker-compose up --build -d
           docker-compose ps
-          docker-compose down
+          sleep 30  # 서비스가 완전히 시작될 때까지 대기
+
+      # Test 실행
+      - name: Run tests
+        run: |
+          docker-compose exec -T shop ./gradlew :shop:test
+          docker-compose exec -T batch ./gradlew :batch:test
+
+      # 컨테이너 종료
+      - name: Stop and remove containers
+        run: docker-compose down
+        if: always()
