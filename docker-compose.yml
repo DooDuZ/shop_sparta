@@ -22,11 +22,11 @@ services:
     networks:
       - mynetwork
 
-  spring-app:
+  shop:
     build:
-      context: ./shop
-      dockerfile: Dockerfile
-    container_name: spring-container
+      context: .
+      dockerfile: shop/Dockerfile
+    container_name: shop
     ports:
       - "8080:8080"
     env_file:
@@ -44,11 +44,11 @@ services:
     networks:
       - mynetwork
 
-  batch-app:
+  batch:
     build:
-      context: ./batch
-      dockerfile: Dockerfile
-    container_name: batch-container
+      context: .
+      dockerfile: batch/Dockerfile
+    container_name: batch
     ports:
       - "8081:8081"
     env_file:

@@ -201,18 +201,6 @@ public class OrderService {
         return orderEntity;
     }
 
-    //@Scheduled(fixedDelay = 60000)
-    // 테스트 - 5분마다 상태 변경
-    // Todo 배치 서버로 옮길 것
-    @Transactional
-    @Scheduled(cron = "0 0 0 * * ?")
-    protected void updateOrderStatus() {
-        updateOrderStatus(OrderStatus.IN_DELIVERY, OrderStatus.DELIVERED);
-        updateOrderStatus(OrderStatus.PREPARED, OrderStatus.IN_DELIVERY);
-        updateOrderStatus(OrderStatus.IN_RETURN, OrderStatus.RETURN_COMPLETED);
-        updateOrderStatus(OrderStatus.RETURN_REQUESTED, OrderStatus.IN_RETURN);
-    }
-
     private void updateOrderStatus(OrderStatus prevStatus, OrderStatus nextStatus) {
         List<OrderEntity> orderEntities = orderRepository.findByOrderStatus(prevStatus);
         for (OrderEntity orderEntity : orderEntities) {

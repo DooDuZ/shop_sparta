@@ -13,6 +13,15 @@ java {
     }
 }
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+// 왜..?
+tasks.register("prepareKotlinBuildScriptModel"){}
+
 repositories {
     mavenCentral()
 }
@@ -33,3 +42,5 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar.enabled = false
