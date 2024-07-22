@@ -31,14 +31,9 @@ public class OrderDetailService {
         // 저장 실패시 어짜피 transaction rollback 된다
         for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
             Long productId = orderDetailRequestDto.getProductId();
-            if (!stockService.isCached(productId)){
-                StockEntity stockEntity = stockService.getStockByProductId(orderDetailRequestDto.getProductId());
-                if (stockEntity.getAmount() > 0){
-                    stockService.redisCache(productId);
-                }else{
-                    throw new OrderException(OrderResponseMessage.OUT_OF_STOCK);
-                }
-            }
+
+            // cache miss 시 캐싱
+            checkCache(productId);
 
             Long stock = stockService.getStockInRedis(productId);
             Long amount = orderDetailRequestDto.getAmount();
@@ -59,6 +54,17 @@ public class OrderDetailService {
         }
 
         return orderDetailEntities;
+    }
+
+    private void checkCache(Long productId) {
+        if (!stockService.isCached(productId)){
+            StockEntity stockEntity = stockService.getStockByProductId(productId);
+            if (stockEntity.getAmount() > 0){
+                stockService.redisCache(productId);
+            }else{
+                throw new OrderException(OrderResponseMessage.OUT_OF_STOCK);
+            }
+        }
     }
 
     @Async
