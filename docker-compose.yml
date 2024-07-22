@@ -13,6 +13,10 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - mynetwork
+    #healthcheck:
+      #test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      #timeout: 5s
+      #retries: 10
 
   redis:
     image: redis:latest
@@ -21,29 +25,56 @@ services:
       - "6379:6379"
     networks:
       - mynetwork
+    #healthcheck:
+      #test: ["CMD", "redis-cli", "ping"]
+      #interval: 5s
+      #timeout: 3s
+      #retries: 5
 
-  spring-app:
+  shop:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: spring-container
+      dockerfile: shop/Dockerfile
+    container_name: shop
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/shop
       SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+      SERVER_PORT: ${SERVER_PORT}
     depends_on:
       - mysql-db
       - redis
     networks:
       - mynetwork
+    #command: ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "/app/shop/build/libs/shop-0.0.1-SNAPSHOT.jar"]
+
+  batch:
+    build:
+      context: .
+      dockerfile: batch/Dockerfile
+    container_name: batch
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/shop
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+    depends_on:
+      - mysql-db
+    networks:
+      - mynetwork
+    #command: ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "/app/batch/build/libs/batch-0.0.1-SNAPSHOT.jar"]
 
 volumes:
   mysql-data:
-
 
 networks:
   mynetwork:

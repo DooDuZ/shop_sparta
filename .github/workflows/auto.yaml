@@ -37,9 +37,13 @@ jobs:
           echo "DATASOURCE_URL=$DATASOURCE_URL" >> .env
           echo "REDIS_HOST=$REDIS_HOST" >> .env
           echo "REDIS_PORT=$REDIS_PORT" >> .env
-          echo "JWT_ACCESS_SECRET=JWT_ACCESS_SECRET" >> .env
-          echo "JWT_REFRESH_SECRET=JWT_REFRESH_SECRET" >> .env
-          echo "TOKEN_USERNAME_SECRET=TOKEN_USERNAME_SECRET" >> .env
+          echo "JWT_ACCESS_SECRET=$JWT_ACCESS_SECRET" >> .env
+          echo "JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET" >> .env
+          echo "TOKEN_USERNAME_SECRET=$TOKEN_USERNAME_SECRET" >> .env
+          echo "S3_BUCKET=$S3_BUCKET" >> .env
+          echo "S3_ACCESS_KEY=$S3_ACCESS_KEY" >> .env
+          echo "S3_SECRET_KEY=$S3_SECRET_KEY" >> .env
+          echo "S3_REGION=$S3_REGION" >> .env
 
         env:
           REQUEST_URL: ${{ secrets.REQUEST_URL }}
@@ -57,8 +61,16 @@ jobs:
           JWT_ACCESS_SECRET: ${{ secrets.JWT_ACCESS_SECRET }}
           JWT_REFRESH_SECRET: ${{ secrets.JWT_REFRESH_SECRET }}
           TOKEN_USERNAME_SECRET: ${{ secrets.TOKEN_USERNAME_SECRET }}
+          S3_BUCKET: ${{secrets.S3_BUCKET}}
+          S3_ACCESS_KEY: ${{secrets.S3_ACCESS_KEY}}
+          S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
+          S3_REGION: ${{secrets.S3_REGION}}
 
-      # unittest 실행
-      - name: Run tests in Docker container
-        working-directory: ${{ github.workspace }}
-        run: docker-compose run --rm spring-app ./gradlew clean test
+      # compose-up
+      - name: Build and run Docker containers
+        run: docker-compose up -d
+
+      # 컨테이너 종료
+      - name: Stop and remove containers
+        run: docker-compose down
+        if: always()
