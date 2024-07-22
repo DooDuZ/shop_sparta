@@ -152,7 +152,7 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ---
 * ***상세 내용 추가 예정***
-* 주문 응답 시간 개선
+* [주문 응답 시간 개선](https://dooduz.tistory.com/19)
     * 레디스 캐싱 적용
     * DB동기화 쿼리 비동기 처리
 * Batch 서버 분리
@@ -170,9 +170,9 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 <!-- CONTACT -->
 ## Contact
 
-신지웅 - sin9158@naver.com
-
-Project Link: [https://github.com/DooDuZ/shop_sparta](https://github.com/DooDuZ/shop_sparta)
+**Email** : sin9158@naver.com  
+**GitHub**: [Shop Sparta](https://github.com/DooDuZ/shop_sparta)  
+**Blog**: [DooDuZ Tistory](https://dooduz.tistory.com/)
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
