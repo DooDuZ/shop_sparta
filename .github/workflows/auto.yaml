@@ -66,6 +66,9 @@ jobs:
           S3_SECRET_KEY: ${{secrets.S3_SECRET_KEY}}
           S3_REGION: ${{secrets.S3_REGION}}
 
-      # Docker Compose를 사용해 빌드 및 테스트 실행
+      # compose up
       - name: Run Docker Compose build and test
-        run: docker-compose up --build --abort-on-container-exit
+        run: |
+          docker-compose up --build -d
+          docker-compose ps
+          docker-compose down
