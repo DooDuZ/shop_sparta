@@ -3,6 +3,7 @@ package com.sparta.shop_sparta.domain.dto.product;
 
 import com.sparta.common.constant.product.ProductImageType;
 import com.sparta.shop_sparta.domain.entity.product.ProductImageEntity;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Setter
-public class ProductImageDto {
+public class ProductImageDto implements Serializable {
     private Long productImageId;
     private String imageData;
     private Byte imageOrdering;

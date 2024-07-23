@@ -8,6 +8,9 @@ import com.sparta.shop_sparta.domain.entity.product.StockEntity;
 import com.sparta.shop_sparta.repository.StockRepository;
 import com.sparta.shop_sparta.repository.memoryRepository.StockRedisRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +20,8 @@ import org.redisson.api.RLock;*/
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StockService {
-
     private final StockRepository stockRepository;
     private final StockRedisRepository stockRedisRepository;
     //private final RedissonClient redissonClient;
@@ -75,8 +78,9 @@ public class StockService {
 
     @Async
     @Transactional
-    public void updateStockAfterOrder(Long stockId, Long amount){
-        stockRepository.updateStockAfterOrder(stockId, amount);
+    public void updateStockAfterOrder(Long productId, Long amount){
+        StockEntity stockEntity = getStockByProductId(productId);
+        stockRepository.updateStockAfterOrder(stockEntity.getProductEntity().getProductId(), amount);
     }
 
     public void redisCache(Long productId) {
@@ -134,7 +138,6 @@ public class StockService {
 
     @Async
     public void repairStock(OrderDetailEntity orderDetailEntity) {
-        StockEntity stockEntity = getStockEntity(orderDetailEntity.getProductEntity());
-        stockRepository.updateStockAfterOrder(stockEntity.getStockId(), -orderDetailEntity.getAmount());
+        stockRepository.updateStockAfterOrder(orderDetailEntity.getProductEntity().getProductId(), -orderDetailEntity.getAmount());
     }
 }

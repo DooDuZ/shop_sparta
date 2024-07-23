@@ -19,6 +19,6 @@ public interface StockRepository extends JpaRepository<StockEntity, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE `stock` SET amount = amount - :amount WHERE stock_id = :stockId", nativeQuery = true)
-    void updateStockAfterOrder(@Param("stockId") Long stockId, @Param("amount") Long amount);
+    @Query(value = "UPDATE `stock` SET amount = amount - :amount WHERE product_id = :productId", nativeQuery = true)
+    void updateStockAfterOrder(@Param("productId") Long productId, @Param("amount") Long amount);
 }

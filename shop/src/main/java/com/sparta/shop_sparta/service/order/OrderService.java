@@ -5,7 +5,7 @@ import com.sparta.common.constant.order.OrderResponseMessage;
 import com.sparta.common.constant.order.OrderStatus;
 import com.sparta.common.exception.AuthorizationException;
 import com.sparta.common.exception.OrderException;
-import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderRequestDto;
 import com.sparta.shop_sparta.domain.dto.order.OrderResponseDto;
@@ -14,6 +14,7 @@ import com.sparta.shop_sparta.domain.entity.order.OrderDetailEntity;
 import com.sparta.shop_sparta.domain.entity.order.OrderEntity;
 import com.sparta.shop_sparta.repository.OrderRepository;
 import com.sparta.shop_sparta.service.cart.CartService;
+import com.sparta.shop_sparta.service.product.ProductService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -24,8 +25,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -33,31 +35,23 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final OrderRepository orderRepository;
     private final OrderDetailService orderDetailService;
     private final PaymentService paymentService;
     private final CartService cartService;
+    private final ProductService productService;
 
     @Transactional
     public void createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
-        OrderEntity orderEntity = orderRequestDto.toEntity();
-        orderEntity.setMemberEntity(memberEntity);
-        // 첫 주문은 항상 배송 준비 상태
-        orderEntity.setOrderStatus(OrderStatus.PREPARED);
-        // 저장하고
-        orderRepository.save(orderEntity);
+        OrderEntity orderEntity = saveAndInitOrderEntity(memberEntity, orderRequestDto);
 
         orderRequestDto.setOrderId(orderEntity.getOrderId());
 
-        // 장바구니에 있는 상품만 결제 하도록 처리 -> 정책임!!
+        // 주문 처리
         List<OrderDetailRequestDto> requestOrderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
-
-        // orderDetail 정보 처리
         List<OrderDetailEntity> orderDetailEntities = orderDetailService.addOrder(orderEntity, requestOrderDetails);
-
-        // 비동기 저장 처리 - 결제 실패시 Exception 발생
-        orderDetailService.orderDetailSaveAll(orderDetailEntities);
 
         // 가격 입력
         orderEntity.setTotalPrice(getTotalPrice(orderDetailEntities));
@@ -69,13 +63,27 @@ public class OrderService {
             throw new OrderException(OrderResponseMessage.FAIL_PAYMENT);
         }
 
+        // 비동기 저장 처리
+        orderDetailService.orderDetailSaveAll(orderDetailEntities);
+
+        // 결제 성공한 데이터는 장바구니에서 제거
+        cartService.removeOrderedProduct(memberEntity, requestOrderDetails);
+
         // 결제된 주문 정보 반환을 위해 생성
         /*OrderResponseDto orderResponseDto = orderEntity.toDto();
         orderResponseDto.setOrderDetails(orderDetailDtoList);*/
+    }
 
-        // 결제 성공한 데이터는 장바구니에서 제거
-        // Todo - 원상 복구 대상
-        // cartService.removeOrderedProduct(memberEntity, orderDetailDtoList);
+    private OrderEntity saveAndInitOrderEntity(MemberEntity memberEntity, OrderRequestDto orderRequestDto){
+        OrderEntity orderEntity = orderRequestDto.toEntity();
+
+        log.info(memberEntity.toString());
+
+        // 첫 주문은 항상 배송 준비 상태
+        orderEntity.setMemberEntity(memberEntity);
+        orderEntity.setOrderStatus(OrderStatus.PREPARED);
+        // 저장하고
+        return orderRepository.save(orderEntity);
     }
 
     private Long getTotalPrice(List<OrderDetailEntity> orderDetails) {
@@ -101,21 +109,9 @@ public class OrderService {
 
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
             // Todo 복구 대상
-            /*
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
-                throw new OrderException(OrderResponseMessage.INVALID_REQUEST.getMessage());
-            }
-             */
-
-            if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() < 0) {
                 throw new OrderException(OrderResponseMessage.INVALID_REQUEST);
             }
-
-            // Todo 테스트용 코드 - 삭제 대상
-            // 수량 완전 일치 시에만 주문 가능. 주문 완료 후 장바구니에서 상품 삭제 예정
-
-            Long amount = cartInfo.get(productId) - orderDetailDto.getAmount();
-            cartService.updateCartDetail(memberEntity, new CartRequestDto(amount, productId));
 
             orderDetails.add(orderDetailDto);
         }
@@ -181,7 +177,9 @@ public class OrderService {
         );
 
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
-            orderInfo.get(orderDetailEntity.getOrderEntity().getOrderId()).getOrderDetails().add(orderDetailEntity.toDto());
+            OrderDetailDto orderDetailDto = orderDetailEntity.toDto();
+            orderDetailDto.setProductDto(productService.getProductDto(orderDetailEntity.getProductEntity()));
+            orderInfo.get(orderDetailEntity.getOrderEntity().getOrderId()).getOrderDetails().add(orderDetailDto);
         }
 
         return orderInfo.values().stream()
