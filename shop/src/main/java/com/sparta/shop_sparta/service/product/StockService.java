@@ -79,8 +79,7 @@ public class StockService {
     @Async
     @Transactional
     public void updateStockAfterOrder(Long productId, Long amount){
-        StockEntity stockEntity = getStockByProductId(productId);
-        stockRepository.updateStockAfterOrder(stockEntity.getProductEntity().getProductId(), amount);
+        stockRepository.updateStockAfterOrder(productId, amount);
     }
 
     public void redisCache(Long productId) {
