@@ -42,6 +42,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     private void decryptMemberEntity(MemberEntity memberEntity) {
+        // test 데이터용 처리
+        if (!memberEntity.getEmail().contains("-")){
+            return;
+        }
         memberEntity.setEmail(userInformationEncoder.decrypt(memberEntity.getEmail()));
         memberEntity.setPhoneNumber(userInformationEncoder.decrypt(memberEntity.getPhoneNumber()));
         memberEntity.setMemberName(userInformationEncoder.decrypt(memberEntity.getMemberName()));

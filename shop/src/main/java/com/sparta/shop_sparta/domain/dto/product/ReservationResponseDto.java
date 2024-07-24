@@ -1,6 +1,7 @@
 package com.sparta.shop_sparta.domain.dto.product;
 
 import com.sparta.common.constant.product.ProductStatus;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +16,7 @@ import lombok.ToString;
 @Builder
 @ToString
 @Setter
-public class ReservationResponseDto {
+public class ReservationResponseDto implements Serializable {
     private Long reservationId;
     private Long productId;
     private LocalDateTime reservationTime;

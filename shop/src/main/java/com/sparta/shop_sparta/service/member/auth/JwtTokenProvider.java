@@ -40,7 +40,7 @@ public class JwtTokenProvider {
     @Value("${JWT_REFRESH_SECRET}")
     private String refreshSecretKey;
     // 유효기간 15분
-    private final long accessTokenValidMillisecond = 1000L * 60 * 15;
+    private final long accessTokenValidMillisecond = 1000L * 60 * 30;
 
     private final long refreshTokenValidMillisecond = 1000L * 60 * 60 * 24 * 7;
     private final String prefix = "Bearer ";

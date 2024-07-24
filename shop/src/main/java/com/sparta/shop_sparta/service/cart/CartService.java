@@ -6,7 +6,7 @@ import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartDto;
-import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
+import com.sparta.shop_sparta.domain.dto.order.OrderDetailRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
@@ -120,12 +120,11 @@ public class CartService {
     }
 
     @Transactional
-    public void removeOrderedProduct(MemberEntity memberEntity, List<OrderDetailDto> orderDetails) {
-        CartDto cartDto = getCart(memberEntity);
+    public void removeOrderedProduct(MemberEntity memberEntity, List<OrderDetailRequestDto> orderDetailEntities) {
         Long memberId = memberEntity.getMemberId();
 
-        for (OrderDetailDto orderedProduct : orderDetails) {
-            cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductDto().getProductId());
+        for (OrderDetailRequestDto orderedProduct : orderDetailEntities) {
+            cartRedisRepository.removeCartDetail(memberId, orderedProduct.getProductId());
         }
     }
 

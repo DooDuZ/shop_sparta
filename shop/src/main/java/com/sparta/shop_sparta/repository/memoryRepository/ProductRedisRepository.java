@@ -1,28 +1,29 @@
 package com.sparta.shop_sparta.repository.memoryRepository;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class StockRedisRepository implements RedisRepository<String, Object> {
-    private final String prefix = "stock : ";
+public class ProductRedisRepository implements RedisRepository<String, Object> {
+
     private final RedisTemplate<String, Object> redisTemplate;
+    private final String prefix = "product : ";
     private final Duration timeout = Duration.ofMinutes(20);
 
     @Override
     public void saveWithDuration(String key, Object value) {
         String prefixKey = addPrefix(key);
+
         redisTemplate.opsForValue().set(prefixKey, value, timeout);
         redisTemplate.expire(prefixKey, timeout);
     }
 
     @Override
     public void save(String key, Object value) {
-        redisTemplate.opsForValue().set(addPrefix(key), value);
+        redisTemplate.opsForValue().set(addPrefix(key), value, timeout);
     }
 
     @Override
@@ -41,9 +42,5 @@ public class StockRedisRepository implements RedisRepository<String, Object> {
 
     private String addPrefix(String key) {
         return prefix + key;
-    }
-
-    public void increment(String key, Long amount) {
-        redisTemplate.opsForValue().increment(addPrefix(key), amount);
     }
 }

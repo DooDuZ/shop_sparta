@@ -6,6 +6,7 @@ import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
 import com.sparta.shop_sparta.repository.ProductRepository;
+import com.sparta.shop_sparta.repository.memoryRepository.ProductRedisRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,17 +18,26 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class CustomerProductService extends ProductService {
 
+    private final ProductRedisRepository productRedisRepository;
+
     @Autowired
     public CustomerProductService(
             ProductImageService productImageService,
             ProductRepository productRepository,
             StockService stockService,
-            ReservationService reservationService
+            ReservationService reservationService, ProductRedisRepository productRedisRepository
     ) {
         super(productImageService, productRepository, stockService, reservationService);
+        this.productRedisRepository = productRedisRepository;
     }
 
     public ProductDto getProduct(Long productId) {
+        String key = String.valueOf(productId);
+
+        if (isCached(key)){
+            return (ProductDto) productRedisRepository.find(key);
+        }
+
         ProductEntity productEntity = getProductEntity(productId);
 
         // 공개되지 않았거나 숨김 처리된 상품이면 throw
@@ -36,7 +46,15 @@ public class CustomerProductService extends ProductService {
             throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
         }
 
-        return getProductDto(productEntity);
+        ProductDto productDto = getProductDto(productEntity);
+        productDto.setAmount(0L);
+        productRedisRepository.saveWithDuration(key, productDto);
+
+        return productDto;
+    }
+
+    private boolean isCached(String key){
+        return productRedisRepository.hasKey(key);
     }
 
     // 모든 상품 찾기, 사용하지 않는 게 좋다.

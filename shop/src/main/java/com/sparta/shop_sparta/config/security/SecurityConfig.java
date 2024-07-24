@@ -37,7 +37,8 @@ public class SecurityConfig {
                                         "/member/verification",
                                         "/auth/token",
                                         "/swagger-ui/**",
-                                        "/v3/api-docs/**"
+                                        "/v3/api-docs/**",
+                                        "/token-test/**"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/member").permitAll()
                                 .anyRequest().hasAnyRole("BASIC", "SELLER","ADMIN")

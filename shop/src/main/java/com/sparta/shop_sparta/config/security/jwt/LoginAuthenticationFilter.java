@@ -16,8 +16,6 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 
     public LoginAuthenticationFilter(AuthenticationManager authenticationManager,
                                      LoginSuccessHandler loginSuccessHandler) {
-
-        // this.authenticationManager = authenticationManager;
         this.loginSuccessHandler = loginSuccessHandler;
         super.setAuthenticationManager(authenticationManager);
         setFilterProcessesUrl("/login");

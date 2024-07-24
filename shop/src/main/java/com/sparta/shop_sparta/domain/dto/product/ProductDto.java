@@ -2,6 +2,7 @@ package com.sparta.shop_sparta.domain.dto.product;
 
 import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Setter
-public class ProductDto {
+public class ProductDto implements Serializable {
     private Long productId;
     private String productName;
     private String productDetail;
@@ -27,7 +28,6 @@ public class ProductDto {
 
     private ProductStatus productStatus;
     private Long sellerId;
-
 
     @Builder.Default
     private List<ProductImageDto> productImages = new ArrayList<>();
@@ -40,11 +40,18 @@ public class ProductDto {
         this.productName = productEntity.getProductName();
         this.productDetail = productEntity.getProductDetail();
         this.categoryId = productEntity.getCategoryEntity().getCategoryId();
-
         this.price = productEntity.getPrice();
-
         this.productStatus = productEntity.getProductStatus();
         this.sellerId = productEntity.getSellerEntity().getMemberId();
+    }
+
+    public ProductEntity toEntity(){
+        return ProductEntity.builder()
+                .productId(this.productId)
+                .productName(this.productName)
+                .price(this.price)
+                .productStatus(this.productStatus)
+                .build();
     }
 
     public void setAmount(Long amount) {

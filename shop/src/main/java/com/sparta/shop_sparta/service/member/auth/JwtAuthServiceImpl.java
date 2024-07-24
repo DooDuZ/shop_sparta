@@ -28,7 +28,7 @@ public class JwtAuthServiceImpl implements JwtAuthService {
     private final String accessTokenCookieName = "access_token";
     // private final String refreshTokenCookieName = "refresh_token";
 
-    private final int accessTokenExpirySecond = 60 * 15;
+    private final int accessTokenExpirySecond = 60 * 30;
     private final int refreshTokenExpirySecond = 60 * 60 * 24 * 7;
     private final TokenUsernameEncoder tokenUsernameEncoder;
     private final String USER_AGENT_KEY = "User-Agent";
