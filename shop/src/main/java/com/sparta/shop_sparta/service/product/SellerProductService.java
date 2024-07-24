@@ -7,6 +7,7 @@ import com.sparta.common.exception.AuthorizationException;
 import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductStatusRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.domain.dto.product.StockRequestDto;
@@ -73,25 +74,21 @@ public class SellerProductService extends ProductService {
         return product.toDto();
     }
 
-    public List<ProductDto> getSellerProducts(UserDetails userDetails, int page, int itemsPerPage, Long productStatus) {
+    public List<ProductDto> getSellerProducts(UserDetails userDetails, int page, int itemsPerPage) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         
-        List<ProductEntity> productEntities = productRepository.findAllBySellerEntityAndProductStatus(
-                pageable,
-                memberEntity,
-                ProductStatus.of(productStatus)
-        ).getContent();
+        List<ProductEntity> productEntities = productRepository.findAllBySellerEntity(pageable, memberEntity).getContent();
 
         return getProductDtos(productEntities);
     }
 
     @Transactional
-    public ProductDto updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
+    public ProductDto updateProduct(UserDetails userDetails, ProductRequestDto productRequestDto, Long productId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
-        ProductEntity productEntity = getProductEntity(productRequestDto.getProductId());
+        ProductEntity productEntity = getProductEntity(productId);
 
         if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
@@ -141,8 +138,15 @@ public class SellerProductService extends ProductService {
     }
 
     @Transactional
-    public void updateProductStatus(Long productId, Long productStatusCode) {
-        getProductEntity(productId).setProductStatus(ProductStatus.of(productStatusCode));
+    public void updateProductStatus(UserDetails userDetails, ProductStatusRequestDto productStatusRequestDto) {
+        MemberEntity memberEntity = (MemberEntity) userDetails;
+        ProductEntity productEntity = getProductEntity(productStatusRequestDto.getProductId());
+
+        if(memberEntity.getMemberId() - productEntity.getSellerEntity().getMemberId() != 0) {
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
+
+        productEntity.setProductStatus(ProductStatus.of(productStatusRequestDto.getProductStatus()));
     }
 
     @Transactional
@@ -165,14 +169,19 @@ public class SellerProductService extends ProductService {
     }
 
     @Transactional
-    public ReservationResponseDto updateReservation(UserDetails userDetails,
-                                                    ReservationRequestDto reservationRequestDto) {
+    public ReservationResponseDto updateReservation(
+            UserDetails userDetails,
+            ReservationRequestDto reservationRequestDto,
+            Long reservationId
+    ) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
         ProductEntity productEntity = getProductEntity(reservationRequestDto.getProductId());
 
         if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
+
+        reservationRequestDto.setReservationId(reservationId);
 
         return reservationService.updateReservation(reservationRequestDto);
     }

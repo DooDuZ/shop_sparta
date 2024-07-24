@@ -30,8 +30,8 @@ public class OrderController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable Long orderId) {
+    @GetMapping("/{order-id}")
+    public ResponseEntity<OrderResponseDto> getOrder(@AuthenticationPrincipal UserDetails userDetails, @PathVariable("order-id") Long orderId) {
         return ResponseEntity.ok(orderService.getOrder(userDetails, orderId));
     }
 

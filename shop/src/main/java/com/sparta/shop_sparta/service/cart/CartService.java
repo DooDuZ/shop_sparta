@@ -36,7 +36,7 @@ public class CartService {
         cartRedisRepository.saveWithDuration(memberEntity.getMemberId(), 0L, 0L);
     }
 
-    public ProductDto addProductToCart(UserDetails userDetails, CartRequestDto cartRequestDto) {
+    public void addProductToCart(UserDetails userDetails, CartRequestDto cartRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
 
         if(!cartRedisRepository.hasKey(memberEntity.getMemberId())){
@@ -57,11 +57,6 @@ public class CartService {
                 cartRequestDto.getProductId(),
                 cartRequestDto.getAmount()
         );
-
-        ProductDto productDto = productEntity.toDto();
-        productDto.setAmount(stockEntity.getAmount());
-
-        return productDto;
     }
 
     private ProductEntity validateProduct(Long productId){

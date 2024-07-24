@@ -126,7 +126,7 @@ public class SellerProductServiceTest {
             when(productRepository.findById(productRequestDto.getProductId())).thenReturn(Optional.of(productEntity));
             when(stockService.updateStock(any(ProductEntity.class), anyLong())).thenReturn(stockEntity);
             // when
-            ProductDto productDto = sellerProductService.updateProduct(memberEntity, productRequestDto);
+            ProductDto productDto = sellerProductService.updateProduct(memberEntity, productRequestDto, productRequestDto.getProductId());
 
             // then
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
@@ -142,7 +142,7 @@ public class SellerProductServiceTest {
 
             // when then
             assertThatThrownBy(
-                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto)
+                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto, productRequestDto.getProductId())
             ).isInstanceOf(ProductException.class).hasMessage(ProductMessage.NOT_FOUND_PRODUCT.getMessage());
         }
 
@@ -154,7 +154,7 @@ public class SellerProductServiceTest {
             memberEntity.setMemberId(2L);
             // when then
             assertThatThrownBy(
-                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto)
+                    ()-> sellerProductService.updateProduct(memberEntity, productRequestDto, productRequestDto.getProductId())
             ).isInstanceOf(AuthorizationException.class).hasMessage(AuthMessage.AUTHORIZATION_DENIED.getMessage());
         }
 

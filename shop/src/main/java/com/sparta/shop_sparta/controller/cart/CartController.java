@@ -1,6 +1,8 @@
 package com.sparta.shop_sparta.controller.cart;
 
+import com.sparta.shop_sparta.domain.dto.cart.CartDto;
 import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.service.cart.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +25,12 @@ public class CartController {
     private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<?> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
-        return ResponseEntity.ok(cartService.addProductToCart(userDetails, cartRequestDto));
+    public ResponseEntity<Void> createCartDetail(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CartRequestDto cartRequestDto) {
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<?> getCart(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<CartDto> getCart(@AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(cartService.getCart(userDetails));
     }
 

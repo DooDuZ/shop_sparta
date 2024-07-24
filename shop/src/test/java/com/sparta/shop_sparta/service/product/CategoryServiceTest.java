@@ -40,9 +40,9 @@ public class CategoryServiceTest {
         doNothing().when(categoryRepository).delete(any(CategoryEntity.class));
 
         // when
-        categoryService.deleteCategory(categoryDto);
+        categoryService.deleteCategory(categoryDto.getCategoryId());
 
         // then
-        verify(categoryRepository).delete(any(CategoryEntity.class));
+        verify(categoryRepository).deleteById(any(Long.class));
     }
 }

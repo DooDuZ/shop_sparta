@@ -17,7 +17,7 @@ public class CategoryService{
         return categoryEntity.toDto();
     }
 
-    public void deleteCategory(CategoryDto categoryDto) {
-        categoryRepository.delete(categoryDto.toEntity());
+    public void deleteCategory(Long categoryId) {
+        categoryRepository.deleteById(categoryId);
     }
 }

@@ -109,12 +109,16 @@ public class MemberService {
     }
 
     @Transactional
-    public void updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto) {
+    public void updatePassword(UserDetails userDetails, MemberRequestVo passwordRequestDto, Long memberId) {
         if (passwordRequestDto.getPassword() == null || passwordRequestDto.getConfirmPassword() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD);
         }
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        if (memberEntity.getMemberId() - memberId != 0) {
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
 
         String password = passwordRequestDto.getPassword();
         String confirmPassword = passwordRequestDto.getConfirmPassword();
@@ -139,12 +143,16 @@ public class MemberService {
 
 
     @Transactional
-    public void updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto) {
+    public void updatePhoneNumber(UserDetails userDetails, MemberRequestVo phoneNumberUpdateRequestDto, Long memberId) {
         if (phoneNumberUpdateRequestDto.getPhoneNumber() == null) {
             throw new MemberException(MemberResponseMessage.MISSING_REQUIRED_FIELD);
         }
 
         MemberEntity memberEntity = (MemberEntity) userDetails;
+
+        if (memberEntity.getMemberId() - memberId != 0) {
+            throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
+        }
 
         MemberEntity memberInfo = memberRepository.findById(memberEntity.getMemberId()).orElseThrow(
                 ()->new MemberException(MemberResponseMessage.NOT_FOUND)

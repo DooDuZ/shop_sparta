@@ -44,7 +44,7 @@ public class JwtTokenProvider {
 
     private final long refreshTokenValidMillisecond = 1000L * 60 * 60 * 24 * 7;
     private final String prefix = "Bearer ";
-    private final String refreshHeaderKey = "JWT_REFRESH_TOKEN";
+    private final String refreshHeaderKey = "Authorization";
 
     private final TokenUsernameEncoder tokenUsernameEncoder;
 

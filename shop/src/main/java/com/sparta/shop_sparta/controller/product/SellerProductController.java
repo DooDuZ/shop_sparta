@@ -2,9 +2,11 @@ package com.sparta.shop_sparta.controller.product;
 
 import com.sparta.shop_sparta.domain.dto.product.ProductDto;
 import com.sparta.shop_sparta.domain.dto.product.ProductRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.ProductStatusRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationRequestDto;
 import com.sparta.shop_sparta.domain.dto.product.ReservationResponseDto;
 import com.sparta.shop_sparta.domain.dto.product.StockRequestDto;
+import com.sparta.shop_sparta.domain.dto.product.StockResponseDto;
 import com.sparta.shop_sparta.service.product.SellerProductService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -39,20 +41,22 @@ public class SellerProductController {
         return ResponseEntity.ok(sellerProductService.createProduct(userDetails, productRequestDto));
     }
 
-    @GetMapping("/product-status")
+    @GetMapping("/all")
     public ResponseEntity<List<ProductDto>> getSellerProducts(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam int page,
-            @RequestParam int itemsPerPage,
-            @RequestParam("product-status") Long productStatus
+            @RequestParam("item-per-page") int itemsPerPage
     ) {
-        return ResponseEntity.ok(sellerProductService.getSellerProducts(userDetails, page, itemsPerPage, productStatus));
+        return ResponseEntity.ok(sellerProductService.getSellerProducts(userDetails, page, itemsPerPage));
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDto> updateProduct(@AuthenticationPrincipal UserDetails userDetails,
-                                                    @ModelAttribute ProductRequestDto productRequestDto) {
-        return ResponseEntity.ok(sellerProductService.updateProduct(userDetails, productRequestDto));
+    public ResponseEntity<ProductDto> updateProduct(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @ModelAttribute ProductRequestDto productRequestDto,
+            @PathVariable("product-id") Long productId
+    ) {
+        return ResponseEntity.ok(sellerProductService.updateProduct(userDetails, productRequestDto, productId));
     }
 
     @DeleteMapping("/{productId}")
@@ -63,9 +67,11 @@ public class SellerProductController {
     }
 
     @PatchMapping("/status")
-    public ResponseEntity<Void> updateProductStatus(@RequestParam("product-id") Long productId,
-                                                    @RequestParam("status-code") Long productStatusCode) {
-        sellerProductService.updateProductStatus(productId, productStatusCode);
+    public ResponseEntity<Void> updateProductStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ProductStatusRequestDto productStatusRequestDto
+    ) {
+        sellerProductService.updateProductStatus(userDetails, productStatusRequestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -76,9 +82,12 @@ public class SellerProductController {
     }
 
     @PutMapping("/reservation/{reservationId}")
-    public ResponseEntity<ReservationResponseDto> updateReservation(@AuthenticationPrincipal UserDetails userDetails,
-                                                                    @RequestBody ReservationRequestDto reservationRequestDto) {
-        return ResponseEntity.ok(sellerProductService.updateReservation(userDetails, reservationRequestDto));
+    public ResponseEntity<ReservationResponseDto> updateReservation(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody ReservationRequestDto reservationRequestDto,
+            @PathVariable Long reservationId
+    ) {
+        return ResponseEntity.ok(sellerProductService.updateReservation(userDetails, reservationRequestDto, reservationId));
     }
 
     @DeleteMapping("/reservation/{reservationId}")
@@ -89,8 +98,8 @@ public class SellerProductController {
     }
 
     @PatchMapping("/stock")
-    public ResponseEntity<?> updateStock(@AuthenticationPrincipal UserDetails userDetails,
-                                         @RequestBody StockRequestDto stockRequestDto) {
+    public ResponseEntity<StockResponseDto> updateStock(@AuthenticationPrincipal UserDetails userDetails,
+                                                        @RequestBody StockRequestDto stockRequestDto) {
         return ResponseEntity.ok(sellerProductService.updateStock(userDetails, stockRequestDto));
     }
 }

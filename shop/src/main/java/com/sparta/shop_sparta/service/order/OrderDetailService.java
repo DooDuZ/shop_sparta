@@ -33,7 +33,6 @@ public class OrderDetailService {
     public List<OrderDetailEntity> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
         List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
 
-        // 저장 실패시 어짜피 transaction rollback 된다
         for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
             Long productId = orderDetailRequestDto.getProductId();
 

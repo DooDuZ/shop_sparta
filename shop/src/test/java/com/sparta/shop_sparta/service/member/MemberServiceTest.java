@@ -140,7 +140,7 @@ public class MemberServiceTest {
 
             // when then
             Assertions.assertDoesNotThrow(
-                    () -> memberService.updatePhoneNumber(memberEntity, memberRequestVo)
+                    () -> memberService.updatePhoneNumber(memberEntity, memberRequestVo, 1L)
             );
         }
 
@@ -152,7 +152,7 @@ public class MemberServiceTest {
 
             // when then
             assertThatThrownBy(
-                    ()->memberService.updatePhoneNumber(memberEntity, memberRequestVo)
+                    ()->memberService.updatePhoneNumber(memberEntity, memberRequestVo, 1L)
             ).isInstanceOf(MemberException.class).hasMessage(MemberResponseMessage.MISSING_REQUIRED_FIELD.getMessage());
         }
     }

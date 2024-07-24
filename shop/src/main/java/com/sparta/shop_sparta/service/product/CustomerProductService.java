@@ -58,7 +58,6 @@ public class CustomerProductService extends ProductService {
     }
 
     // 모든 상품 찾기, 사용하지 않는 게 좋다.
-    // Todo 예약 시간 리턴 방법 고민
     public List<ProductDto> getAllProducts(int page, int itemPerPage) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);
 
@@ -69,6 +68,10 @@ public class CustomerProductService extends ProductService {
 
     public List<ProductDto> getAllProductsByProductStatus(int page, int itemPerPage, Long productStatus) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);
+
+        if(productStatus == 1 || productStatus == 5){
+            throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
+        }
 
         List<ProductEntity> productEntities = productRepository.findAllByProductStatus(pageable, ProductStatus.of(productStatus)).getContent();
 

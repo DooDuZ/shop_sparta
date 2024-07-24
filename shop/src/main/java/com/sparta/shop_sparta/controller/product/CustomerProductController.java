@@ -22,18 +22,30 @@ public class CustomerProductController {
         return ResponseEntity.ok(customerProductService.getProduct(productId));
     }
 
-    @GetMapping("/on-sale/all")
-    public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam long productStatus) {
+    @GetMapping("/status/all")
+    public ResponseEntity<List<ProductDto>> getAllProducts(
+            @RequestParam int page,
+            @RequestParam("item-per-page") int itemsPerPage,
+            @RequestParam("product-status") long productStatus
+    ) {
         return ResponseEntity.ok(customerProductService.getAllProductsByProductStatus(page, itemsPerPage, productStatus));
     }
 
-    @GetMapping("/on-sale/category")
-    public ResponseEntity<?> getAllByCategory(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam Long categoryId) {
+    @GetMapping("/category/all")
+    public ResponseEntity<List<ProductDto>> getAllByCategory(
+            @RequestParam int page,
+            @RequestParam("item-per-page") int itemsPerPage,
+            @RequestParam("category-id") Long categoryId
+    ) {
         return ResponseEntity.ok(customerProductService.getAllByCategory(page, itemsPerPage, categoryId));
     }
 
-    @GetMapping("/on-sale/seller")
-    public ResponseEntity<?> getAllProductsBySeller(@RequestParam int page, @RequestParam int itemsPerPage, @RequestParam Long sellerId) {
+    @GetMapping("/by-seller/all")
+    public ResponseEntity<List<ProductDto>> getAllProductsBySeller(
+            @RequestParam int page,
+            @RequestParam("item-per-page") int itemsPerPage,
+            @RequestParam("seller-id") Long sellerId
+    ) {
         return ResponseEntity.ok(customerProductService.getAllProductsBySeller(page, itemsPerPage, sellerId));
     }
 }

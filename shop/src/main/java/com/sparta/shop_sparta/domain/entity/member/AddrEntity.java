@@ -44,6 +44,6 @@ public class AddrEntity {
 
     public AddrDto toDto() {
         return AddrDto.builder().addr(this.addr).addrDetail(this.addrDetail).addrId(this.addrId)
-                .memberId(this.memberEntity.getMemberId()).build();
+                .build();
     }
 }
