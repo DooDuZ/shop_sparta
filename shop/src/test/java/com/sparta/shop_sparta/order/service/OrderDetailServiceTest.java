@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.order;
+package com.sparta.shop_sparta.order.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -10,11 +10,11 @@ import com.sparta.shop_sparta.order.domain.dto.OrderDetailRequestDto;
 import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
-import com.sparta.shop_sparta.order.service.OrderDetailService;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.order.repository.OrderDetailRepository;
+import com.sparta.shop_sparta.product.service.CustomerProductService;
 import com.sparta.shop_sparta.product.service.ProductService;
 import com.sparta.shop_sparta.product.service.StockService;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class OrderDetailServiceTest {
     @InjectMocks
     OrderDetailService orderDetailService;
     @Mock
-    private ProductService productService;
+    private CustomerProductService productService;
     @Mock
     private OrderDetailRepository orderDetailRepository;
     @Mock
@@ -70,6 +70,7 @@ public class OrderDetailServiceTest {
             // given
             when(stockService.getStockByProductId(anyLong())).thenReturn(stockEntity);
             when(stockService.getStockInRedis(anyLong())).thenReturn(stockEntity.getAmount());
+            when(productService.getProduct(anyLong())).thenReturn(productEntity.toDto());
 
             Long totalAmount = 0L;
 

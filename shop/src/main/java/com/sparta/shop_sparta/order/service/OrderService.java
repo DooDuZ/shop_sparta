@@ -77,8 +77,6 @@ public class OrderService {
     private OrderEntity saveAndInitOrderEntity(MemberEntity memberEntity, OrderRequestDto orderRequestDto){
         OrderEntity orderEntity = orderRequestDto.toEntity();
 
-        log.info(memberEntity.toString());
-
         // 첫 주문은 항상 배송 준비 상태
         orderEntity.setMemberEntity(memberEntity);
         orderEntity.setOrderStatus(OrderStatus.PREPARED);
@@ -104,17 +102,11 @@ public class OrderService {
         Map<Long, Long> cartInfo = cartService.getCartInfo(memberEntity);
 
         for (OrderDetailRequestDto orderDetailDto : orderRequestDto.getOrderDetails()) {
-            // Todo -> 여기서부터 고쳐
             Long productId = orderDetailDto.getProductId();
 
             // 장바구니에 상품 정보가 없거나, 요청 수량이 다르면
-            // Todo 복구 대상
             if (!cartInfo.containsKey(productId) || cartInfo.get(productId) - orderDetailDto.getAmount() != 0) {
-                try {
-                    throw new OrderException(OrderResponseMessage.INVALID_REQUEST);
-                }catch (Exception e){
-                    log.info("" + cartInfo.get(productId) + " - " +  orderDetailDto.getAmount());
-                }
+                throw new OrderException(OrderResponseMessage.INVALID_REQUEST);
             }
 
             orderDetails.add(orderDetailDto);

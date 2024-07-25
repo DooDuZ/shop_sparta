@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.member;
+package com.sparta.shop_sparta.member.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.product;
+package com.sparta.shop_sparta.product.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,10 +18,6 @@ import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
-import com.sparta.shop_sparta.product.service.CustomerProductService;
-import com.sparta.shop_sparta.product.service.LocalStorageImageService;
-import com.sparta.shop_sparta.product.service.ReservationService;
-import com.sparta.shop_sparta.product.service.StockService;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.List;

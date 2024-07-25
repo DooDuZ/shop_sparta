@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.member;
+package com.sparta.shop_sparta.member.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -12,7 +12,6 @@ import com.sparta.shop_sparta.member.domain.dto.MemberDto;
 import com.sparta.shop_sparta.member.domain.dto.MemberRequestVo;
 import com.sparta.shop_sparta.member.domain.dto.MemberResponseDto;
 import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
-import com.sparta.shop_sparta.member.service.MemberService;
 import com.sparta.shop_sparta.member.repository.AddrRepository;
 import com.sparta.shop_sparta.member.repository.MemberRepository;
 import com.sparta.shop_sparta.member.service.addr.AddrService;
@@ -137,8 +136,8 @@ public class MemberServiceTest {
         void updatePhoneNumberSuccessTest() {
             // given
             MemberRequestVo memberRequestVo = MemberRequestVo.builder().phoneNumber("010-2720-9158").build();
+            memberEntity = MemberEntity.builder().memberId(1L).build();
             when(memberRepository.findById(anyLong())).thenReturn(Optional.of(memberEntity));
-
             // when then
             Assertions.assertDoesNotThrow(
                     () -> memberService.updatePhoneNumber(memberEntity, memberRequestVo, 1L)

@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.cart;
+package com.sparta.shop_sparta.cart.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -11,7 +11,6 @@ import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.cart.domain.dto.CartDetailResponseDto;
 import com.sparta.shop_sparta.cart.domain.dto.CartDto;
 import com.sparta.shop_sparta.cart.domain.dto.CartRequestDto;
-import com.sparta.shop_sparta.cart.service.CartService;
 import com.sparta.shop_sparta.order.domain.dto.OrderDetailDto;
 import com.sparta.shop_sparta.product.domain.dto.ProductDto;
 import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
@@ -96,12 +95,9 @@ public class CartServiceTest {
             when(stockService.getStockEntity(any(ProductEntity.class))).thenReturn(stockEntity);
             doNothing().when(cartRedisRepository).saveWithDuration(anyLong(), anyLong(), anyLong());
             // when
-            ProductDto productDto = cartService.addProductToCart(memberEntity, cartRequestDto);
+            cartService.addProductToCart(memberEntity, cartRequestDto);
             // then
-            assertThat(productDto.getProductId()).isEqualTo(productEntity.getProductId());
-            assertThat(productDto.getProductDetail()).isEqualTo(productEntity.getProductDetail());
-            assertThat(productDto.getPrice()).isEqualTo(productEntity.getPrice());
-            assertThat(productDto.getAmount()).isEqualTo(stockEntity.getAmount());
+            verify(cartRedisRepository).saveWithDuration(anyLong(), anyLong(), anyLong());
         }
 
         @Test
@@ -113,12 +109,9 @@ public class CartServiceTest {
             when(stockService.getStockEntity(any(ProductEntity.class))).thenReturn(stockEntity);
             doNothing().when(cartRedisRepository).saveWithDuration(anyLong(), anyLong(), anyLong());
             // when
-            ProductDto productDto = cartService.addProductToCart(memberEntity, cartRequestDto);
+            cartService.addProductToCart(memberEntity, cartRequestDto);
             // then
-            assertThat(productDto.getProductId()).isEqualTo(productEntity.getProductId());
-            assertThat(productDto.getProductDetail()).isEqualTo(productEntity.getProductDetail());
-            assertThat(productDto.getPrice()).isEqualTo(productEntity.getPrice());
-            assertThat(productDto.getAmount()).isEqualTo(stockEntity.getAmount());
+            verify(cartRedisRepository, times(2)).saveWithDuration(anyLong(), anyLong(), anyLong());
         }
 
         @Test

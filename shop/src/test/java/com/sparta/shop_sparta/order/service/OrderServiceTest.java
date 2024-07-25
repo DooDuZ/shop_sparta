@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.service.order;
+package com.sparta.shop_sparta.order.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,9 +14,6 @@ import com.sparta.shop_sparta.order.domain.dto.OrderRequestDto;
 import com.sparta.shop_sparta.order.domain.dto.OrderResponseDto;
 import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
-import com.sparta.shop_sparta.order.service.OrderDetailService;
-import com.sparta.shop_sparta.order.service.OrderService;
-import com.sparta.shop_sparta.order.service.PaymentService;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
