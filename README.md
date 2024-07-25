@@ -44,7 +44,7 @@ Spring Batch 서버를 통해 상품 등록, 예약, 상품 배송 등의 안정
 ![erd-diagram]
 
 
-<!-- GETTING STARTED 
+<!-- GETTING STARTED
 ## Getting Started
 
 ---
@@ -85,6 +85,31 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 ---
 
 * [Git Book](https://dooduzs-organization.gitbook.io/api/)
+
+## 패키지 구조
+
+---
+
+<details>
+    <summary>Common Module </summary>
+    <img src="/images/module-structure/common-module.png" />
+</details>
+
+<details>
+    <summary>Batch Module </summary>
+    <img src="/images/module-structure/batch-module1.png" />
+    <img src="/images/module-structure/batch-module2.png" />
+</details>
+<details>
+    <summary>Shop Module </summary>
+    <img src="/images/module-structure/shop-module1.png" />
+    <img src="/images/module-structure/shop-module2.png" />
+    <img src="/images/module-structure/shop-module3.png" />
+    <img src="/images/module-structure/shop-module4.png" />
+    <img src="/images/module-structure/shop-module5.png" />
+</details>
+
+
 <!--
 * 회원
 * 상품
