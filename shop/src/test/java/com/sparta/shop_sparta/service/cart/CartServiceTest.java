@@ -8,18 +8,19 @@ import com.sparta.common.constant.member.MemberRole;
 import com.sparta.common.constant.product.ProductMessage;
 import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.common.exception.ProductException;
-import com.sparta.shop_sparta.domain.dto.cart.CartDetailResponseDto;
-import com.sparta.shop_sparta.domain.dto.cart.CartDto;
-import com.sparta.shop_sparta.domain.dto.cart.CartRequestDto;
-import com.sparta.shop_sparta.domain.dto.order.OrderDetailDto;
-import com.sparta.shop_sparta.domain.dto.product.ProductDto;
-import com.sparta.shop_sparta.domain.entity.member.MemberEntity;
-import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
-import com.sparta.shop_sparta.domain.entity.product.ProductEntity;
-import com.sparta.shop_sparta.domain.entity.product.StockEntity;
-import com.sparta.shop_sparta.repository.memoryRepository.CartRedisRepository;
-import com.sparta.shop_sparta.service.product.ProductService;
-import com.sparta.shop_sparta.service.product.StockService;
+import com.sparta.shop_sparta.cart.domain.dto.CartDetailResponseDto;
+import com.sparta.shop_sparta.cart.domain.dto.CartDto;
+import com.sparta.shop_sparta.cart.domain.dto.CartRequestDto;
+import com.sparta.shop_sparta.cart.service.CartService;
+import com.sparta.shop_sparta.order.domain.dto.OrderDetailDto;
+import com.sparta.shop_sparta.product.domain.dto.ProductDto;
+import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
+import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
+import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
+import com.sparta.shop_sparta.product.domain.entity.StockEntity;
+import com.sparta.shop_sparta.cart.repository.CartRedisRepository;
+import com.sparta.shop_sparta.product.service.ProductService;
+import com.sparta.shop_sparta.product.service.StockService;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -207,7 +208,7 @@ public class CartServiceTest {
             // given
             cartInfo = new HashMap<>();
             when(cartRedisRepository.findCart(memberEntity.getMemberId())).thenReturn(cartInfo);
-            when(cartService.getProductsIncart(cartInfo)).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
+            when(cartService.getProductsInCart(cartInfo)).thenThrow(new ProductException(ProductMessage.FAIL_IO_IMAGE));
 
             // when then
             assertThatThrownBy(

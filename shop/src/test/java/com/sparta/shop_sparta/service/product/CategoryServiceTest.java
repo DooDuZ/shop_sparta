@@ -3,9 +3,10 @@ package com.sparta.shop_sparta.service.product;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.sparta.shop_sparta.domain.dto.product.CategoryDto;
-import com.sparta.shop_sparta.domain.entity.product.CategoryEntity;
-import com.sparta.shop_sparta.repository.CategoryRepository;
+import com.sparta.shop_sparta.product.domain.dto.CategoryDto;
+import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
+import com.sparta.shop_sparta.product.service.CategoryService;
+import com.sparta.shop_sparta.product.repository.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

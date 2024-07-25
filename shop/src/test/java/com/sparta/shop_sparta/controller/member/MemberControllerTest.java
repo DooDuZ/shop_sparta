@@ -4,8 +4,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.service.member.MemberService;
+import com.sparta.shop_sparta.member.domain.dto.MemberDto;
+import com.sparta.shop_sparta.member.controller.MemberController;
+import com.sparta.shop_sparta.member.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

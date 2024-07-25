@@ -1,7 +1,7 @@
 package com.sparta.shop_sparta.validate;
 
-import com.sparta.shop_sparta.domain.dto.member.MemberDto;
-import com.sparta.shop_sparta.validator.member.EntityFieldValidator;
+import com.sparta.shop_sparta.member.domain.dto.MemberDto;
+import com.sparta.shop_sparta.util.validator.member.EntityFieldValidator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.junit.jupiter.api.DisplayName;

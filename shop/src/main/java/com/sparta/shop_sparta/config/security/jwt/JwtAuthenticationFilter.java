@@ -2,7 +2,7 @@ package com.sparta.shop_sparta.config.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.common.constant.member.AuthMessage;
-import com.sparta.shop_sparta.service.member.auth.JwtTokenProvider;
+import com.sparta.shop_sparta.member.service.auth.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import jakarta.servlet.FilterChain;
@@ -35,7 +35,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && claims != null) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
         }else if(token != null && claims == null){
             // 리프레시 토큰으로 재요청 하라고 전달
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -46,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String errorMessage = AuthMessage.INVALID_TOKEN.getMessage();
 
             response.getWriter().write(objectMapper.writeValueAsString(errorMessage));
+            return;
         }
 
         filterChain.doFilter(request, response);

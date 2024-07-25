@@ -1,6 +1,6 @@
 package com.sparta.shop_sparta.config.security.jwt;
 
-import com.sparta.shop_sparta.service.member.auth.JwtAuthServiceImpl;
+import com.sparta.shop_sparta.member.service.auth.JwtAuthServiceImpl;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
