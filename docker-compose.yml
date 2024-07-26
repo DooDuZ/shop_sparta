@@ -56,6 +56,28 @@ services:
     networks:
       - mynetwork
 
+  shop-test:
+    build:
+      context: .
+      dockerfile: shop/Dockerfile
+    container_name: shop-test
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/shop
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mynetwork
+    command: ["./gradlew", "test"]
+
   batch:
     build:
       context: .
