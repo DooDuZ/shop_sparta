@@ -97,16 +97,16 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 <details>
     <summary>Batch Module </summary>
-    <img src="/images/module-structure/batch-module1.png" />
-    <img src="/images/module-structure/batch-module2.png" />
+    <img src="/images/module-structure/batch-module1.png" /><br>
+    <img src="/images/module-structure/batch-module2.png" /><br>
 </details>
 <details>
     <summary>Shop Module </summary>
-    <img src="/images/module-structure/shop-module1.png" />
-    <img src="/images/module-structure/shop-module2.png" />
-    <img src="/images/module-structure/shop-module3.png" />
-    <img src="/images/module-structure/shop-module4.png" />
-    <img src="/images/module-structure/shop-module5.png" />
+    <img src="/images/module-structure/shop-module1.png" /><br>
+    <img src="/images/module-structure/shop-module2.png" /><br>
+    <img src="/images/module-structure/shop-module3.png" /><br>
+    <img src="/images/module-structure/shop-module4.png" /><br>
+    <img src="/images/module-structure/shop-module5.png" /><br>
 </details>
 
 
