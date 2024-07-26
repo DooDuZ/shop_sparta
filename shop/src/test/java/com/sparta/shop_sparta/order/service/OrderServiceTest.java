@@ -338,7 +338,7 @@ public class OrderServiceTest {
             // when then
             assertThatThrownBy(
                     ()-> orderService.requestReturn(memberEntity, orderId)
-            ).isInstanceOf(AuthorizationException.class).hasMessage(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
+            ).isInstanceOf(OrderException.class).hasMessage(OrderResponseMessage.FAIL_REQUEST_RETURN.getMessage());
         }
     }
 }
