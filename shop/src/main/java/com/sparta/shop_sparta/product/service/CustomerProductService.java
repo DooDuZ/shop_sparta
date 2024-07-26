@@ -34,7 +34,7 @@ public class CustomerProductService extends ProductService {
     public ProductDto getProduct(Long productId) {
         String key = String.valueOf(productId);
 
-        if (isCached(key)){
+        if (isCached(key)) {
             return (ProductDto) productRedisRepository.find(key);
         }
 
@@ -42,7 +42,7 @@ public class CustomerProductService extends ProductService {
 
         // 공개되지 않았거나 숨김 처리된 상품이면 throw
         ProductStatus productStatus = productEntity.getProductStatus();
-        if (productStatus == ProductStatus.NOT_PUBLISHED || productStatus == ProductStatus.SUSPENDED_SALE){
+        if (productStatus == ProductStatus.NOT_PUBLISHED || productStatus == ProductStatus.SUSPENDED_SALE) {
             throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
         }
 
@@ -53,7 +53,7 @@ public class CustomerProductService extends ProductService {
         return productDto;
     }
 
-    private boolean isCached(String key){
+    private boolean isCached(String key) {
         return productRedisRepository.hasKey(key);
     }
 
@@ -69,11 +69,12 @@ public class CustomerProductService extends ProductService {
     public List<ProductDto> getAllProductsByProductStatus(int page, int itemPerPage, Long productStatus) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);
 
-        if(productStatus == 1 || productStatus == 5){
+        if (productStatus == 1 || productStatus == 5) {
             throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
         }
 
-        List<ProductEntity> productEntities = productRepository.findAllByProductStatus(pageable, ProductStatus.of(productStatus)).getContent();
+        List<ProductEntity> productEntities = productRepository.findAllByProductStatus(pageable,
+                ProductStatus.of(productStatus)).getContent();
 
         return getProductDtos(productEntities);
     }
