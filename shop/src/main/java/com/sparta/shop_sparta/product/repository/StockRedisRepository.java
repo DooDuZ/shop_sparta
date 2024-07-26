@@ -46,4 +46,9 @@ public class StockRedisRepository implements RedisRepository<String, Object> {
     public void increment(String key, Long amount) {
         redisTemplate.opsForValue().increment(addPrefix(key), amount);
     }
+
+    public void cache(String key, Object value){
+        redisTemplate.opsForValue().setIfAbsent(addPrefix(key), value, timeout);
+        redisTemplate.expire(addPrefix(key), timeout);
+    }
 }

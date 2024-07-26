@@ -36,7 +36,7 @@ public class OrderDetailService {
         for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
             Long productId = orderDetailRequestDto.getProductId();
 
-            // cache miss 시 캐싱
+            // 재고 cache miss 시 캐싱
             checkCache(productId);
 
             Long stock = stockService.getStockInRedis(productId);

@@ -84,11 +84,13 @@ public class StockService {
         String key = String.valueOf(productId);
         StockEntity stockEntity = getStockByProductId(productId);
 
+        stockRedisRepository.cache(key, stockEntity.getAmount());
+/*
         if(stockRedisRepository.hasKey(key)){
             return;
         }
 
-        stockRedisRepository.saveWithDuration(String.valueOf(productId), stockEntity.getAmount());
+        stockRedisRepository.saveWithDuration(String.valueOf(productId), stockEntity.getAmount());*/
     }
 
     /*@Override
