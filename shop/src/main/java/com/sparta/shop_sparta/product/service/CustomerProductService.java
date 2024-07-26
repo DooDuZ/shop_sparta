@@ -48,7 +48,7 @@ public class CustomerProductService extends ProductService {
 
         ProductDto productDto = getProductDto(productEntity);
         productDto.setAmount(0L);
-        productRedisRepository.saveWithDuration(key, productDto);
+        productRedisRepository.cache(key, productDto);
 
         return productDto;
     }

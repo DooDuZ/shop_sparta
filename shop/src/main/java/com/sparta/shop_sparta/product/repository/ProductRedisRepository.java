@@ -44,4 +44,9 @@ public class ProductRedisRepository implements RedisRepository<String, Object> {
     private String addPrefix(String key) {
         return prefix + key;
     }
+
+    public void cache(String key, Object value){
+        redisTemplate.opsForValue().setIfAbsent(addPrefix(key), value, timeout);
+        redisTemplate.expire(addPrefix(key), timeout);
+    }
 }
