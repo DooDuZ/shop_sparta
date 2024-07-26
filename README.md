@@ -3,8 +3,6 @@
 
 ## 프로잭트 개요
 
----
-
 ### 원하는 물품을 구매하고 판매하는 e-commerce
 ```
 Online Open Run E-Commerce Shop Sparta 입니다. 
@@ -12,8 +10,6 @@ Spring Batch 서버를 통해 상품 등록, 예약, 상품 배송 등의 안정
 대규모 트래픽에 대한 동시성 처리와 빠른 응답을 위한 캐싱이 적용되어 있습니다.
 ```
 ## 개발 환경
-
----
 
 * **JDK** : Amazon Corretto 21.0.3
 * **Framework** : Spring Boot 3.3.0
@@ -33,13 +29,9 @@ Spring Batch 서버를 통해 상품 등록, 예약, 상품 배송 등의 안정
 
 ## Architecture
 
----
-
 ![architect-screenshot]
 
 ## ERD diagram
-
----
 
 ![erd-diagram]
 
@@ -82,26 +74,22 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ## API 명세
 
----
-
-* [Git Book](https://dooduzs-organization.gitbook.io/api/)
+* **[Git Book](https://dooduzs-organization.gitbook.io/api/)**
 
 ## 패키지 구조
 
----
-
 <details>
-    <summary>Common Module </summary>
+    <summary><Strong>Common Module</Strong> </summary>
     <img src="/images/module-structure/common-module.png" />
 </details>
 
 <details>
-    <summary>Batch Module </summary>
+    <summary> <Strong>Batch Module</Strong> </summary>
     <img src="/images/module-structure/batch-module1.png" /><br>
     <img src="/images/module-structure/batch-module2.png" /><br>
 </details>
 <details>
-    <summary>Shop Module </summary>
+    <summary> <strong>Shop Module</strong> </summary>
     <img src="/images/module-structure/shop-module1.png" /><br>
     <img src="/images/module-structure/shop-module2.png" /><br>
     <img src="/images/module-structure/shop-module3.png" /><br>
@@ -119,7 +107,6 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ## 주요 기능
 
----
 ### 회원
 * **EMAIL 인증(SMTP)**
     * 회원 가입 시 인증 메일이 발송 됩니다.
@@ -166,7 +153,6 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ## 트러블 슈팅
 
----
 
 * **[동시성 이슈](https://dooduz.tistory.com/19)**
     * 기존 재고 변경 방식
@@ -178,7 +164,6 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ## 성능 개선
 
----
 * **[주문 응답 시간 개선](https://dooduz.tistory.com/20)**
     * Before
         * 주문 요청 시 DB 재고 확인 - 업데이트 query 반영 후 결제
