@@ -13,10 +13,11 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - mynetwork
-    #healthcheck:
-      #test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      #timeout: 5s
-      #retries: 10
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:latest
@@ -25,11 +26,11 @@ services:
       - "6379:6379"
     networks:
       - mynetwork
-    #healthcheck:
-      #test: ["CMD", "redis-cli", "ping"]
-      #interval: 5s
-      #timeout: 3s
-      #retries: 5
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   shop:
     build:
@@ -48,11 +49,34 @@ services:
       SPRING_REDIS_PORT: 6379
       SERVER_PORT: ${SERVER_PORT}
     depends_on:
-      - mysql-db
-      - redis
+      mysql-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - mynetwork
-    #command: ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "/app/shop/build/libs/shop-0.0.1-SNAPSHOT.jar"]
+
+  shop-test:
+    build:
+      context: .
+      dockerfile: shop/Dockerfile
+    container_name: shop-test
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/shop
+      SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - mynetwork
+    command: ["./gradlew", "test"]
 
   batch:
     build:
@@ -68,10 +92,10 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DATASOURCE_PASSWORD}
     depends_on:
-      - mysql-db
+      mysql-db:
+        condition: service_healthy
     networks:
       - mynetwork
-    #command: ["./wait-for-it.sh", "mysql-db:3306", "--", "java", "-jar", "/app/batch/build/libs/batch-0.0.1-SNAPSHOT.jar"]
 
 volumes:
   mysql-data:

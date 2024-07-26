@@ -44,7 +44,7 @@ Spring Batch 서버를 통해 상품 등록, 예약, 상품 배송 등의 안정
 ![erd-diagram]
 
 
-<!-- GETTING STARTED 
+<!-- GETTING STARTED
 ## Getting Started
 
 ---
@@ -84,7 +84,32 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 
 ---
 
-* 추가 예정
+* [Git Book](https://dooduzs-organization.gitbook.io/api/)
+
+## 패키지 구조
+
+---
+
+<details>
+    <summary>Common Module </summary>
+    <img src="/images/module-structure/common-module.png" />
+</details>
+
+<details>
+    <summary>Batch Module </summary>
+    <img src="/images/module-structure/batch-module1.png" />
+    <img src="/images/module-structure/batch-module2.png" />
+</details>
+<details>
+    <summary>Shop Module </summary>
+    <img src="/images/module-structure/shop-module1.png" />
+    <img src="/images/module-structure/shop-module2.png" />
+    <img src="/images/module-structure/shop-module3.png" />
+    <img src="/images/module-structure/shop-module4.png" />
+    <img src="/images/module-structure/shop-module5.png" />
+</details>
+
+
 <!--
 * 회원
 * 상품
@@ -107,14 +132,8 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
     * 비밀번호 - 복호화가 불가능한 인코더를 사용하여 보안성을 향상 시켰습니다.
     * 개인정보 - AES 대칭키 암호화를 적용하여 사용자의 요청 시에만 복호화된 정보를 제공합니다.
 * **마이 페이지**
-    * 개인 정보 조회
     * 주소 관리
-        * 최대 5개의 주소를 등록하고 사용합니다.
-    * 개인 정보 변경
-        * 비밀번호 / 연락처 수정 기능
-    * 주문 목록 조회
-    * 주문 상세 조회
-        * 주문/배송 상태를 조회할 수 있습니다.
+        * 다중 주소(최대 5개) 관리를 지원합니다.
     * 장바구니 조회
       * Redis 캐싱 스토리지를 통해 14일 간 데이터가 보관됩니다.
       * 담은 상품을 조회하고 수량을 수정할 수 있습니다.
