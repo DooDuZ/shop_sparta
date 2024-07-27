@@ -25,7 +25,8 @@ public class CustomerProductService extends ProductService {
             ProductImageService productImageService,
             ProductRepository productRepository,
             StockService stockService,
-            ReservationService reservationService, ProductRedisRepository productRedisRepository
+            ReservationService reservationService,
+            ProductRedisRepository productRedisRepository
     ) {
         super(productImageService, productRepository, stockService, reservationService);
         this.productRedisRepository = productRedisRepository;

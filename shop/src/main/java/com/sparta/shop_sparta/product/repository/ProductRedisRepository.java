@@ -49,4 +49,8 @@ public class ProductRedisRepository implements RedisRepository<String, Object> {
         redisTemplate.opsForValue().setIfAbsent(addPrefix(key), value, timeout);
         redisTemplate.expire(addPrefix(key), timeout);
     }
+
+    public void flushAll(){
+        redisTemplate.getConnectionFactory().getConnection().serverCommands().flushAll();
+    }
 }
