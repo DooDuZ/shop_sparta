@@ -59,6 +59,10 @@ dependencies {
 
     // s3
     implementation group: 'com.amazonaws', name: 'aws-java-sdk-s3', version: '1.12.762'
+
+    // test container
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
 }
 
 tasks.named('test') {
