@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.util.test;
+package com.sparta.shop_sparta.util.jmeter;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

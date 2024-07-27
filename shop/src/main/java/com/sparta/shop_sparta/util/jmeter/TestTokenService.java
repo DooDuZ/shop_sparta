@@ -1,4 +1,4 @@
-package com.sparta.shop_sparta.util.test;
+package com.sparta.shop_sparta.util.jmeter;
 
 import com.sparta.common.constant.member.MemberRole;
 import com.sparta.shop_sparta.member.service.auth.JwtTokenProvider;
