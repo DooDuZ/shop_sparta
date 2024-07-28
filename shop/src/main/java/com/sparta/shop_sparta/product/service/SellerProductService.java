@@ -61,11 +61,11 @@ public class SellerProductService extends ProductService {
                 productRequestDto.getProductDetailImages()
         );
 
-        if(productRequestDto.isReservation() && productRequestDto.getReservationTime() != null) {
+        if(productRequestDto.isReservation()) {
             reservationService.createReservation(
                     productEntity,
                     productRequestDto.getReservationTime(),
-                    ProductStatus.of(productRequestDto.getReservationStatus())
+                    productRequestDto.getReservationStatus()
             );
         }
 
@@ -162,8 +162,7 @@ public class SellerProductService extends ProductService {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
-        return reservationService.createReservation(productEntity, reservationRequestDto.getReservationTime(), ProductStatus.of(
-                reservationRequestDto.getReserveStatus()));
+        return reservationService.createReservation(productEntity, reservationRequestDto.getReservationTime(), reservationRequestDto.getReserveStatus());
     }
 
     @Transactional

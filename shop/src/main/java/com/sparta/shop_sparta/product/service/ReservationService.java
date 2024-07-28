@@ -25,12 +25,16 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public ReservationResponseDto createReservation(ProductEntity productEntity, LocalDateTime reservationTime, ProductStatus reserveStatus) {
+    public ReservationResponseDto createReservation(ProductEntity productEntity, LocalDateTime reservationTime, Long reserveStatus) {
+        if (reservationTime == null) {
+            throw new ProductException(ProductMessage.INVALID_RESERVATION);
+        }
+
         ReservationEntity reservationEntity = reservationRepository.save(
                 ReservationEntity.builder()
                         .completed(false)
                         .reservationTime(reservationTime)
-                        .reserveStatus(reserveStatus)
+                        .reserveStatus(ProductStatus.of(reserveStatus))
                         .productEntity(productEntity)
                         .build()
         );
