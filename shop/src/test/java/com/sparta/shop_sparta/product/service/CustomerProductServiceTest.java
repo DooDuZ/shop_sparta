@@ -39,7 +39,7 @@ import org.testcontainers.utility.DockerImageName;
 public class CustomerProductServiceTest {
 
     @Container
-    public static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:5.0.3-alpine"))
+    public static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:latest"))
             .withExposedPorts(6379);
 
     @Autowired
