@@ -30,27 +30,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class SellerProductService extends ProductService {
 
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
     @Autowired
     public SellerProductService(
             ProductImageService productImageService,
             ProductRepository productRepository,
             StockService stockService,
-            CategoryRepository categoryRepository,
+            CategoryService categoryService,
             ReservationService reservationService
     ) {
         super(productImageService, productRepository, stockService, reservationService);
-        this.categoryRepository = categoryRepository;
+        this.categoryService = categoryService;
     }
 
     @Transactional
     public ProductDto createProduct(UserDetails userDetails, ProductRequestDto productRequestDto) {
         ProductEntity productEntity = productRequestDto.toEntity();
 
-        CategoryEntity categoryEntity = categoryRepository.findById(productRequestDto.getCategoryId()).orElseThrow(
-                () -> new ProductException(ProductMessage.INVALID_CATEGORY)
-        );
+        CategoryEntity categoryEntity = categoryService.getCategoryEntity(productRequestDto.getCategoryId());
 
         productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
