@@ -32,9 +32,11 @@ public class ProductRequestDto {
     private List<MultipartFile> productThumbnails;
     private List<MultipartFile> productDetailImages;
 
-    private boolean reservation;
-    private LocalDateTime reservationTime;
-    private Long reservationStatus;
+    private List<ReservationRequestDto> reservations;
+
+    //private boolean reservation;
+    //private LocalDateTime reservationTime;
+    //private Long reservationStatus;
 
     public ProductEntity toEntity(){
         return ProductEntity.builder().productId(this.productId).productDetail(this.productDetail)

@@ -17,6 +17,7 @@ import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,8 +36,8 @@ public class SellerProductService extends ProductService {
             ProductRepository productRepository,
             StockService stockService,
             CategoryService categoryService,
-            ReservationService reservationService
-    ) {
+            ReservationService reservationService,
+            @Qualifier("productService") ProductService productService) {
         super(productImageService, productRepository, stockService, reservationService);
         this.categoryService = categoryService;
     }
@@ -49,7 +50,7 @@ public class SellerProductService extends ProductService {
 
         productEntity.init(categoryEntity, (MemberEntity) userDetails);
 
-        ProductEntity product = productRepository.save(productEntity);
+        productRepository.save(productEntity);
 
         stockService.addProduct(productEntity, productRequestDto.getAmount());
 
@@ -58,15 +59,17 @@ public class SellerProductService extends ProductService {
                 productRequestDto.getProductDetailImages()
         );
 
-        if(productRequestDto.isReservation()) {
-            reservationService.createReservation(
-                    productEntity,
-                    productRequestDto.getReservationTime(),
-                    productRequestDto.getReservationStatus()
-            );
+        if(!productRequestDto.getReservations().isEmpty()) {
+            for(ReservationRequestDto reservationRequestDto : productRequestDto.getReservations()) {
+                reservationService.createReservation(
+                        productEntity,
+                        reservationRequestDto.getReservationTime(),
+                        reservationRequestDto.getReservationStatus()
+                );
+            }
         }
 
-        return product.toDto();
+        return getProductDto(productEntity);
     }
 
     public List<ProductDto> getSellerProducts(UserDetails userDetails, int page, int itemsPerPage) {
@@ -91,9 +94,19 @@ public class SellerProductService extends ProductService {
 
         productEntity.update(productRequestDto);
         stockService.updateStock(productEntity, productRequestDto.getAmount());
+        // 이미지 교체 여부 확인 해야함
         productImageService.updateProductImages(productEntity, productRequestDto.getProductThumbnails(), productRequestDto.getProductDetailImages());
 
-        return productEntity.toDto();
+        if (!productRequestDto.getReservations().isEmpty()) {
+            reservationService.updateReservations(productId, productRequestDto.getReservations());
+        }
+
+        return getProductDto(productEntity);
+    }
+
+    @Transactional
+    public List<ReservationResponseDto> updateReservations(UserDetails userDetails, ProductEntity productEntity, List<ReservationRequestDto> reservations) {
+        return reservationService.updateReservations(productEntity.getProductId(), reservations);
     }
 
     @Transactional
@@ -159,7 +172,7 @@ public class SellerProductService extends ProductService {
             throw new AuthorizationException(AuthMessage.AUTHORIZATION_DENIED);
         }
 
-        return reservationService.createReservation(productEntity, reservationRequestDto.getReservationTime(), reservationRequestDto.getReserveStatus());
+        return reservationService.createReservation(productEntity, reservationRequestDto.getReservationTime(), reservationRequestDto.getReservationStatus());
     }
 
     @Transactional

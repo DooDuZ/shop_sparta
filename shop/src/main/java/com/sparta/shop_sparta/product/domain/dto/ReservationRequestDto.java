@@ -18,5 +18,5 @@ public class ReservationRequestDto {
     private Long reservationId;
     private Long productId;
     private LocalDateTime reservationTime;
-    private Long reserveStatus;
+    private Long reservationStatus;
 }

@@ -11,6 +11,7 @@ import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.ReservationEntity;
 import com.sparta.shop_sparta.product.repository.ReservationRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +50,32 @@ public class ReservationService {
         );
 
         reservationEntity.setReservationTime(reservationRequestDto.getReservationTime());
-        reservationEntity.setReserveStatus(ProductStatus.of(reservationRequestDto.getReserveStatus()));
+        reservationEntity.setReserveStatus(ProductStatus.of(reservationRequestDto.getReservationStatus()));
 
         return reservationEntity.toResponseDto();
+    }
+
+    @Transactional
+    public List<ReservationResponseDto> updateReservations(Long productId, List<ReservationRequestDto> reservations) {
+        List<ReservationResponseDto> updates = new ArrayList<>();
+
+        for (ReservationRequestDto reservation : reservations) {
+
+            if(productId - reservation.getProductId() != 0){
+                throw new ProductException(ProductMessage.INVALID_RESERVATION);
+            }
+
+            ReservationEntity reservationEntity = reservationRepository.findById(reservation.getReservationId()).orElseThrow(
+                    () -> new ProductException(ProductMessage.INVALID_RESERVATION)
+            );
+
+            reservationEntity.setReservationTime(reservation.getReservationTime());
+            reservationEntity.setReserveStatus(ProductStatus.of(reservation.getReservationStatus()));
+
+            updates.add(reservationEntity.toResponseDto());
+        }
+
+        return updates;
     }
 
     @Transactional
