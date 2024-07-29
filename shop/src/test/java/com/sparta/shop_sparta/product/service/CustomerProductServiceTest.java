@@ -168,7 +168,7 @@ public class CustomerProductServiceTest {
             List<ProductEntity> productEntities = Arrays.asList(cachedProductEntity, notCachedProductEntity);
             Page<ProductEntity> productEntityPage = new PageImpl<>(productEntities);
 
-            when(productRepository.findAllByProductStatus(any(), eq(ProductStatus.of(productStatus))))
+            when(productRepository.findAllByProductStatusAndIsDeletedFalse(any(), eq(ProductStatus.of(productStatus))))
                     .thenReturn(productEntityPage);
 
             // when
@@ -234,7 +234,7 @@ public class CustomerProductServiceTest {
             List<ProductEntity> productEntities = Arrays.asList(cachedProductEntity, notCachedProductEntity);
             Page<ProductEntity> productEntityPage = new PageImpl<>(productEntities);
 
-            when(productRepository.findAllBySellerEntity_memberIdAndProductStatus(
+            when(productRepository.findAllBySellerEntity_memberIdAndProductStatusAndIsDeletedFalse(
                     any(), eq(sellerId), eq(ProductStatus.ON_SALE)))
                     .thenReturn(productEntityPage);
 
@@ -255,7 +255,7 @@ public class CustomerProductServiceTest {
             List<ProductEntity> productEntities = new ArrayList<>();
             Page<ProductEntity> productEntityPage = new PageImpl<>(productEntities);
 
-            when(productRepository.findAllBySellerEntity_memberIdAndProductStatus(
+            when(productRepository.findAllBySellerEntity_memberIdAndProductStatusAndIsDeletedFalse(
                     any(), eq(sellerId), eq(ProductStatus.ON_SALE)))
                     .thenReturn(productEntityPage);
 
@@ -281,7 +281,7 @@ public class CustomerProductServiceTest {
             List<ProductEntity> productEntities = Arrays.asList(cachedProductEntity);
             Page<ProductEntity> productEntityPage = new PageImpl<>(productEntities);
 
-            when(productRepository.findAllByCategoryEntity_CategoryIdAndProductStatus(
+            when(productRepository.findAllByCategoryEntity_CategoryIdAndProductStatusAndIsDeletedFalse(
                     any(), eq(categoryId), eq(ProductStatus.ON_SALE)))
                     .thenReturn(productEntityPage);
 

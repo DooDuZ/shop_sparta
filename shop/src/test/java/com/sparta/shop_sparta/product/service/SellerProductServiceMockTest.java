@@ -51,6 +51,8 @@ public class SellerProductServiceMockTest {
     private StockService stockService;
     @Mock
     private ReservationService reservationService;
+    @Mock
+    private CategoryService categoryService;
 
     ProductRequestDto productRequestDto;
     ProductEntity productEntity;
@@ -67,7 +69,7 @@ public class SellerProductServiceMockTest {
         sellerEntity = MemberEntity.builder().memberId(1L).memberName("장사꾼지웅이").email("shin9158@gmail.com")
                 .role(MemberRole.SELLER).loginId("shin91588").password("test12").phoneNumber("010-2720-9151").build();
         productRequestDto = ProductRequestDto.builder().productName("지웅이꺼").productDetail("메롱이다").productStatus(1L)
-                .price(100000L).productDetailImages(new ArrayList<>()).productThumbnails(new ArrayList<>()).amount(20L).build();
+                .price(100000L).reservations(new ArrayList<>()).productDetailImages(new ArrayList<>()).productThumbnails(new ArrayList<>()).amount(20L).build();
         productEntity = ProductEntity.builder().productId(1L).productStatus(ProductStatus.WAITING).price(100000L)
                 .categoryEntity(categoryEntity).sellerEntity(sellerEntity).productDetail("메롱").productName("지웅이꺼").build();
         stockEntity = StockEntity.builder().amount(20L).productEntity(productEntity).build();
@@ -83,8 +85,9 @@ public class SellerProductServiceMockTest {
             productRequestDto = ProductRequestDto.builder().productId(1L).price(100000L)
                     .amount(20L).categoryId(1L).sellerId(1L).productDetail("메롱").productName("지웅이꺼")
                     .productThumbnails(new ArrayList<>()).productDetailImages(new ArrayList<>())
+                    .reservations(new ArrayList<>())
                     .build();
-            when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
+            when(categoryService.getCategoryEntity(productRequestDto.getCategoryId())).thenReturn(categoryEntity);
             when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
             doNothing().when(localStorageImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
@@ -94,14 +97,15 @@ public class SellerProductServiceMockTest {
             // then
             assertThat(productDto.getProductDetail()).isEqualTo(productRequestDto.getProductDetail());
             assertThat(productDto.getPrice()).isEqualTo(productRequestDto.getPrice());
-            assertThat(productDto.getProductStatus()).isEqualTo(ProductStatus.WAITING);
+            assertThat(productDto.getProductStatus()).isEqualTo(ProductStatus.NOT_PUBLISHED);
         }
 
         @Test
         @DisplayName("존재하지 않는 카테고리 입력 시 Exception이 발생합니다.")
         void createProductCategoryFailTest() {
             // given
-            when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.ofNullable(null));
+            productRequestDto.setCategoryId(2L);
+            when(categoryService.getCategoryEntity(anyLong())).thenThrow(new ProductException(ProductMessage.INVALID_CATEGORY));
             // when then
             assertThatThrownBy(
                     () -> sellerProductService.createProduct(memberEntity, productRequestDto)
@@ -112,7 +116,6 @@ public class SellerProductServiceMockTest {
         @DisplayName("이미지 저장 실패 시 Exception이 발생합니댜.")
         void createProductImageFailTest() {
             // given
-            when(categoryRepository.findById(productRequestDto.getCategoryId())).thenReturn(Optional.of(categoryEntity));
             when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
             doThrow(new RuntimeException()).when(localStorageImageService).createProductImages(any(ProductEntity.class), anyList(), anyList());
 
@@ -203,7 +206,7 @@ public class SellerProductServiceMockTest {
             productEntity.setProductStatus(productStatus);
             List<ProductEntity> productEntities = new ArrayList<>();
             productEntities.add(productEntity);
-            when(productRepository.findAllBySellerEntity(any(Pageable.class), any(MemberEntity.class))).thenReturn(new PageImpl<>(productEntities));
+            when(productRepository.findAllBySellerEntityAndIsDeletedFalse(any(Pageable.class), any(MemberEntity.class))).thenReturn(new PageImpl<>(productEntities));
             when(reservationService.getAllReservationsByProductEntities(anyList())).thenReturn(new ArrayList<>());
 
             // when
