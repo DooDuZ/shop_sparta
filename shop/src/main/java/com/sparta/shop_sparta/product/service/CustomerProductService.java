@@ -74,7 +74,7 @@ public class CustomerProductService extends ProductService {
             throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
         }
 
-        List<ProductEntity> productEntities = productRepository.findAllByProductStatus(pageable,
+        List<ProductEntity> productEntities = productRepository.findAllByProductStatusAndIsDeletedFalse(pageable,
                 ProductStatus.of(productStatus)).getContent();
 
         return getProductDtos(productEntities);
@@ -82,7 +82,7 @@ public class CustomerProductService extends ProductService {
 
     public List<ProductDto> getAllProductsBySeller(int page, int itemPerPage, Long sellerId) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);
-        List<ProductEntity> productEntities = productRepository.findAllBySellerEntity_memberIdAndProductStatus(
+        List<ProductEntity> productEntities = productRepository.findAllBySellerEntity_memberIdAndProductStatusAndIsDeletedFalse(
                 pageable,
                 sellerId,
                 ProductStatus.ON_SALE
@@ -92,7 +92,7 @@ public class CustomerProductService extends ProductService {
 
     public List<ProductDto> getAllByCategory(int page, int itemPerPage, Long categoryId) {
         Pageable pageable = PageRequest.of(page - 1, itemPerPage);
-        List<ProductEntity> productEntities = productRepository.findAllByCategoryEntity_CategoryIdAndProductStatus(
+        List<ProductEntity> productEntities = productRepository.findAllByCategoryEntity_CategoryIdAndProductStatusAndIsDeletedFalse(
                 pageable,
                 categoryId,
                 ProductStatus.ON_SALE

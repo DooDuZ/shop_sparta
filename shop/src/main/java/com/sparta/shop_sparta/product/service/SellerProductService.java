@@ -1,10 +1,8 @@
 package com.sparta.shop_sparta.product.service;
 
 import com.sparta.common.constant.member.AuthMessage;
-import com.sparta.common.constant.product.ProductMessage;
 import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.common.exception.AuthorizationException;
-import com.sparta.common.exception.ProductException;
 import com.sparta.shop_sparta.product.domain.dto.ProductDto;
 import com.sparta.shop_sparta.product.domain.dto.ProductRequestDto;
 import com.sparta.shop_sparta.product.domain.dto.ProductStatusRequestDto;
@@ -16,7 +14,6 @@ import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
-import com.sparta.shop_sparta.product.repository.CategoryRepository;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +74,7 @@ public class SellerProductService extends ProductService {
 
         Pageable pageable = PageRequest.of(page - 1, itemsPerPage);
         
-        List<ProductEntity> productEntities = productRepository.findAllBySellerEntity(pageable, memberEntity).getContent();
+        List<ProductEntity> productEntities = productRepository.findAllBySellerEntityAndIsDeletedFalse(pageable, memberEntity).getContent();
 
         return getProductDtos(productEntities);
     }

@@ -13,9 +13,9 @@ import org.springframework.stereotype.Repository;
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     Optional<ProductEntity> findBySellerEntity_MemberId(Long memberId);
 
-    Page<ProductEntity> findAll(Pageable pageable);
-    Page<ProductEntity> findAllByProductStatus(Pageable pageable, ProductStatus productStatus);
-    Page<ProductEntity> findAllByCategoryEntity_CategoryIdAndProductStatus(Pageable pageable, Long categoryId, ProductStatus productStatus);
-    Page<ProductEntity> findAllBySellerEntity_memberIdAndProductStatus(Pageable pageable, Long memberId, ProductStatus productStatus);
-    Page<ProductEntity> findAllBySellerEntity(Pageable pageable, MemberEntity sellerEntity);
+    Page<ProductEntity> findAllByIsDeletedFalse(Pageable pageable);
+    Page<ProductEntity> findAllByProductStatusAndIsDeletedFalse(Pageable pageable, ProductStatus productStatus);
+    Page<ProductEntity> findAllByCategoryEntity_CategoryIdAndProductStatusAndIsDeletedFalse(Pageable pageable, Long categoryId, ProductStatus productStatus);
+    Page<ProductEntity> findAllBySellerEntity_memberIdAndProductStatusAndIsDeletedFalse(Pageable pageable, Long memberId, ProductStatus productStatus);
+    Page<ProductEntity> findAllBySellerEntityAndIsDeletedFalse(Pageable pageable, MemberEntity sellerEntity);
 }
