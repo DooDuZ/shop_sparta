@@ -1,6 +1,5 @@
 package com.sparta.shop_sparta.common.domain;
 
-
 import com.sparta.common.constant.ServerErrorMessage;
 import jakarta.persistence.PreRemove;
 

@@ -13,7 +13,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 // abstract class로 인스턴스화 방지
 // commit test
 @MappedSuperclass
-@EntityListeners({AuditingEntityListener.class, BaseEntityListener.class})
+//@EntityListeners({AuditingEntityListener.class, BaseEntityListener.class})
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 //@SQLRestriction("is_deleted is true") //-> where deprecated 이후 사용할 어노테이션
 public abstract class BaseEntity {
