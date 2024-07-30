@@ -10,11 +10,15 @@ import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.product.domain.dto.ProductDto;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
+import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.product.repository.ProductRedisRepository;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
+import com.sparta.shop_sparta.product.repository.StockRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,6 +47,12 @@ public class CustomerProductServiceTest {
     public static GenericContainer<?> redis = new GenericContainer<>(DockerImageName.parse("redis:latest"))
             .withExposedPorts(6379);
 
+    @DynamicPropertySource
+    static void redisProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.redis.host", redis::getHost);
+        registry.add("spring.redis.port", redis::getFirstMappedPort);
+    }
+
     @Autowired
     private CustomerProductService customerProductService;
 
@@ -51,25 +62,24 @@ public class CustomerProductServiceTest {
     @Autowired
     private ProductRedisRepository productRedisRepository;
 
+    @MockBean
+    private StockService stockService;
+
     private ProductEntity cachedProductEntity;
     private ProductEntity notCachedProductEntity;
 
-    @DynamicPropertySource
-    static void redisProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.redis.host", redis::getHost);
-        registry.add("spring.redis.port", redis::getFirstMappedPort);
-    }
+
 
     @BeforeEach
-    void setUp() {
-        productRedisRepository.flushAll();
+    void init() {
+        CategoryEntity categoryEntity = CategoryEntity.builder().categoryId(1L).categoryName("콤퓨타").build();
 
         cachedProductEntity = ProductEntity.builder()
                 .productId(1L)
                 .productStatus(ProductStatus.ON_SALE)
                 .productName("캐시 상품")
                 .productDetail("빠르다")
-                .categoryEntity(CategoryEntity.builder().categoryId(1L).categoryName("콤퓨타").build())
+                .categoryEntity(categoryEntity)
                 .imageVersion(1L)
                 .sellerEntity(MemberEntity.builder().memberId(1L).build())
                 .build();
@@ -79,10 +89,15 @@ public class CustomerProductServiceTest {
                 .productStatus(ProductStatus.ON_SALE)
                 .productName("DB 상품")
                 .productDetail("느리다")
-                .categoryEntity(CategoryEntity.builder().categoryId(1L).categoryName("콤퓨타").build())
+                .categoryEntity(categoryEntity)
                 .imageVersion(1L)
                 .sellerEntity(MemberEntity.builder().memberId(1L).build())
                 .build();
+    }
+
+    @AfterEach
+    void clear() {
+        productRedisRepository.flushAll();
     }
 
     @Nested
@@ -100,8 +115,11 @@ public class CustomerProductServiceTest {
 
             // Then
             assertThat(productDto).isNotNull();
-            assertThat(productDto.getProductId()).isEqualTo(1L);
-            assertThat(productDto.getProductStatus()).isEqualTo(ProductStatus.ON_SALE);
+            assertThat(productDto.getProductId()).isEqualTo(cachedProductEntity.getProductId());
+            assertThat(productDto.getProductStatus()).isEqualTo(cachedProductEntity.getProductStatus());
+            
+            // DB 조회 메서드가 호출되지 않음
+            verify(productRepository, times(0)).findById(anyLong());
         }
 
 
@@ -109,10 +127,12 @@ public class CustomerProductServiceTest {
         @DisplayName("캐사되지 않은 상품을 조회합니다.")
         void getUncachedProductSuccessTest() {
             // given
-            Long productId = 1L;
+            Long productId = 2L;
+            StockEntity stockEntity = StockEntity.builder().productEntity(notCachedProductEntity).amount(0L).build();
 
             // 따로 캐시하지 않은 상태
-            when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(cachedProductEntity));
+            when(productRepository.findById(productId)).thenReturn(java.util.Optional.of(notCachedProductEntity));
+            when(stockService.getStockEntity(notCachedProductEntity)).thenReturn(stockEntity);
 
             // when
             ProductDto result = customerProductService.getProduct(productId);

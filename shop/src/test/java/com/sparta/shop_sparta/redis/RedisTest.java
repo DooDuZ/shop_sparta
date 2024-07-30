@@ -30,7 +30,6 @@ public class RedisTest {
         redisTemplate.opsForSet().add(key, "PostmanRuntime/7.37.3");
 
         Set<Object> values = redisTemplate.opsForSet().members(key);
-        System.out.println(redisTemplate.opsForSet().isMember(key, "PostmanRuntime/7.37.3"));
 
         redisTemplate.delete(key);
     }
@@ -46,13 +45,7 @@ public class RedisTest {
         redisTemplate.opsForSet().add(key, "value2");
         redisTemplate.opsForSet().add(key, "PostmanRuntime/7.37.3");
 
-
-        System.out.println(redisTemplate.opsForSet().members(key));
-        System.out.println(redisTemplate.opsForSet().isMember(key, "PostmanRuntime/7.37.3"));
-
         redisTemplate.opsForSet().remove(key, "PostmanRuntime/7.37.3");
-        System.out.println(redisTemplate.opsForSet().members(key));
-        System.out.println();
 
         redisTemplate.delete(key);
     }

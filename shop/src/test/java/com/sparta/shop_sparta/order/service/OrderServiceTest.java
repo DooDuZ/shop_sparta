@@ -106,13 +106,13 @@ public class OrderServiceTest {
             orderService.createOrder(memberEntity, orderRequestDto);
 
             // then
-        /*assertThat(orderResponseDto).isNotNull();
-        assertThat(orderResponseDto.getOrderId()).isEqualTo(1L);
-        assertThat(orderResponseDto.getOrderStatus()).isEqualTo(OrderStatus.PREPARED);
-        assertThat(orderResponseDto.getOrderAddr()).isEqualTo(orderRequestDto.getOrderAddr());
-        assertThat(orderResponseDto.getOrderAddrDetail()).isEqualTo(orderRequestDto.getOrderAddrDetail());
-        assertThat(orderResponseDto.getMemberId()).isEqualTo(memberEntity.getMemberId());
-        assertThat(orderResponseDto.getTotalPrice()).isEqualTo(productEntity.getPrice() * 10L);*/
+            /*assertThat(orderResponseDto).isNotNull();
+            assertThat(orderResponseDto.getOrderId()).isEqualTo(1L);
+            assertThat(orderResponseDto.getOrderStatus()).isEqualTo(OrderStatus.PREPARED);
+            assertThat(orderResponseDto.getOrderAddr()).isEqualTo(orderRequestDto.getOrderAddr());
+            assertThat(orderResponseDto.getOrderAddrDetail()).isEqualTo(orderRequestDto.getOrderAddrDetail());
+            assertThat(orderResponseDto.getMemberId()).isEqualTo(memberEntity.getMemberId());
+            assertThat(orderResponseDto.getTotalPrice()).isEqualTo(productEntity.getPrice() * 10L);*/
             // Todo 부하 테스트를 위한 임시 주석 처리
             //verify(cartService).removeOrderedProduct(any(MemberEntity.class), anyList());
         }
@@ -185,7 +185,7 @@ public class OrderServiceTest {
 
         @Test
         @DisplayName("주문 번호가 잘못된 경우 Exception이 발생합니다.")
-        void getOrderInvalidOrderFailTest(){
+        void getOrderFailTest_InvalidOrderId(){
             // given
             Long orderId = 2L;
 
