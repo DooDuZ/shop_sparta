@@ -75,7 +75,6 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
 ## API 명세
 
 * **[Git Book](https://dooduzs-organization.gitbook.io/api/)**
-
 ## 패키지 구조
 
 <details>
@@ -180,7 +179,8 @@ Docker가 설치되어 있지 않은 경우, [Docker 공식 웹사이트](https:
         * 상품 상세 정보 캐싱 - 주문 시 캐시 데이터 사용 - DB 접근 최소화
         * **최대 응답 시간 4000ms -> 1478ms**
 
-
+## More
+* **[Notion Project Page](https://unruly-shrimp-2b4.notion.site/Online-Open-Run-E-Commerce-Shop-Sparta-357bcae266f844c6aa492918f57530ad?pvs=4)**
 
 <!-- CONTACT -->
 ## Contact
