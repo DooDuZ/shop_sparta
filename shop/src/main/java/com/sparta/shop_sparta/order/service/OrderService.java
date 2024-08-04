@@ -14,7 +14,7 @@ import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
 import com.sparta.shop_sparta.order.repository.OrderRepository;
 import com.sparta.shop_sparta.cart.service.CartService;
-import com.sparta.shop_sparta.product.service.ProductService;
+import com.sparta.shop_sparta.product.service.CustomerProductService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -26,8 +26,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,7 @@ public class OrderService {
     private final OrderDetailService orderDetailService;
     private final PaymentService paymentService;
     private final CartService cartService;
-    private final ProductService productService;
+    private final CustomerProductService customerProductService;
 
     @Transactional
     public void createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {
@@ -51,20 +49,20 @@ public class OrderService {
 
         // 주문 처리
         List<OrderDetailRequestDto> requestOrderDetails = getOrderDetailsInCart(orderRequestDto, memberEntity);
-        List<OrderDetailEntity> orderDetailEntities = orderDetailService.addOrder(orderEntity, requestOrderDetails);
+        List<OrderDetailDto> orderDetailDtoList = orderDetailService.addOrder(orderEntity, requestOrderDetails);
 
         // 가격 입력
-        orderEntity.setTotalPrice(getTotalPrice(orderDetailEntities));
+        orderEntity.setTotalPrice(getTotalPrice(requestOrderDetails));
 
         // 재고 확인까지 끝난 상태로 결제한다.
         // 결제 실패 시 재고 복구
         if (!paymentService.pay(orderEntity)) {
-            orderDetailService.rollbackOrder(orderDetailEntities);
+            orderDetailService.rollbackOrder(orderDetailDtoList);
             throw new OrderException(OrderResponseMessage.FAIL_PAYMENT);
         }
 
         // 비동기 저장 처리
-        orderDetailService.orderDetailSaveAll(orderDetailEntities);
+        orderDetailService.orderDetailSaveAll(orderDetailDtoList);
 
         // 결제 성공한 데이터는 장바구니에서 제거
         cartService.removeOrderedProduct(memberEntity, requestOrderDetails);
@@ -84,18 +82,17 @@ public class OrderService {
         return orderRepository.save(orderEntity);
     }
 
-    private Long getTotalPrice(List<OrderDetailEntity> orderDetails) {
+    private Long getTotalPrice(List<OrderDetailRequestDto> orderDetails) {
         Long totalPrice = 0L;
 
-        for (OrderDetailEntity orderDetail : orderDetails) {
-            totalPrice += orderDetail.getAmount() * orderDetail.getProductEntity().getPrice();
+        for (OrderDetailRequestDto orderDetail : orderDetails) {
+            totalPrice += orderDetail.getAmount() * customerProductService.getProduct(orderDetail.getProductId()).getPrice();
         }
 
         return totalPrice;
     }
 
-    private List<OrderDetailRequestDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto,
-                                                              MemberEntity memberEntity) {
+    private List<OrderDetailRequestDto> getOrderDetailsInCart(OrderRequestDto orderRequestDto, MemberEntity memberEntity) {
         List<OrderDetailRequestDto> orderDetails = new ArrayList<>();
 
         // 장바구니 정보 가져오기
@@ -174,7 +171,7 @@ public class OrderService {
 
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
             OrderDetailDto orderDetailDto = orderDetailEntity.toDto();
-            orderDetailDto.setProductDto(productService.getProductDto(orderDetailEntity.getProductEntity()));
+            orderDetailDto.setProductDto(customerProductService.getProductDto(orderDetailEntity.getProductEntity()));
             orderInfo.get(orderDetailEntity.getOrderEntity().getOrderId()).getOrderDetails().add(orderDetailDto);
         }
 

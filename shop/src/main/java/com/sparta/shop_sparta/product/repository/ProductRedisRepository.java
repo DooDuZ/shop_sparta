@@ -3,6 +3,8 @@ package com.sparta.shop_sparta.product.repository;
 import com.sparta.shop_sparta.common.repository.RedisRepository;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class ProductRedisRepository implements RedisRepository<String, Object> {
 
+    private static final Logger log = LoggerFactory.getLogger(ProductRedisRepository.class);
     private final RedisTemplate<String, Object> redisTemplate;
     private final String prefix = "product : ";
     private final Duration timeout = Duration.ofMinutes(20);

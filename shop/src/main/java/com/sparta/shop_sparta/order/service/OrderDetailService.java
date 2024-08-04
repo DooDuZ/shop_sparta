@@ -7,17 +7,17 @@ import com.sparta.shop_sparta.order.domain.dto.OrderDetailRequestDto;
 import com.sparta.shop_sparta.product.domain.dto.ProductDto;
 import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
+import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.order.repository.OrderDetailRepository;
-import com.sparta.shop_sparta.product.repository.ProductRedisRepository;
 import com.sparta.shop_sparta.product.service.CustomerProductService;
 import com.sparta.shop_sparta.product.service.StockService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,11 +27,10 @@ public class OrderDetailService {
     private final CustomerProductService productService;
     private final OrderDetailRepository orderDetailRepository;
     private final StockService stockService;
-    private final ProductRedisRepository productRedisRepository;
 
     @Transactional
-    public List<OrderDetailEntity> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
-        List<OrderDetailEntity> orderDetailEntities = new ArrayList<>();
+    public List<OrderDetailDto> addOrder(OrderEntity orderEntity, List<OrderDetailRequestDto> orderDetailRequstDtoList) {
+        List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
 
         for (OrderDetailRequestDto orderDetailRequestDto : orderDetailRequstDtoList) {
             Long productId = orderDetailRequestDto.getProductId();
@@ -50,16 +49,19 @@ public class OrderDetailService {
             stockService.updateStockAfterOrder(productId, amount);
 
             // 상품 가격 정보 불러오기
-            ProductDto productDto = productService.getProduct(productId);
-
-            // 넣어줄 Entity가 많음... toEntity 말고 그냥 build로
-            orderDetailEntities.add(
-                    OrderDetailEntity.builder().orderEntity(orderEntity)
-                            .productEntity(productDto.toEntity()).amount(orderDetailRequestDto.getAmount()).build()
+            orderDetailDtoList.add(
+                    OrderDetailDto.builder().orderId(orderEntity.getOrderId())
+                            .productDto(
+                                    ProductDto.builder()
+                                            .productId(productId)
+                                            .build()
+                            )
+                            .amount(orderDetailRequestDto.getAmount())
+                            .build()
             );
         }
 
-        return orderDetailEntities;
+        return orderDetailDtoList;
     }
 
     private void checkCache(Long productId) {
@@ -73,22 +75,34 @@ public class OrderDetailService {
         }
     }
 
-    @Async
-    public void orderDetailSaveAll(List<OrderDetailEntity> orderDetailEntities){
-        orderDetailRepository.saveAll(orderDetailEntities);
+    //@Async
+    public void orderDetailSaveAll(List<OrderDetailDto> orderDetailDtoList){
+        CompletableFuture.runAsync(() -> {
+            for (OrderDetailDto orderDetailDto : orderDetailDtoList){
+                OrderEntity orderEntity = OrderEntity.builder().orderId(orderDetailDto.getOrderId()).build();
+                ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductDto().getProductId());
+
+                orderDetailRepository.save(
+                        OrderDetailEntity.builder()
+                                .orderEntity(orderEntity)
+                                .amount(orderDetailDto.getAmount())
+                                .productEntity(productEntity)
+                                .build()
+                );
+            }
+        });
     }
 
     public List<OrderDetailEntity> getOrderDetailsByOrderEntities(List<OrderEntity> orderEntities) {
         return orderDetailRepository.findAllByOrderEntityIn(orderEntities);
     }
 
-    public void rollbackOrder(List<OrderDetailEntity> orderDetailEntityList) {
-        for (OrderDetailEntity orderDetailEntity : orderDetailEntityList) {
-            stockService.repairStock(orderDetailEntity);
-            stockService.updateStockInRedis(orderDetailEntity.getProductEntity().getProductId(), -orderDetailEntity.getAmount());
+    public void rollbackOrder(List<OrderDetailDto> orderDetailDtoList) {
+        for (OrderDetailDto orderDetailDto : orderDetailDtoList) {
+            stockService.repairStock(orderDetailDto);
+            stockService.updateStockInRedis(orderDetailDto.getProductDto().getProductId(), -orderDetailDto.getAmount());
         }
     }
-
 
     private void validateOrderRequest(Long stock, Long amount){
         if(amount <= 0){

@@ -59,16 +59,20 @@ public class SellerProductService extends ProductService {
         );
 
         if(!productRequestDto.getReservations().isEmpty()) {
-            for(ReservationRequestDto reservationRequestDto : productRequestDto.getReservations()) {
-                reservationService.createReservation(
-                        productEntity,
-                        reservationRequestDto.getReservationTime(),
-                        reservationRequestDto.getReservationStatus()
-                );
-            }
+            createReservations(productEntity, productRequestDto.getReservations());
         }
 
         return getProductDto(productEntity);
+    }
+
+    private void createReservations(ProductEntity productEntity, List<ReservationRequestDto> reservations){
+        for(ReservationRequestDto reservationRequestDto : reservations) {
+            reservationService.createReservation(
+                    productEntity,
+                    reservationRequestDto.getReservationTime(),
+                    reservationRequestDto.getReservationStatus()
+            );
+        }
     }
 
     public List<ProductDto> getSellerProducts(UserDetails userDetails, int page, int itemsPerPage) {
@@ -103,6 +107,7 @@ public class SellerProductService extends ProductService {
         return getProductDto(productEntity);
     }
 
+    // controller를 통해 바꿀 일이 있다면 사용
     @Transactional
     public List<ReservationResponseDto> updateReservations(UserDetails userDetails, ProductEntity productEntity, List<ReservationRequestDto> reservations) {
         return reservationService.updateReservations(productEntity.getProductId(), reservations);
@@ -125,6 +130,7 @@ public class SellerProductService extends ProductService {
     @Transactional
     public StockResponseDto updateStock(UserDetails userDetails, StockRequestDto stockRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
+
         ProductEntity productEntity = getProductEntity(stockRequestDto.getProductId());
 
         if (productEntity.getSellerEntity().getMemberId() - memberEntity.getMemberId() != 0) {

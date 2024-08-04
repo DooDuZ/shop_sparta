@@ -27,10 +27,9 @@ public class BatchConfig {
     private final PlatformTransactionManager platformTransactionManager;
 
     @Bean
-    public  JobCompletionNotificationListener jobCompletionNotificationListener() {
+    public JobCompletionNotificationListener jobCompletionNotificationListener() {
         return new JobCompletionNotificationListener();
     }
-
 
     @Bean
     public Job reservationJob(JobCompletionNotificationListener listener, Step reservationStep) {
@@ -103,7 +102,7 @@ public class BatchConfig {
         return new StepBuilder("orderStep", jobRepository)
                 .<OrderEntity, OrderEntity>chunk(1000, platformTransactionManager)
                 .reader(orderReader)
-                .processor(orderProcessor)
+                //.processor(orderProcessor)
                 .writer(orderWriter)
                 .listener(jobCompletionNotificationListener)
                 .taskExecutor(taskExecutor())

@@ -2,11 +2,13 @@ package com.sparta.shop_sparta.product.service;
 
 import com.sparta.common.constant.product.ProductMessage;
 import com.sparta.common.exception.ProductException;
+import com.sparta.shop_sparta.order.domain.dto.OrderDetailDto;
 import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.product.repository.StockRepository;
 import com.sparta.shop_sparta.product.repository.StockRedisRepository;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -38,12 +40,14 @@ public class StockService {
     public StockEntity updateStock(ProductEntity productEntity, Long amount) {
         String key = String.valueOf(productEntity.getProductId());
 
+        StockEntity stockEntity = getStockEntity(productEntity);
+        stockEntity.setAmount(amount);
+
+        // db 반영 후 redis 캐시 데이터 제거
+        // 더 정확히 하려면 transaction이 종료된 후에 반영돼야 하는데... 방법이 있을까?
         if (stockRedisRepository.hasKey(key)){
             stockRedisRepository.deleteKey(key);
         }
-
-        StockEntity stockEntity = getStockEntity(productEntity);
-        stockEntity.setAmount(amount);
 
         return stockEntity;
     }
@@ -74,10 +78,12 @@ public class StockService {
         );
     }
 
-    @Async
+    //@Async
     @Transactional
     public void updateStockAfterOrder(Long productId, Long amount){
-        stockRepository.updateStockAfterOrder(productId, amount);
+        CompletableFuture.runAsync(()->{
+            stockRepository.updateStockAfterOrder(productId, amount);
+        });
     }
 
     public void redisCache(Long productId) {
@@ -135,8 +141,9 @@ public class StockService {
         return stock.longValue();
     }
 
-    @Async
-    public void repairStock(OrderDetailEntity orderDetailEntity) {
-        stockRepository.updateStockAfterOrder(orderDetailEntity.getProductEntity().getProductId(), -orderDetailEntity.getAmount());
+    public void repairStock(OrderDetailDto orderDetailDto) {
+        CompletableFuture.runAsync(()->{
+            stockRepository.updateStockAfterOrder(orderDetailDto.getProductDto().getProductId(), -orderDetailDto.getAmount());
+        });
     }
 }

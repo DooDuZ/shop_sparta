@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.sparta.common.constant.order.OrderResponseMessage;
 import com.sparta.common.constant.product.ProductStatus;
 import com.sparta.common.exception.OrderException;
+import com.sparta.shop_sparta.order.domain.dto.OrderDetailDto;
 import com.sparta.shop_sparta.order.domain.dto.OrderDetailRequestDto;
 import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
@@ -15,7 +16,6 @@ import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.order.repository.OrderDetailRepository;
 import com.sparta.shop_sparta.product.service.CustomerProductService;
-import com.sparta.shop_sparta.product.service.ProductService;
 import com.sparta.shop_sparta.product.service.StockService;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,12 +79,12 @@ public class OrderDetailServiceTest {
             }
 
             // when
-            List<OrderDetailEntity> orderDetails = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
+            List<OrderDetailDto> orderDetails = orderDetailService.addOrder(orderEntity, orderDetailDtoList);
 
             Long totalPrice = 0L;
 
-            for (OrderDetailEntity orderDetailEntity : orderDetails) {
-                totalPrice += orderDetailEntity.getAmount() * orderDetailEntity.getProductEntity().getPrice();
+            for (OrderDetailDto orderDetailDto : orderDetails) {
+                totalPrice += orderDetailDto.getAmount() * orderDetailDto.getProductDto().getPrice();
             }
 
             // then

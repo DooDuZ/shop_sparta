@@ -55,7 +55,8 @@ public class MailService implements VerifySignUpService<MemberDto>{
         signupVerifyCodeRedisRepository.saveWithDuration(String.valueOf(memberDto.getMemberId()),
                 verificationCode);
 
-        verificationMessage.append("<h3>")
+        verificationMessage
+                .append("<h3>")
                 .append("<a href=\"").append(mailConfig.requestUrl).append("/member/verification?memberId=")
                 .append(memberDto.getMemberId()).append("&verificationCode=").append(verificationCode)
                 .append("\">Click!!</a>")

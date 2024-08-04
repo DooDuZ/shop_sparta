@@ -21,7 +21,7 @@ public class OrderDetailDto {
     private Long orderId;
     private ProductDto productDto;
 
-    OrderDetailEntity toEntity(){
+    public OrderDetailEntity toEntity(){
         return OrderDetailEntity.builder().orderDetailId(this.orderDetailId).amount(this.amount).build();
     }
 }

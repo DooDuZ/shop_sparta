@@ -70,7 +70,8 @@ public class SchedulerConfig {
         }
     }
 
-    @Scheduled(cron = "0 */5 * * * ?")
+    //@Scheduled(cron = "0 */5 * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void performOrderJob() {
         try {
             log.info("Performing Order Job");

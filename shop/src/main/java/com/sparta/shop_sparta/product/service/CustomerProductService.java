@@ -8,6 +8,7 @@ import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
 import com.sparta.shop_sparta.product.repository.ProductRedisRepository;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service("customerProductService")
 @Transactional(readOnly = true)
+@Slf4j
 public class CustomerProductService extends ProductService {
 
     private final ProductRedisRepository productRedisRepository;
@@ -38,6 +40,8 @@ public class CustomerProductService extends ProductService {
         if (isCached(key)) {
             return (ProductDto) productRedisRepository.find(key);
         }
+
+        log.error(productId.toString() + "캐싱 안 됐어요");
 
         ProductEntity productEntity = getProductEntity(productId);
 

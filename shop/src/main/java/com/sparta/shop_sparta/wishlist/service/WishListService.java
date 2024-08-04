@@ -23,12 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class WishListService {
     private final WishListRepository wishListRepository;
-    private final ProductService productService;
+    private final ProductService customerProductService;
 
     @Transactional
     public WishListResponseDto addWishList(UserDetails userDetails, WishListRequestDto wishListRequestDto) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
-        ProductEntity productEntity = productService.getProductEntity(wishListRequestDto.getProductId());
+        ProductEntity productEntity = customerProductService.getProductEntity(wishListRequestDto.getProductId());
 
         return wishListRepository.save(
                 WishListEntity.builder()
@@ -53,7 +53,7 @@ public class WishListService {
     @Transactional
     public void deleteWishList(UserDetails userDetails, Long productId) {
         MemberEntity memberEntity = (MemberEntity) userDetails;
-        ProductEntity productEntity = productService.getProductEntity(productId);
+        ProductEntity productEntity = customerProductService.getProductEntity(productId);
 
         WishListEntity wishListEntity = wishListRepository.findByProductEntityAndMemberEntity(productEntity, memberEntity).orElseThrow(
                 () -> new RuntimeException("WishList Not Found")

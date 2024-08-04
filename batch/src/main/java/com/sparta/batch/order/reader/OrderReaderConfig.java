@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManagerFactory;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class OrderReaderConfig {
     private final EntityManagerFactory entityManagerFactory;
 
@@ -22,6 +24,7 @@ public class OrderReaderConfig {
             @Value("#{jobParameters['date']}") LocalDateTime dateTime,
             @Value("#{jobParameters['chunkSize']}") int chunkSize
     ) {
+        log.info(Thread.currentThread().getName() + ": Reading orders from database");
         JpaPagingItemReader<OrderEntity> reader = new JpaPagingItemReader<>();
         reader.setQueryString(
                 "SELECT o FROM orders o " +
@@ -31,8 +34,9 @@ public class OrderReaderConfig {
         );
         reader.setParameterValues(Collections.singletonMap("date", dateTime));
         reader.setEntityManagerFactory(entityManagerFactory);
-        reader.setPageSize(chunkSize); // jobParameters로부터 가져온 chunk 크기로 설정
+        reader.setPageSize(chunkSize * chunkSize);
         reader.setSaveState(false);
+
         return reader;
     }
 }

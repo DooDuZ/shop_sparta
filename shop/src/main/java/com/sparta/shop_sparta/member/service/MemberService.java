@@ -56,8 +56,13 @@ public class MemberService {
         mailService.sendVerification(memberDto);
 
         // 주소 서비스 통해서 주소 저장
-        addrService.addAddr(memberEntity,
-                AddrDto.builder().addr(memberDto.getAddr()).addrDetail(memberDto.getAddrDetail()).build());
+        addrService.addAddr(
+                memberEntity,
+                AddrDto.builder()
+                        .addr(memberDto.getAddr())
+                        .addrDetail(memberDto.getAddrDetail())
+                        .build()
+        );
     }
 
     private void validateSignupRequest(MemberDto memberDto) {

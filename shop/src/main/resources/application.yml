@@ -8,6 +8,10 @@ spring:
       - optional:file:../.env[.properties]
       - optional:file:../../.env[.properties]
 
+  threads:
+    virtual:
+      enabled: true
+
   servlet:
     multipart:
       max-request-size: 30MB
@@ -51,7 +55,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: update
-    #show-sql: 'true'
+    show-sql: 'true'
 
 logging:
   pattern:

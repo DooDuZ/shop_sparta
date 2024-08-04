@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service;
 public class CartService {
 
     private final CartRedisRepository cartRedisRepository;
-    private final ProductService productService;
+    private final ProductService customerProductService;
 
     private final StockService stockService;
 
@@ -61,7 +61,7 @@ public class CartService {
 
     private ProductEntity validateProduct(Long productId){
         // 조회 실패시 exception
-        ProductEntity productEntity = productService.getProductEntity(productId);
+        ProductEntity productEntity = customerProductService.getProductEntity(productId);
 
         if(productEntity.getProductStatus() != ProductStatus.ON_SALE){
             throw new ProductException(ProductMessage.NOT_ON_SALE);
@@ -111,7 +111,7 @@ public class CartService {
     }
 
     List<ProductDto> getProductsInCart(Map<Long, Long> cartInfo){
-        return productService.getProductDtoList(cartInfo);
+        return customerProductService.getProductDtoList(cartInfo);
     }
 
     @Transactional

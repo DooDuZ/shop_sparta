@@ -10,7 +10,6 @@ import com.sparta.shop_sparta.product.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-@Service
 public class ProductService {
 
     protected final ProductImageService productImageService;
