@@ -10,7 +10,7 @@ import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
 import com.sparta.shop_sparta.order.repository.OrderDetailRepository;
-import com.sparta.shop_sparta.product.service.CustomerProductService;
+import com.sparta.shop_sparta.product.service.ProductService;
 import com.sparta.shop_sparta.product.service.StockService;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class OrderDetailService {
-    private final CustomerProductService productService;
+    private final ProductService customerProductService;
     private final OrderDetailRepository orderDetailRepository;
     private final StockService stockService;
 
@@ -80,7 +80,7 @@ public class OrderDetailService {
         CompletableFuture.runAsync(() -> {
             for (OrderDetailDto orderDetailDto : orderDetailDtoList){
                 OrderEntity orderEntity = OrderEntity.builder().orderId(orderDetailDto.getOrderId()).build();
-                ProductEntity productEntity = productService.getProductEntity(orderDetailDto.getProductDto().getProductId());
+                ProductEntity productEntity = customerProductService.getProductEntity(orderDetailDto.getProductDto().getProductId());
 
                 orderDetailRepository.save(
                         OrderDetailEntity.builder()
@@ -119,7 +119,7 @@ public class OrderDetailService {
 
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
             OrderDetailDto orderDetailDto = orderDetailEntity.toDto();
-            orderDetailDto.setProductDto(productService.getProductDto(orderDetailEntity.getProductEntity()));
+            orderDetailDto.setProductDto(customerProductService.getProductDto(orderDetailEntity.getProductEntity()));
 
             orderDetailDtoList.add(orderDetailDto);
         }
@@ -133,7 +133,7 @@ public class OrderDetailService {
 
         for (OrderDetailEntity orderDetailEntity : orderDetailEntities) {
             OrderDetailDto orderDetailDto = orderDetailEntity.toDto();
-            orderDetailDto.setProductDto(productService.getProductDto(orderDetailEntity.getProductEntity()));
+            orderDetailDto.setProductDto(customerProductService.getProductDto(orderDetailEntity.getProductEntity()));
             orderDetailDtoList.add(orderDetailDto);
         }
 

@@ -14,6 +14,7 @@ import com.sparta.shop_sparta.member.domain.entity.MemberEntity;
 import com.sparta.shop_sparta.product.domain.entity.CategoryEntity;
 import com.sparta.shop_sparta.product.domain.entity.ProductEntity;
 import com.sparta.shop_sparta.product.domain.entity.StockEntity;
+import com.sparta.shop_sparta.product.repository.ProductRedisRepository;
 import com.sparta.shop_sparta.product.repository.ProductRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,10 @@ public class SellerProductService extends ProductService {
             ProductRepository productRepository,
             StockService stockService,
             CategoryService categoryService,
-            ReservationService reservationService
+            ReservationService reservationService,
+            ProductRedisRepository productRedisRepository
     ) {
-        super(productImageService, productRepository, stockService, reservationService);
+        super(productImageService, productRepository, stockService, reservationService, productRedisRepository);
         this.categoryService = categoryService;
     }
 

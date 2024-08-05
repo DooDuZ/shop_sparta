@@ -14,7 +14,7 @@ import com.sparta.shop_sparta.order.domain.entity.OrderDetailEntity;
 import com.sparta.shop_sparta.order.domain.entity.OrderEntity;
 import com.sparta.shop_sparta.order.repository.OrderRepository;
 import com.sparta.shop_sparta.cart.service.CartService;
-import com.sparta.shop_sparta.product.service.CustomerProductService;
+import com.sparta.shop_sparta.product.service.ProductService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -38,7 +38,7 @@ public class OrderService {
     private final OrderDetailService orderDetailService;
     private final PaymentService paymentService;
     private final CartService cartService;
-    private final CustomerProductService customerProductService;
+    private final ProductService customerProductService;
 
     @Transactional
     public void createOrder(UserDetails userDetails, OrderRequestDto orderRequestDto) {

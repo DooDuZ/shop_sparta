@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CustomerProductService extends ProductService {
 
-    private final ProductRedisRepository productRedisRepository;
-
     @Autowired
     public CustomerProductService(
             ProductImageService productImageService,
@@ -30,36 +28,7 @@ public class CustomerProductService extends ProductService {
             ReservationService reservationService,
             ProductRedisRepository productRedisRepository
     ) {
-        super(productImageService, productRepository, stockService, reservationService);
-        this.productRedisRepository = productRedisRepository;
-    }
-
-    public ProductDto getProduct(Long productId) {
-        String key = String.valueOf(productId);
-
-        if (isCached(key)) {
-            return (ProductDto) productRedisRepository.find(key);
-        }
-
-        log.error(productId.toString() + "캐싱 안 됐어요");
-
-        ProductEntity productEntity = getProductEntity(productId);
-
-        // 공개되지 않았거나 숨김 처리된 상품이면 throw
-        ProductStatus productStatus = productEntity.getProductStatus();
-        if (productStatus == ProductStatus.NOT_PUBLISHED || productStatus == ProductStatus.SUSPENDED_SALE) {
-            throw new ProductException(ProductMessage.NOT_FOUND_PRODUCT);
-        }
-
-        ProductDto productDto = getProductDto(productEntity);
-        productDto.setAmount(0L);
-        productRedisRepository.cache(key, productDto);
-
-        return productDto;
-    }
-
-    private boolean isCached(String key) {
-        return productRedisRepository.hasKey(key);
+        super(productImageService, productRepository, stockService, reservationService, productRedisRepository);
     }
 
     // 모든 상품 찾기, 사용하지 않는 게 좋다.

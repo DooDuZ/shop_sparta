@@ -44,13 +44,7 @@ public class CartService {
         }
 
         // 상품 유효성 검증
-        ProductEntity productEntity = validateProduct(cartRequestDto.getProductId());
-        StockEntity stockEntity = stockService.getStockEntity(productEntity);
-
-        /* Todo 테스트를 위한 임시 주석
-        if(stockEntity.getAmount() < cartRequestDto.getAmount()){
-            throw new ProductException(ProductMessage.OUT_OF_STOCK);
-        }*/
+        validateProduct(cartRequestDto.getProductId());
 
         cartRedisRepository.saveWithDuration(
                 memberEntity.getMemberId(),
@@ -59,15 +53,15 @@ public class CartService {
         );
     }
 
-    private ProductEntity validateProduct(Long productId){
+    private ProductDto validateProduct(Long productId){
         // 조회 실패시 exception
-        ProductEntity productEntity = customerProductService.getProductEntity(productId);
+        ProductDto productDto = customerProductService.getProduct(productId);
 
-        if(productEntity.getProductStatus() != ProductStatus.ON_SALE){
+        if(productDto.getProductStatus() != ProductStatus.ON_SALE){
             throw new ProductException(ProductMessage.NOT_ON_SALE);
         }
 
-        return productEntity;
+        return productDto;
     }
 
     // client 입장에선 create 여부는 중요하지 않다
@@ -84,8 +78,12 @@ public class CartService {
             List<CartDetailResponseDto> cartDetailResponseDtoList = new ArrayList<>();
 
             for (ProductDto productDto : productDtoList) {
-                cartDetailResponseDtoList.add(CartDetailResponseDto.builder().productDto(productDto).amount(
-                        cartInfo.get(productDto.getProductId())).build());
+                cartDetailResponseDtoList.add(
+                        CartDetailResponseDto.builder()
+                                .productDto(productDto)
+                                .amount(cartInfo.get(productDto.getProductId()))
+                                .build()
+                );
             }
 
             cartDto.setCartDetails(cartDetailResponseDtoList);
